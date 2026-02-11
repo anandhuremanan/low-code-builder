@@ -56,14 +56,19 @@ export const BuilderLayout = () => {
 
             // Logic to determine parent.
             let parentId: string | null = null;
+            const shouldForceRootParent = type === 'Footer';
 
-            // If dropping on 'canvas-root', or if we default to root
-            if (over.id === 'canvas-root') {
+            if (shouldForceRootParent) {
                 parentId = 'root-container';
             } else {
-                // If over.id is NOT canvas-root, it means we dropped ON a container
-                // We trust over.id is the container ID
-                parentId = over.id as string;
+                // If dropping on 'canvas-root', or if we default to root
+                if (over.id === 'canvas-root') {
+                    parentId = 'root-container';
+                } else {
+                    // If over.id is NOT canvas-root, it means we dropped ON a container
+                    // We trust over.id is the container ID
+                    parentId = over.id as string;
+                }
             }
 
             if (parentId) {

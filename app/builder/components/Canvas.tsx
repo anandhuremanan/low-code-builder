@@ -84,6 +84,11 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
         e.stopPropagation();
         dispatch({ type: 'SELECT_NODE', payload: { id: node.id } });
     };
+    const handleSelectFromHandle = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dispatch({ type: 'SELECT_NODE', payload: { id: node.id } });
+    };
 
     const isSelected = state.selectedNodeId === node.id;
     const hasChildNodes = node.children.length > 0;
@@ -187,7 +192,7 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
             {...listeners}
             style={wrapperSizeStyle}
             className={clsx(
-                "relative transition-all duration-200 outline-none",
+                "group relative transition-all duration-200 outline-none",
                 isRoot ? "w-full" : "",
                 !isContainer ? "inline-block align-top" : "",
                 wrapperMarginClasses,
@@ -198,6 +203,25 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
             )}
         >
             <Component {...componentProps} />
+
+            {isContainer && (
+                <button
+                    type="button"
+                    onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
+                    onClick={handleSelectFromHandle}
+                    className={clsx(
+                        "absolute -top-2 -left-2 z-20 rounded border bg-white px-1.5 py-0.5 text-[10px] shadow-sm transition-opacity",
+                        isSelected
+                            ? "opacity-100 border-blue-500 text-blue-600"
+                            : "opacity-0 group-hover:opacity-100 border-gray-300 text-gray-600"
+                    )}
+                >
+                    {isRoot ? 'Root' : componentEntry.name}
+                </button>
+            )}
 
             {isSelected && !isRoot && (
                 <>
@@ -248,12 +272,12 @@ export const Canvas = () => {
     }[state.viewMode] || 'w-full max-w-6xl';
 
     return (
-        <div className="flex-1 h-full bg-gray-100 p-8 overflow-auto flex justify-center transition-all">
+        <div className="flex-1 h-full bg-gray-100 p-8 pb-16 overflow-auto flex items-start justify-center transition-all">
             <div
                 ref={setNodeRef}
                 className={clsx(
                     widthClass,
-                    "min-h-[80vh] bg-white shadow-sm transition-all duration-300 ease-in-out",
+                    "min-h-[80vh] mb-12 bg-white shadow-sm transition-all duration-300 ease-in-out",
                     isOver ? "bg-blue-50 ring-2 ring-blue-400" : ""
                 )}
             >
