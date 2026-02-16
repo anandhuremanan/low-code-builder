@@ -3,7 +3,7 @@ import { useBuilder } from '../context';
 import { Input } from '../../components/ui/Input';
 import { Typography } from '../../components/ui/Typography';
 import { X, Plus, Trash2 } from 'lucide-react';
-import { updateClass, getTailwindValue } from '../../lib/styleUtils';
+import { updateClass, getTailwindValue, getBorderValue, updateBorderClass, getEffectValue, updateEffectClass } from '../../lib/styleUtils';
 
 const TEXT_SIZE_CLASSES = new Set([
     'text-xs',
@@ -158,6 +158,21 @@ export const PropertiesPanel = () => {
         fontSize: '',
         textAlign: ''
     });
+    const [borderState, setBorderState] = useState({
+        radius: '',
+        width: '',
+        color: '',
+        style: ''
+    });
+    const [effectState, setEffectState] = useState({
+        shadow: '',
+        opacity: ''
+    });
+    const [dataGridProps, setDataGridProps] = useState({
+        apiUrl: '',
+        columns: [] as any[]
+    });
+
     const [textTypography, setTextTypography] = useState<{
         element: TextElementValue;
         format: TextFormatValue;
@@ -181,6 +196,22 @@ export const PropertiesPanel = () => {
                 fontSize: extractTokenFromClass(className, TEXT_SIZE_CLASSES),
                 textAlign: extractTokenFromClass(className, TEXT_ALIGN_CLASSES)
             });
+            setBorderState({
+                radius: getBorderValue(className, 'radius'),
+                width: getBorderValue(className, 'width'),
+                color: getBorderValue(className, 'color'),
+                style: getBorderValue(className, 'style')
+            });
+            setEffectState({
+                shadow: getEffectValue(className, 'shadow'),
+                opacity: getEffectValue(className, 'opacity')
+            });
+            if (selectedNode.type === 'DataGrid') {
+                setDataGridProps({
+                    apiUrl: selectedNode.props.apiUrl || '',
+                    columns: selectedNode.props.columns || []
+                });
+            }
             const variant = selectedNode.props?.variant || 'body1';
             const style = selectedNode.props?.style || {};
             const currentFormat: TextFormatValue = style.fontStyle === 'italic'
@@ -510,8 +541,64 @@ export const PropertiesPanel = () => {
         handleChange('options', options);
     };
 
+    // Border & Effect Handlers
+    const handleBorderChange = (field: 'radius' | 'width' | 'color' | 'style', value: string) => {
+        setBorderState(prev => ({ ...prev, [field]: value }));
+        const currentClass = localProps.className || '';
+        const newClass = updateBorderClass(currentClass, field, value);
+
+        const nextProps = { ...localProps, className: newClass };
+        setLocalProps(nextProps);
+        dispatch({
+            type: 'UPDATE_NODE',
+            payload: { id: selectedNode.id, props: nextProps }
+        });
+    };
+
+    const handleEffectChange = (field: 'shadow' | 'opacity', value: string) => {
+        setEffectState(prev => ({ ...prev, [field]: value }));
+        const currentClass = localProps.className || '';
+        const newClass = updateEffectClass(currentClass, field, value);
+
+        const nextProps = { ...localProps, className: newClass };
+        setLocalProps(nextProps);
+        dispatch({
+            type: 'UPDATE_NODE',
+            payload: { id: selectedNode.id, props: nextProps }
+        });
+    };
+
+    // Data Grid Handlers
+    const handleDataGridChange = (key: 'apiUrl' | 'columns', value: any) => {
+        setDataGridProps(prev => ({ ...prev, [key]: value }));
+        const nextProps = { ...localProps, [key]: value };
+        setLocalProps(nextProps);
+        dispatch({
+            type: 'UPDATE_NODE',
+            payload: { id: selectedNode.id, props: nextProps }
+        });
+    };
+
+    const addDataGridColumn = () => {
+        const columns = [...(dataGridProps.columns || [])];
+        columns.push({ field: 'newField', headerName: 'New Column', width: 150 });
+        handleDataGridChange('columns', columns);
+    };
+
+    const updateDataGridColumn = (index: number, key: string, val: any) => {
+        const columns = [...(dataGridProps.columns || [])];
+        columns[index] = { ...columns[index], [key]: val };
+        handleDataGridChange('columns', columns);
+    };
+
+    const removeDataGridColumn = (index: number) => {
+        const columns = [...(dataGridProps.columns || [])];
+        columns.splice(index, 1);
+        handleDataGridChange('columns', columns);
+    };
+
     return (
-        <div className="w-80 h-full bg-white border-l border-gray-200 flex flex-col">
+        <div className="w-80 h-full bg-white border-l border-gray-200 flex flex-col" >
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
                 <Typography variant="h6" className="font-semibold">
                     Properties
@@ -569,6 +656,119 @@ export const PropertiesPanel = () => {
                                 value={styles.margin}
                                 onChange={(e) => handleStyleChange('margin', 'm-', e.target.value)}
                             />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Borders Section */}
+                <div className="space-y-3">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Borders</label>
+                    <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Radius</label>
+                            <select
+                                className="w-full text-sm border rounded p-1"
+                                value={borderState.radius}
+                                onChange={(e) => handleBorderChange('radius', e.target.value)}
+                            >
+                                <option value="">None</option>
+                                <option value="rounded-sm">Small</option>
+                                <option value="rounded">Normal</option>
+                                <option value="rounded-md">Medium</option>
+                                <option value="rounded-lg">Large</option>
+                                <option value="rounded-xl">XL</option>
+                                <option value="rounded-2xl">2XL</option>
+                                <option value="rounded-full">Full</option>
+                            </select>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Width</label>
+                            <select
+                                className="w-full text-sm border rounded p-1"
+                                value={borderState.width}
+                                onChange={(e) => handleBorderChange('width', e.target.value)}
+                            >
+                                <option value="">None</option>
+                                <option value="border">1px</option>
+                                <option value="border-2">2px</option>
+                                <option value="border-4">4px</option>
+                                <option value="border-8">8px</option>
+                            </select>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Color</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="color"
+                                    // Extract hex from class if possible, or default
+                                    // This is hard with tailwind classes unless we have a map.
+                                    // For now just let them type or pick from a limited set.
+                                    // Let's use a text input for class for now, or a simple color picker that sets arbitrary style?
+                                    // Actually we are setting tailwind classes like border-red-500.
+                                    // Let's simplified input for now:
+                                    disabled
+                                    className="h-8 w-8 rounded border border-gray-300 bg-gray-100 p-1 cursor-not-allowed"
+                                />
+                                <Input
+                                    size="small"
+                                    placeholder="border-gray-300"
+                                    value={borderState.color}
+                                    onChange={(e) => handleBorderChange('color', e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Style</label>
+                            <select
+                                className="w-full text-sm border rounded p-1"
+                                value={borderState.style}
+                                onChange={(e) => handleBorderChange('style', e.target.value)}
+                            >
+                                <option value="">Solid</option>
+                                <option value="border-dashed">Dashed</option>
+                                <option value="border-dotted">Dotted</option>
+                                <option value="border-double">Double</option>
+                                <option value="border-none">None</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Effects Section */}
+                <div className="space-y-3">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Effects</label>
+                    <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Shadow</label>
+                            <select
+                                className="w-full text-sm border rounded p-1"
+                                value={effectState.shadow}
+                                onChange={(e) => handleEffectChange('shadow', e.target.value)}
+                            >
+                                <option value="">None</option>
+                                <option value="shadow-sm">Small</option>
+                                <option value="shadow">Normal</option>
+                                <option value="shadow-md">Medium</option>
+                                <option value="shadow-lg">Large</option>
+                                <option value="shadow-xl">XL</option>
+                                <option value="shadow-2xl">2XL</option>
+                                <option value="shadow-inner">Inner</option>
+                            </select>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Opacity</label>
+                            <select
+                                className="w-full text-sm border rounded p-1"
+                                value={effectState.opacity}
+                                onChange={(e) => handleEffectChange('opacity', e.target.value)}
+                            >
+                                <option value="">100%</option>
+                                <option value="opacity-90">90%</option>
+                                <option value="opacity-75">75%</option>
+                                <option value="opacity-50">50%</option>
+                                <option value="opacity-25">25%</option>
+                                <option value="opacity-0">0%</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -992,6 +1192,69 @@ export const PropertiesPanel = () => {
                     )}
                 </div>
 
+                {/* Data Grid Section */}
+                {selectedNode.type === 'DataGrid' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Data Grid</label>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">API URL</label>
+                            <Input
+                                size="small"
+                                value={dataGridProps.apiUrl}
+                                placeholder="https://api.example.com/data"
+                                onChange={(e) => handleDataGridChange('apiUrl', e.target.value)}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <label className="text-xs text-gray-400">Columns</label>
+                                <button onClick={addDataGridColumn} className="text-blue-500 hover:text-blue-600">
+                                    <Plus size={14} />
+                                </button>
+                            </div>
+                            <div className="space-y-2">
+                                {dataGridProps.columns.map((col: any, idx: number) => (
+                                    <div key={idx} className="rounded border border-gray-100 p-2 space-y-2">
+                                        <div className="flex items-center gap-1">
+                                            <Input
+                                                size="small"
+                                                placeholder="Header Name"
+                                                value={col.headerName}
+                                                onChange={(e) => updateDataGridColumn(idx, 'headerName', e.target.value)}
+                                            />
+                                            <button onClick={() => removeDataGridColumn(idx)} className="text-red-400 hover:text-red-600">
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div className="space-y-1">
+                                                <label className="text-[10px] text-gray-400">Field Key</label>
+                                                <Input
+                                                    size="small"
+                                                    placeholder="fieldKey"
+                                                    value={col.field}
+                                                    onChange={(e) => updateDataGridColumn(idx, 'field', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[10px] text-gray-400">Width</label>
+                                                <Input
+                                                    size="small"
+                                                    type="number"
+                                                    placeholder="150"
+                                                    value={col.width}
+                                                    onChange={(e) => updateDataGridColumn(idx, 'width', Number(e.target.value))}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
 
                 <div className="border-t border-gray-200 pt-4 mt-8">
                     <button
@@ -1002,6 +1265,6 @@ export const PropertiesPanel = () => {
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };

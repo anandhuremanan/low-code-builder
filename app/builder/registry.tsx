@@ -7,7 +7,8 @@ import {
     TextCursorInput as InputIcon,
     List as SelectIcon,
     CheckSquare as CheckboxIcon,
-    Layout as ContainerIcon
+    Layout as ContainerIcon,
+    Table as TableIcon
 } from 'lucide-react';
 import { type RegisteredComponent, type ComponentType } from './types';
 
@@ -18,6 +19,7 @@ import { Select } from '../components/ui/Select';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Box } from '../components/ui/Box';
 import { Typography } from '../components/ui/Typography';
+import { DataGrid } from './components/DataGrid';
 import { Container } from './components/Container';
 
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
@@ -159,7 +161,6 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             label: 'Check me',
         },
     },
-    // Placeholder for other types if needed
     Image: {
         name: 'Image',
         icon: BoxIcon, // Default icon
@@ -173,6 +174,21 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         defaultProps: {
             placeholder: 'Enter long text...',
             className: ''
+        }
+    },
+    DataGrid: {
+        name: 'DataGrid',
+        icon: TableIcon,
+        component: DataGrid,
+        defaultProps: {
+            className: '',
+            apiUrl: '',
+            columns: [
+                { field: 'id', headerName: 'ID', width: 70 },
+                { field: 'firstName', headerName: 'First name', width: 130 },
+                { field: 'lastName', headerName: 'Last name', width: 130 },
+            ],
+            style: { width: '100%', height: '400px' }
         }
     }
 };

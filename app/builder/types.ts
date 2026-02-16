@@ -11,7 +11,8 @@ export type ComponentType =
   | "Image"
   | "Select"
   | "Checkbox"
-  | "Textarea";
+  | "Textarea"
+  | "DataGrid";
 
 export type ComponentNode = {
   id: string;

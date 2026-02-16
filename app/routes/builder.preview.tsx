@@ -7,6 +7,7 @@ import { Select } from '../components/ui/Select';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
 import { type ComponentNode, type Page } from '../builder/types';
+import { DataGrid } from '../builder/components/DataGrid';
 
 const PREVIEW_STORAGE_KEY = 'builder-preview-site';
 
@@ -165,8 +166,28 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                     placeholder={node.props.placeholder}
                 />
             );
+
+
+        case 'Textarea':
+            return (
+                <textarea
+                    className={node.props.className || 'border p-2 rounded w-full'}
+                    style={node.props.style}
+                    placeholder={node.props.placeholder}
+                />
+            );
+        case 'DataGrid':
+            return (
+                <DataGrid
+                    {...node.props}
+                    isPreview={true}
+                    className={node.props.className}
+                    style={node.props.style}
+                />
+            );
         default:
             return null;
+
     }
 };
 
