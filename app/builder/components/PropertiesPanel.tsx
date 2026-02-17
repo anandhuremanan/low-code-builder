@@ -908,6 +908,25 @@ export const PropertiesPanel = () => {
                                 </div>
                             </div>
                         </div>
+                        <div className="space-y-1 pt-2 border-t border-gray-100">
+                            <label className="text-xs text-gray-400">Button Icon</label>
+                            <div className="grid grid-cols-[2fr_1fr] gap-2">
+                                <Input
+                                    size="small"
+                                    placeholder="icon name"
+                                    value={localProps.icon || ''}
+                                    onChange={(e) => handleChange('icon', e.target.value)}
+                                />
+                                <select
+                                    className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                                    value={localProps.iconPos || 'start'}
+                                    onChange={(e) => handleChange('iconPos', e.target.value)}
+                                >
+                                    <option value="start">Start</option>
+                                    <option value="end">End</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -1255,6 +1274,83 @@ export const PropertiesPanel = () => {
                     </div>
                 )}
 
+                {/* Material Icon Section */}
+                {selectedNode.type === 'MaterialIcon' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Icon Settings</label>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Icon Name</label>
+                            <Input
+                                size="small"
+                                value={localProps.icon || ''}
+                                placeholder="home, settings, favorite..."
+                                onChange={(e) => handleChange('icon', e.target.value)}
+                            />
+                            <p className="text-[10px] text-gray-400">
+                                See <a href="https://fonts.google.com/icons" target="_blank" rel="noreferrer" className="text-blue-500 underline">Material Icons</a>
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Size</label>
+                                <Input
+                                    size="small"
+                                    value={localProps.style?.fontSize || ''}
+                                    placeholder="40px"
+                                    onChange={(e) => handleNodeStyleChange('fontSize', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Color</label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="color"
+                                        value={localProps.style?.color || '#000000'}
+                                        onChange={(e) => handleNodeStyleChange('color', e.target.value)}
+                                        className="h-8 w-12 rounded border border-gray-300 bg-white p-1 cursor-pointer"
+                                    />
+                                    <Input
+                                        size="small"
+                                        value={localProps.style?.color || '#000000'}
+                                        onChange={(e) => handleNodeStyleChange('color', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+
+                {/* Date Picker Section */}
+                {selectedNode.type === 'DatePicker' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Date Picker</label>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Label</label>
+                            <Input
+                                size="small"
+                                value={localProps.label || ''}
+                                onChange={(e) => handleChange('label', e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Helper Text</label>
+                            <Input
+                                size="small"
+                                value={localProps.helperText || ''}
+                                onChange={(e) => handleChange('helperText', e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Form Name</label>
+                            <Input
+                                size="small"
+                                value={localProps.name || ''}
+                                onChange={(e) => handleChange('name', e.target.value)}
+                            />
+                        </div>
+                    </div>
+                )}
 
                 <div className="border-t border-gray-200 pt-4 mt-8">
                     <button

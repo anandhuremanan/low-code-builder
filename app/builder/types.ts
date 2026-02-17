@@ -12,7 +12,9 @@ export type ComponentType =
   | "Select"
   | "Checkbox"
   | "Textarea"
-  | "DataGrid";
+  | "DataGrid"
+  | "MaterialIcon"
+  | "DatePicker";
 
 export type ComponentNode = {
   id: string;

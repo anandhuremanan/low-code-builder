@@ -8,7 +8,9 @@ import {
     List as SelectIcon,
     CheckSquare as CheckboxIcon,
     Layout as ContainerIcon,
-    Table as TableIcon
+    Table as TableIcon,
+    Star as StarIcon,
+    Calendar as CalendarIcon
 } from 'lucide-react';
 import { type RegisteredComponent, type ComponentType } from './types';
 
@@ -21,6 +23,8 @@ import { Box } from '../components/ui/Box';
 import { Typography } from '../components/ui/Typography';
 import { DataGrid } from './components/DataGrid';
 import { Container } from './components/Container';
+import { MaterialIcon } from './components/MaterialIcon';
+import { DatePicker } from './components/DatePicker';
 
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Container: {
@@ -28,7 +32,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         icon: ContainerIcon,
         component: Container,
         defaultProps: {
-            className: 'p-4 border border-dashed border-gray-300 min-h-[100px] w-full',
+            className: 'p-4 border border-dashed border-gray-300 w-full',
         },
     },
     Header: {
@@ -115,6 +119,8 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             children: 'Button',
             variant: 'contained',
             className: '',
+            icon: '',
+            iconPos: 'start'
         },
     },
     Input: {
@@ -189,6 +195,26 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
                 { field: 'lastName', headerName: 'Last name', width: 130 },
             ],
             style: { width: '100%', height: '400px' }
+        }
+    },
+    MaterialIcon: {
+        name: 'MaterialIcon',
+        icon: StarIcon,
+        component: MaterialIcon,
+        defaultProps: {
+            icon: 'home',
+            className: 'text-gray-800 text-4xl',
+            style: { fontSize: '40px' }
+        }
+    },
+    DatePicker: {
+        name: 'DatePicker',
+        icon: CalendarIcon,
+        component: DatePicker,
+        defaultProps: {
+            label: 'Select Date',
+            className: '',
+            helperText: ''
         }
     }
 };
