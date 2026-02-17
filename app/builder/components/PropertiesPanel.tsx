@@ -608,7 +608,53 @@ export const PropertiesPanel = () => {
                 </div>
             </div>
 
+
             <div className="p-4 flex-1 overflow-y-auto space-y-6">
+
+                {/* Input Settings */}
+                {selectedNode.type === 'Input' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Input Settings</label>
+                        <div className="space-y-2">
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Label</label>
+                                <Input
+                                    size="small"
+                                    value={localProps.label || ''}
+                                    onChange={(e) => handleChange('label', e.target.value)}
+                                    placeholder="Input Label"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Type</label>
+                                <select
+                                    className="w-full text-sm border rounded p-1"
+                                    value={localProps.type || 'text'}
+                                    onChange={(e) => handleChange('type', e.target.value)}
+                                >
+                                    <option value="text">Text</option>
+                                    <option value="email">Email</option>
+                                    <option value="password">Password</option>
+                                    <option value="number">Number</option>
+                                    <option value="tel">Telephone</option>
+                                    <option value="url">URL</option>
+                                    <option value="date">Date</option>
+                                    <option value="search">Search</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Placeholder</label>
+                                <Input
+                                    size="small"
+                                    value={localProps.placeholder || ''}
+                                    onChange={(e) => handleChange('placeholder', e.target.value)}
+                                    placeholder="Placeholder text"
+                                />
+                            </div>
+                        </div>
+                        <div className="h-px bg-gray-200 my-4" />
+                    </div>
+                )}
 
                 {/* Layout Section */}
                 <div className="space-y-3">
@@ -1167,20 +1213,10 @@ export const PropertiesPanel = () => {
                         </div>
                     )}
 
-                    {/* Input Placeholder */}
-                    {selectedNode.type === 'Input' && (
-                        <div className="space-y-1">
-                            <label className="text-xs text-gray-400">Placeholder</label>
-                            <Input
-                                size="small"
-                                value={localProps.placeholder || ''}
-                                onChange={(e) => handleChange('placeholder', e.target.value)}
-                            />
-                        </div>
-                    )}
+
 
                     {/* Select Options */}
-                    {selectedNode.type === 'Select' && (
+                    {(selectedNode.type === 'Select' || selectedNode.type === 'MultiSelect') && (
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
                                 <label className="text-xs text-gray-400">Options</label>
@@ -1320,6 +1356,21 @@ export const PropertiesPanel = () => {
                     </div>
                 )}
 
+
+                {/* Select / MultiSelect Settings */}
+                {(selectedNode.type === 'Select' || selectedNode.type === 'MultiSelect') && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Field Settings</label>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Label</label>
+                            <Input
+                                size="small"
+                                value={localProps.label || ''}
+                                onChange={(e) => handleChange('label', e.target.value)}
+                            />
+                        </div>
+                    </div>
+                )}
 
                 {/* Date Picker Section */}
                 {selectedNode.type === 'DatePicker' && (

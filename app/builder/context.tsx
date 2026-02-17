@@ -1,10 +1,14 @@
 
 import React, { createContext, useContext, useReducer, type ReactNode } from 'react';
 import { type ComponentNode, type Page } from './types';
-// import { v4 as uuidv4 } from 'uuid'; // Removed as we use custom generator
 
 // Simple ID generator if we don't want to add another dependency
 const generateId = () => Math.random().toString(36).substr(2, 9);
+
+type HistoryState = {
+    past: { pages: Page[]; currentPageId: string | null }[];
+    future: { pages: Page[]; currentPageId: string | null }[];
+};
 
 type BuilderState = {
     pages: Page[];
@@ -12,6 +16,7 @@ type BuilderState = {
     selectedNodeId: string | null;
     draggedComponentType: string | null; // For sidebar drag
     viewMode: 'desktop' | 'tablet' | 'mobile';
+    history: HistoryState;
 };
 
 type Action =
@@ -23,7 +28,9 @@ type Action =
     | { type: 'SET_DRAGGED_COMPONENT'; payload: { type: string | null } }
     | { type: 'ADD_PAGE'; payload: { name: string } }
     | { type: 'SWITCH_PAGE'; payload: { id: string } }
-    | { type: 'MOVE_NODE'; payload: { nodeId: string; newParentId: string | null; index: number } };
+    | { type: 'MOVE_NODE'; payload: { nodeId: string; newParentId: string | null; index: number } }
+    | { type: 'UNDO' }
+    | { type: 'REDO' };
 
 const initialState: BuilderState = {
     pages: [
@@ -44,7 +51,11 @@ const initialState: BuilderState = {
     currentPageId: "home",
     selectedNodeId: null,
     draggedComponentType: null,
-    viewMode: 'desktop'
+    viewMode: 'desktop',
+    history: {
+        past: [],
+        future: []
+    }
 };
 
 const findNode = (nodes: ComponentNode[], id: string): ComponentNode | null => {
@@ -71,11 +82,6 @@ const updateNodeInTree = (nodes: ComponentNode[], id: string, updater: (node: Co
 
 const addNodeToParent = (nodes: ComponentNode[], parentId: string | null, newNode: ComponentNode): ComponentNode[] => {
     if (parentId === null) {
-        // Add to root level if not supported, but usually roots are inside a page container ? 
-        // Actually Page.nodes is the root list.
-        // If we want to add to root, we just push to the array.
-        // But typically we might have a strict root.
-        // For now let's assume we can add to root array.
         return [...nodes, newNode];
     }
     return nodes.map((node) => {
@@ -156,11 +162,58 @@ const removeNodeFromTree = (nodes: ComponentNode[], nodeId: string): ComponentNo
 };
 // End: Helper
 
+const pushToHistory = (state: BuilderState): HistoryState => {
+    const { pages, currentPageId } = state;
+    const newPast = [
+        ...state.history.past,
+        { pages, currentPageId }
+    ];
+    // Optional: Limit history size
+    if (newPast.length > 50) newPast.shift();
+
+    return {
+        past: newPast,
+        future: []
+    };
+};
+
 const builderReducer = (state: BuilderState, action: Action): BuilderState => {
     const currentPage = state.pages.find(p => p.id === state.currentPageId)!;
     const otherPages = state.pages.filter(p => p.id !== state.currentPageId);
 
     switch (action.type) {
+        case 'UNDO': {
+            if (state.history.past.length === 0) return state;
+            const previous = state.history.past[state.history.past.length - 1];
+            const newPast = state.history.past.slice(0, -1);
+
+            return {
+                ...state,
+                pages: previous.pages,
+                currentPageId: previous.currentPageId,
+                history: {
+                    past: newPast,
+                    future: [{ pages: state.pages, currentPageId: state.currentPageId }, ...state.history.future]
+                }
+            };
+        }
+
+        case 'REDO': {
+            if (state.history.future.length === 0) return state;
+            const next = state.history.future[0];
+            const newFuture = state.history.future.slice(1);
+
+            return {
+                ...state,
+                pages: next.pages,
+                currentPageId: next.currentPageId,
+                history: {
+                    past: [...state.history.past, { pages: state.pages, currentPageId: state.currentPageId }],
+                    future: newFuture
+                }
+            };
+        }
+
         case 'SET_VIEW_MODE':
             return { ...state, viewMode: action.payload.mode };
 
@@ -175,6 +228,7 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             const updatedNodes = addNodeToParent(currentPage.nodes, parentId, node);
             return {
                 ...state,
+                history: pushToHistory(state),
                 pages: [...otherPages, { ...currentPage, nodes: updatedNodes }]
             };
         }
@@ -184,11 +238,11 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             const updatedNodes = updateNodeInTree(currentPage.nodes, id, (node) => ({ ...node, props: { ...node.props, ...props } }));
             return {
                 ...state,
+                history: pushToHistory(state),
                 pages: [...otherPages, { ...currentPage, nodes: updatedNodes }]
             };
         }
 
-        // Simplistic move for now - just remove and add (losing original index if not careful, but dnd-kit handles sorting)
         case 'MOVE_NODE': {
             const { nodeId, newParentId, index } = action.payload;
 
@@ -216,6 +270,7 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
 
             return {
                 ...state,
+                history: pushToHistory(state),
                 pages: [...otherPages, { ...currentPage, nodes: updatedNodes }]
             };
         }
@@ -228,6 +283,7 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             return {
                 ...state,
                 selectedNodeId: state.selectedNodeId === id ? null : state.selectedNodeId,
+                history: pushToHistory(state),
                 pages: [...otherPages, { ...currentPage, nodes: updatedNodes }]
             };
         }
@@ -248,7 +304,12 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                     children: []
                 }]
             };
-            return { ...state, pages: [...state.pages, newPage], currentPageId: newPage.id };
+            return {
+                ...state,
+                history: pushToHistory(state),
+                pages: [...state.pages, newPage],
+                currentPageId: newPage.id
+            };
         }
 
         default:

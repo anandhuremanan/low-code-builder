@@ -4,6 +4,7 @@ import { Box } from '../components/ui/Box';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
+import { MultiSelect } from '../components/ui/MultiSelect';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
 import { type ComponentNode, type Page } from '../builder/types';
@@ -132,12 +133,20 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
             );
         case 'Input':
             return (
-                <Input
-                    className={node.props.className}
-                    style={node.props.style}
-                    placeholder={node.props.placeholder}
-                    size={node.props.size}
-                />
+                <div className="flex flex-col gap-1 w-full">
+                    {node.props.label && (
+                        <label className="text-sm font-medium text-gray-700">
+                            {node.props.label}
+                        </label>
+                    )}
+                    <Input
+                        className={node.props.className}
+                        style={node.props.style}
+                        placeholder={node.props.placeholder}
+                        size={node.props.size}
+                        type={node.props.type || 'text'}
+                    />
+                </div>
             );
         case 'Select':
             return (
@@ -147,6 +156,16 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                     options={node.props.options || []}
                     style={node.props.style}
                     defaultValue={node.props.options?.[0]?.value}
+                />
+            );
+        case 'MultiSelect':
+            return (
+                <MultiSelect
+                    className={node.props.className}
+                    label={node.props.label}
+                    options={node.props.options || []}
+                    style={node.props.style}
+                    value={node.props.value || []}
                 />
             );
         case 'Checkbox':

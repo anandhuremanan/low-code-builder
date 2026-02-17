@@ -14,7 +14,8 @@ export type ComponentType =
   | "Textarea"
   | "DataGrid"
   | "MaterialIcon"
-  | "DatePicker";
+  | "DatePicker"
+  | "MultiSelect";
 
 export type ComponentNode = {
   id: string;

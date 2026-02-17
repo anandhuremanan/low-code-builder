@@ -25,6 +25,7 @@ import { DataGrid } from './components/DataGrid';
 import { Container } from './components/Container';
 import { MaterialIcon } from './components/MaterialIcon';
 import { DatePicker } from './components/DatePicker';
+import { MultiSelect } from '../components/ui/MultiSelect';
 
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Container: {
@@ -126,8 +127,15 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Input: {
         name: 'Input',
         icon: InputIcon,
-        component: Input,
+        component: ({ label, type, ...props }: any) => (
+            <div className="flex flex-col gap-1 w-full">
+                {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
+                <Input {...props} type={type || 'text'} />
+            </div>
+        ),
         defaultProps: {
+            label: 'Input Label',
+            type: 'text',
             placeholder: 'Enter text...',
             className: '',
             fullWidth: false,
@@ -216,5 +224,23 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             className: '',
             helperText: ''
         }
+    },
+    MultiSelect: {
+        name: 'MultiSelect',
+        icon: SelectIcon,
+        component: ({ options, ...props }: any) => (
+            <MultiSelect {...props} options={options || []} />
+        ),
+        defaultProps: {
+            label: 'Multi Select',
+            className: '',
+            fullWidth: false,
+            options: [
+                { value: 'option1', label: 'Option 1' },
+                { value: 'option2', label: 'Option 2' },
+                { value: 'option3', label: 'Option 3' }
+            ],
+            value: []
+        },
     }
 };

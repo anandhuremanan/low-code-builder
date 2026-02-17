@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     DndContext,
     DragOverlay,
@@ -39,6 +39,33 @@ export const BuilderLayout = () => {
             dispatch({ type: 'SET_DRAGGED_COMPONENT', payload: { type } });
         }
     };
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Check if user is typing in an input/textarea to avoid triggering undo/redo
+            const target = e.target as HTMLElement;
+            if (['INPUT', 'TEXTAREA'].includes(target.tagName) || target.isContentEditable) {
+                return;
+            }
+
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'z') {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                        dispatch({ type: 'REDO' });
+                    } else {
+                        dispatch({ type: 'UNDO' });
+                    }
+                } else if (e.key === 'y') {
+                    e.preventDefault();
+                    dispatch({ type: 'REDO' });
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [dispatch]);
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
@@ -142,7 +169,23 @@ export const BuilderLayout = () => {
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="12" height="20" x="6" y="2" rx="2" /><path d="M12 18h.01" /></svg>
                             </button>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
+                            <div className="flex bg-gray-100 rounded-lg p-1 gap-1 mr-2">
+                                <button
+                                    onClick={() => dispatch({ type: 'UNDO' })}
+                                    className="p-1.5 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-200"
+                                    title="Undo (Ctrl+Z)"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6" /><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" /></svg>
+                                </button>
+                                <button
+                                    onClick={() => dispatch({ type: 'REDO' })}
+                                    className="p-1.5 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-200"
+                                    title="Redo (Ctrl+Y)"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 7v6h-6" /><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" /></svg>
+                                </button>
+                            </div>
                             <button
                                 onClick={handlePreview}
                                 className="text-sm border border-gray-300 px-3 py-1.5 rounded"
