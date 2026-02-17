@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "firstName": "Aarav",
+    "lastName": "Sharma",
+    "email": "aarav.sharma@example.com",
+    "age": 28,
+    "isActive": true,
+    "roles": ["user"],
+    "createdAt": "2024-01-15T10:23:00Z"
+  },
+  {
+    "id": 2,
+    "firstName": "Emma",
+    "lastName": "Johnson",
+    "email": "emma.johnson@example.com",
+    "age": 32,
+    "isActive": true,
+    "roles": ["admin"],
+    "createdAt": "2024-02-03T08:45:00Z"
+  },
+  {
+    "id": 3,
+    "firstName": "Liam",
+    "lastName": "Brown",
+    "email": "liam.brown@example.com",
+    "age": 24,
+    "isActive": false,
+    "roles": ["user"],
+    "createdAt": "2024-03-12T14:12:00Z"
+  },
+  {
+    "id": 4,
+    "firstName": "Olivia",
+    "lastName": "Davis",
+    "email": "olivia.davis@example.com",
+    "age": 29,
+    "isActive": true,
+    "roles": ["editor", "user"],
+    "createdAt": "2024-04-21T09:30:00Z"
+  },
+  {
+    "id": 5,
+    "firstName": "Noah",
+    "lastName": "Wilson",
+    "email": "noah.wilson@example.com",
+    "age": 35,
+    "isActive": true,
+    "roles": ["user"],
+    "createdAt": "2024-05-10T16:05:00Z"
+  },
+  {
+    "id": 6,
+    "firstName": "Ava",
+    "lastName": "Martinez",
+    "email": "ava.martinez@example.com",
+    "age": 27,
+    "isActive": false,
+    "roles": ["user"],
+    "createdAt": "2024-06-18T11:47:00Z"
+  },
+  {
+    "id": 7,
+    "firstName": "Ethan",
+    "lastName": "Anderson",
+    "email": "ethan.anderson@example.com",
+    "age": 31,
+    "isActive": true,
+    "roles": ["moderator"],
+    "createdAt": "2024-07-02T13:15:00Z"
+  },
+  {
+    "id": 8,
+    "firstName": "Sophia",
+    "lastName": "Thomas",
+    "email": "sophia.thomas@example.com",
+    "age": 26,
+    "isActive": true,
+    "roles": ["user"],
+    "createdAt": "2024-08-09T07:55:00Z"
+  },
+  {
+    "id": 9,
+    "firstName": "Mason",
+    "lastName": "Taylor",
+    "email": "mason.taylor@example.com",
+    "age": 30,
+    "isActive": false,
+    "roles": ["user"],
+    "createdAt": "2024-09-14T18:20:00Z"
+  },
+  {
+    "id": 10,
+    "firstName": "Isabella",
+    "lastName": "Moore",
+    "email": "isabella.moore@example.com",
+    "age": 33,
+    "isActive": true,
+    "roles": ["admin", "user"],
+    "createdAt": "2024-10-01T12:40:00Z"
+  }
+]
