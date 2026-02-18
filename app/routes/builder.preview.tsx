@@ -141,7 +141,10 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
             return (
                 <div className="flex flex-col gap-1 w-full">
                     {node.props.label && (
-                        <label className="text-sm font-medium text-gray-700">
+                        <label
+                            className="text-sm font-medium text-gray-700"
+                            style={node.props.labelColor ? { color: node.props.labelColor } : undefined}
+                        >
                             {node.props.label}
                         </label>
                     )}

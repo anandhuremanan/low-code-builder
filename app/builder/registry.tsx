@@ -175,14 +175,19 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Input: {
         name: 'Input',
         icon: InputIcon,
-        component: ({ label, type, ...props }: any) => (
+        component: ({ label, type, labelColor, ...props }: any) => (
             <div className="flex flex-col gap-1 w-full">
-                {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
+                {label && (
+                    <label className="text-sm font-medium text-gray-700" style={labelColor ? { color: labelColor } : undefined}>
+                        {label}
+                    </label>
+                )}
                 <Input {...props} type={type || 'text'} />
             </div>
         ),
         defaultProps: {
             label: 'Input Label',
+            labelColor: '#374151',
             type: 'text',
             placeholder: 'Enter text...',
             className: '',
@@ -230,7 +235,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             <img
                 src={src || "https://placehold.co/150"}
                 alt={alt || "placeholder"}
-                className={`max-w-full h-auto ${className || ''}`}
+                className={`max-w-full ${className || ''}`}
                 {...props}
             />
         ),

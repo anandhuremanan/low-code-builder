@@ -199,7 +199,7 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
             className={clsx(
                 "group relative transition-all duration-200 outline-none",
                 isRoot ? "w-full" : "",
-                !isContainer ? "inline-block align-top" : "",
+                !isContainer && node.type !== 'Image' ? "inline-block align-top" : "",
                 wrapperMarginClasses,
                 wrapperLayoutClasses,
                 isSelected ? "ring-2 ring-blue-500" : "hover:ring-1 hover:ring-blue-300",

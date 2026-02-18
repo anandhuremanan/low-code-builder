@@ -664,6 +664,38 @@ export const PropertiesPanel = () => {
                                     placeholder="Placeholder text"
                                 />
                             </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Background Color</label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="color"
+                                        value={localProps.style?.backgroundColor || '#ffffff'}
+                                        onChange={(e) => handleNodeStyleChange('backgroundColor', e.target.value)}
+                                        className="h-8 w-12 rounded border border-gray-300 bg-white p-1 cursor-pointer"
+                                    />
+                                    <Input
+                                        size="small"
+                                        value={localProps.style?.backgroundColor || '#ffffff'}
+                                        onChange={(e) => handleNodeStyleChange('backgroundColor', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Label Color</label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="color"
+                                        value={localProps.labelColor || '#374151'}
+                                        onChange={(e) => handleChange('labelColor', e.target.value)}
+                                        className="h-8 w-12 rounded border border-gray-300 bg-white p-1 cursor-pointer"
+                                    />
+                                    <Input
+                                        size="small"
+                                        value={localProps.labelColor || '#374151'}
+                                        onChange={(e) => handleChange('labelColor', e.target.value)}
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div className="h-px bg-gray-200 my-4" />
                     </div>

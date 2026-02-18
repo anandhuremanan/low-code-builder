@@ -36,7 +36,7 @@ export const Container = ({ node, children, className, ...props }: ContainerProp
             id: generateId(),
             type: 'Container',
             props: {
-                className: `p-4 min-h-[50px] border border-dashed border-gray-200 ${widthClass}`,
+                className: `min-h-[50px] border border-dashed border-gray-200 ${widthClass}`,
                 isColumn: true
             },
             children: []
@@ -131,7 +131,7 @@ export const Container = ({ node, children, className, ...props }: ContainerProp
                     </div>
                 </div>
             ) : isEmpty && isColumn ? (
-                <div className="min-h-[80px] flex items-center justify-center rounded border-2 border-dashed border-gray-300 text-xs text-gray-400">
+                <div className="h-full min-h-[80px] flex items-center justify-center rounded border-2 border-dashed border-gray-300 text-xs text-gray-400">
                     Drop widgets here
                 </div>
             ) : (
