@@ -298,7 +298,7 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                 name: action.payload.name,
                 slug: `/${action.payload.name.toLowerCase().replace(/\s+/g, '-')}`,
                 nodes: [{
-                    id: generateId(),
+                    id: 'root-container',
                     type: 'Container',
                     props: { className: "min-h-screen p-8 bg-white" },
                     children: []

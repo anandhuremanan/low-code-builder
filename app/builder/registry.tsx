@@ -39,7 +39,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Header: {
         name: 'Header',
         icon: ContainerIcon,
-        component: ({ brand, menuItems = [], ...props }: any) => (
+        component: ({ brand, menuItems = [], onNavigateToPageSlug, ...props }: any) => (
             <header
                 {...props}
                 className={`w-full px-6 py-4 bg-white border-b border-gray-200 ${props.className || ''}`}
@@ -50,12 +50,34 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
                         <ul className="flex items-center gap-6">
                             {menuItems.map((item: any) => (
                                 <li key={item.id} className="relative group text-sm text-gray-700">
-                                    <span>{item.label}</span>
+                                    <button
+                                        type="button"
+                                        className="hover:text-blue-600"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            if (item.pageSlug && onNavigateToPageSlug) {
+                                                onNavigateToPageSlug(item.pageSlug);
+                                            }
+                                        }}
+                                    >
+                                        {item.label}
+                                    </button>
                                     {item.children?.length > 0 && (
                                         <ul className="absolute left-0 top-full mt-2 hidden min-w-[180px] rounded-md border border-gray-200 bg-white p-2 shadow-md group-hover:block">
                                             {item.children.map((child: any) => (
                                                 <li key={child.id} className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
-                                                    {child.label}
+                                                    <button
+                                                        type="button"
+                                                        className="w-full text-left"
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            if (child.pageSlug && onNavigateToPageSlug) {
+                                                                onNavigateToPageSlug(child.pageSlug);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {child.label}
+                                                    </button>
                                                 </li>
                                             ))}
                                         </ul>
@@ -88,7 +110,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Footer: {
         name: 'Footer',
         icon: ContainerIcon,
-        component: ({ copyrightText, menuItems = [], ...props }: any) => (
+        component: ({ copyrightText, menuItems = [], onNavigateToPageSlug, ...props }: any) => (
             <footer
                 {...props}
                 className={`w-full px-6 py-5 bg-gray-900 text-white ${props.className || ''}`}
@@ -97,7 +119,20 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
                     <p className="text-sm text-gray-200">{copyrightText || '© 2026 My Site'}</p>
                     <ul className="flex items-center gap-4 text-sm text-gray-200">
                         {menuItems.map((item: any) => (
-                            <li key={item.id}>{item.label}</li>
+                            <li key={item.id}>
+                                <button
+                                    type="button"
+                                    className="hover:text-white"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        if (item.pageSlug && onNavigateToPageSlug) {
+                                            onNavigateToPageSlug(item.pageSlug);
+                                        }
+                                    }}
+                                >
+                                    {item.label}
+                                </button>
+                            </li>
                         ))}
                     </ul>
                 </div>
@@ -115,13 +150,26 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Button: {
         name: 'Button',
         icon: ButtonIcon,
-        component: Button,
+        component: ({ pageSlug, onNavigateToPageSlug, onClick, ...props }: any) => (
+            <Button
+                {...props}
+                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                    event.stopPropagation();
+                    if (pageSlug && onNavigateToPageSlug) {
+                        onNavigateToPageSlug(pageSlug);
+                        return;
+                    }
+                    onClick?.(event);
+                }}
+            />
+        ),
         defaultProps: {
             children: 'Button',
             variant: 'contained',
             className: '',
             icon: '',
-            iconPos: 'start'
+            iconPos: 'start',
+            pageSlug: ''
         },
     },
     Input: {

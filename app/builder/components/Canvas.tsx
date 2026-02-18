@@ -98,6 +98,11 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
         ...node.props,
         node
     };
+    componentProps.onNavigateToPageSlug = (pageSlug: string) => {
+        const targetPage = state.pages.find((page) => page.slug === pageSlug);
+        if (!targetPage) return;
+        dispatch({ type: 'SWITCH_PAGE', payload: { id: targetPage.id } });
+    };
     const wrapperMarginClasses = extractMarginClasses(node.props.className);
     const wrapperLayoutClasses = extractLayoutClasses(node.props.className);
     const wrapperSizeStyle = {

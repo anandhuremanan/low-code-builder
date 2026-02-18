@@ -119,7 +119,10 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                     {node.props.children}
                 </Typography>
             );
-        case 'Button':
+        case 'Button': {
+            const buttonHref = node.props.pageSlug
+                ? `/builder/preview?page=${encodeURIComponent(node.props.pageSlug)}`
+                : undefined;
             return (
                 <Button
                     className={node.props.className}
@@ -127,10 +130,13 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                     variant={node.props.variant}
                     icon={node.props.icon}
                     iconPos={node.props.iconPos}
+                    component={buttonHref ? 'a' : undefined}
+                    href={buttonHref}
                 >
                     {node.props.children}
                 </Button>
             );
+        }
         case 'Input':
             return (
                 <div className="flex flex-col gap-1 w-full">

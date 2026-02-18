@@ -970,8 +970,23 @@ export const PropertiesPanel = () => {
                                 >
                                     <option value="start">Start</option>
                                     <option value="end">End</option>
-                                </select>
+                                    </select>
+                                </div>
                             </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Link Page</label>
+                            <select
+                                className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                                value={localProps.pageSlug || ''}
+                                onChange={(e) => handleChange('pageSlug', e.target.value)}
+                            >
+                                <option value="">No Link</option>
+                                {pageOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                 )}
