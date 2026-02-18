@@ -226,7 +226,14 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Image: {
         name: 'Image',
         icon: BoxIcon, // Default icon
-        component: ({ src, alt, ...props }: any) => <img src={src || "https://placehold.co/150"} alt={alt || "placeholder"} {...props} className="max-w-full h-auto" />,
+        component: ({ src, alt, className, ...props }: any) => (
+            <img
+                src={src || "https://placehold.co/150"}
+                alt={alt || "placeholder"}
+                className={`max-w-full h-auto ${className || ''}`}
+                {...props}
+            />
+        ),
         defaultProps: {},
     },
     Textarea: {

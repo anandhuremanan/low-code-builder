@@ -27,7 +27,16 @@ const TEXT_ALIGN_CLASSES = new Set([
     'text-right',
     'text-justify',
     'text-start',
+    'text-start',
     'text-end'
+]);
+
+const OBJECT_FIT_CLASSES = new Set([
+    'object-contain',
+    'object-cover',
+    'object-fill',
+    'object-none',
+    'object-scale-down'
 ]);
 
 const extractTokenFromClass = (className: string, allowed: Set<string>): string => {
@@ -156,7 +165,8 @@ export const PropertiesPanel = () => {
         padding: '',
         margin: '',
         fontSize: '',
-        textAlign: ''
+        textAlign: '',
+        objectFit: ''
     });
     const [borderState, setBorderState] = useState({
         radius: '',
@@ -194,7 +204,8 @@ export const PropertiesPanel = () => {
                 padding: getTailwindValue(className, 'p-'),
                 margin: extractMarginToken(className),
                 fontSize: extractTokenFromClass(className, TEXT_SIZE_CLASSES),
-                textAlign: extractTokenFromClass(className, TEXT_ALIGN_CLASSES)
+                textAlign: extractTokenFromClass(className, TEXT_ALIGN_CLASSES),
+                objectFit: extractTokenFromClass(className, OBJECT_FIT_CLASSES)
             });
             setBorderState({
                 radius: getBorderValue(className, 'radius'),
@@ -257,7 +268,9 @@ export const PropertiesPanel = () => {
             ? replaceTokenInClass(currentClass, TEXT_SIZE_CLASSES, value)
             : field === 'textAlign'
                 ? replaceTokenInClass(currentClass, TEXT_ALIGN_CLASSES, value)
-                : updateClass(currentClass, prefix, value);
+                : field === 'objectFit'
+                    ? replaceTokenInClass(currentClass, OBJECT_FIT_CLASSES, value)
+                    : updateClass(currentClass, prefix, value);
 
         const nextProps: Record<string, any> = { className: newClass };
         if (field === 'margin') {
@@ -970,9 +983,9 @@ export const PropertiesPanel = () => {
                                 >
                                     <option value="start">Start</option>
                                     <option value="end">End</option>
-                                    </select>
-                                </div>
+                                </select>
                             </div>
+                        </div>
                         <div className="space-y-1">
                             <label className="text-xs text-gray-400">Link Page</label>
                             <select
@@ -1105,6 +1118,21 @@ export const PropertiesPanel = () => {
                                     onChange={(e) => handleImageSizeChange('height', e.target.value)}
                                 />
                             </div>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Object Fit</label>
+                            <select
+                                className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                                value={styles.objectFit || ''}
+                                onChange={(e) => handleStyleChange('objectFit', 'object-', e.target.value)}
+                            >
+                                <option value="">Default</option>
+                                <option value="object-contain">Contain</option>
+                                <option value="object-cover">Cover</option>
+                                <option value="object-fill">Fill</option>
+                                <option value="object-none">None</option>
+                                <option value="object-scale-down">Scale Down</option>
+                            </select>
                         </div>
                     </div>
                 )}
