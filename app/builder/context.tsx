@@ -21,7 +21,7 @@ type BuilderState = {
 
 type Action =
     | { type: 'SET_VIEW_MODE'; payload: { mode: 'desktop' | 'tablet' | 'mobile' } }
-    | { type: 'ADD_NODE'; payload: { parentId: string | null; node: ComponentNode } }
+    | { type: 'ADD_NODE'; payload: { parentId: string | null; node: ComponentNode; index?: number } }
     | { type: 'UPDATE_NODE'; payload: { id: string; props: Record<string, any> } }
     | { type: 'DELETE_NODE'; payload: { id: string } }
     | { type: 'SELECT_NODE'; payload: { id: string | null } }
@@ -224,8 +224,10 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             return { ...state, draggedComponentType: action.payload.type };
 
         case 'ADD_NODE': {
-            const { parentId, node } = action.payload;
-            const updatedNodes = addNodeToParent(currentPage.nodes, parentId, node);
+            const { parentId, node, index } = action.payload;
+            const updatedNodes = typeof index === 'number'
+                ? insertNodeToParent(currentPage.nodes, parentId, node, index)
+                : addNodeToParent(currentPage.nodes, parentId, node);
             return {
                 ...state,
                 history: pushToHistory(state),

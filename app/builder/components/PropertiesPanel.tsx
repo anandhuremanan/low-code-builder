@@ -610,6 +610,59 @@ export const PropertiesPanel = () => {
         handleDataGridChange('columns', columns);
     };
 
+    // Tabs Handlers
+    const getTabsItems = (): { label: string; id: string }[] => {
+        const items = localProps.items;
+        if (!Array.isArray(items)) return [];
+        return items as { label: string; id: string }[];
+    };
+
+    const updateTabsItems = (items: { label: string; id: string }[]) => {
+        const nextProps = { ...localProps, items };
+        setLocalProps(nextProps);
+        dispatch({
+            type: 'UPDATE_NODE',
+            payload: { id: selectedNode.id, props: { items } }
+        });
+    };
+
+    const addTabItem = () => {
+        const items = [...getTabsItems()];
+        items.push({
+            id: `tab-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            label: 'New Tab'
+        });
+        updateTabsItems(items);
+        // We also need to add a corresponding child container for the new tab?
+        // Tabs logic handles initialization on demand, so we don't strictly need to add it here.
+        // But if we want consistent UX, we could.
+        // For now, let's rely on Tabs.tsx "Initialize Content" button.
+    };
+
+    const removeTabItem = (index: number) => {
+        const items = [...getTabsItems()];
+        items.splice(index, 1);
+        updateTabsItems(items);
+
+        // We should also remove the corresponding child node if it exists?
+        // If we remove tab 1, child at index 1 becomes child for tab 2 (which becomes tab 1).
+        // This shifts content.
+        // Ideally we should remove the child at that index too.
+        if (selectedNode.children && selectedNode.children[index]) {
+            dispatch({
+                type: 'DELETE_NODE',
+                payload: { id: selectedNode.children[index].id }
+            });
+        }
+    };
+
+    const updateTabItem = (index: number, label: string) => {
+        const items = [...getTabsItems()];
+        if (!items[index]) return;
+        items[index] = { ...items[index], label };
+        updateTabsItems(items);
+    };
+
     return (
         <div className="w-80 h-full bg-white border-l border-gray-200 flex flex-col" >
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
@@ -623,6 +676,41 @@ export const PropertiesPanel = () => {
 
 
             <div className="p-4 flex-1 overflow-y-auto space-y-6">
+
+                {/* Tabs Settings */}
+                {selectedNode.type === 'Tabs' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Tabs Management</label>
+                        <div className="space-y-2">
+                            {getTabsItems().map((item, index) => (
+                                <div key={item.id || index} className="flex gap-2 items-center">
+                                    <Input
+                                        size="small"
+                                        value={item.label}
+                                        onChange={(e) => updateTabItem(index, e.target.value)}
+                                        placeholder="Tab Label"
+                                        className="flex-1"
+                                    />
+                                    <button
+                                        onClick={() => removeTabItem(index)}
+                                        className="text-gray-400 hover:text-red-500 p-1 rounded hover:bg-red-50"
+                                        disabled={getTabsItems().length <= 1}
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                            <button
+                                onClick={addTabItem}
+                                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium mt-2"
+                            >
+                                <Plus size={14} />
+                                Add Tab
+                            </button>
+                        </div>
+                        <div className="h-px bg-gray-200 my-4" />
+                    </div>
+                )}
 
                 {/* Input Settings */}
                 {selectedNode.type === 'Input' && (

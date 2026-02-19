@@ -23,6 +23,7 @@ import { Box } from '../components/ui/Box';
 import { Typography } from '../components/ui/Typography';
 import { DataGrid } from './components/DataGrid';
 import { Container } from './components/Container';
+import { Tabs } from './components/Tabs';
 import { MaterialIcon } from './components/MaterialIcon';
 import { DatePicker } from './components/DatePicker';
 import { MultiSelect } from '../components/ui/MultiSelect';
@@ -302,5 +303,18 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             ],
             value: []
         },
+    },
+    Tabs: {
+        name: 'Tabs',
+        icon: ContainerIcon,
+        component: Tabs,
+        defaultProps: {
+            items: [
+                { label: 'Tab 1', id: 'tab1' },
+                { label: 'Tab 2', id: 'tab2' }
+            ],
+            defaultValue: 0,
+            className: ''
+        }
     }
 };

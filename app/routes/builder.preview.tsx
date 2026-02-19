@@ -27,6 +27,11 @@ type MenuItem = {
     children?: MenuItem[];
 };
 
+type TabItem = {
+    id: string;
+    label: string;
+};
+
 const sanitizePreviewContainerClassName = (className?: string): string => {
     if (!className) return '';
     const tokens = className.split(/\s+/).filter(Boolean);
@@ -64,6 +69,50 @@ const PreviewMenu = ({ items }: { items: MenuItem[] }) => {
                 </li>
             ))}
         </ul>
+    );
+};
+
+const PreviewTabs = ({
+    items,
+    children,
+    className,
+    style,
+    defaultValue = 0
+}: {
+    items: TabItem[];
+    children: React.ReactNode;
+    className?: string;
+    style?: React.CSSProperties;
+    defaultValue?: number;
+}) => {
+    const safeDefaultIndex = Math.min(Math.max(defaultValue, 0), Math.max(items.length - 1, 0));
+    const [activeIndex, setActiveIndex] = useState(safeDefaultIndex);
+    const currentChildren = React.Children.toArray(children);
+    const activePanel = currentChildren[activeIndex] || null;
+
+    return (
+        <div className={className} style={style}>
+            <div className="border-b border-gray-200">
+                <div className="flex flex-wrap gap-1">
+                    {items.map((item, index) => (
+                        <button
+                            key={item.id || String(index)}
+                            type="button"
+                            onClick={() => setActiveIndex(index)}
+                            className={`px-4 py-2 text-sm border-b-2 transition-colors ${activeIndex === index
+                                ? 'border-blue-600 text-blue-700 font-medium'
+                                : 'border-transparent text-gray-600 hover:text-gray-900'
+                                }`}
+                        >
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+            <div className="pt-4">
+                {activePanel}
+            </div>
+        </div>
     );
 };
 
@@ -229,6 +278,17 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                     style={node.props.style}
                 />
             );
+        case 'Tabs':
+            return (
+                <PreviewTabs
+                    items={(node.props.items || []) as TabItem[]}
+                    defaultValue={node.props.defaultValue ?? 0}
+                    className={node.props.className}
+                    style={node.props.style}
+                >
+                    {childNodes}
+                </PreviewTabs>
+            );
         default:
             return null;
 
@@ -281,12 +341,6 @@ export default function BuilderPreviewPage() {
         return selectedPage.nodes.map((node) => <PreviewNode key={node.id} node={node} />);
     }, [selectedPage]);
 
-    const widthClass = {
-        desktop: 'w-full max-w-6xl',
-        tablet: 'w-[768px]',
-        mobile: 'w-[375px]'
-    }[site?.viewMode || 'desktop'] || 'w-full max-w-6xl';
-
     if (!selectedPage) {
         return (
             <div className="min-h-screen bg-gray-50 p-8">
@@ -301,10 +355,8 @@ export default function BuilderPreviewPage() {
     }
 
     return (
-        <div className="h-screen bg-gray-100 p-8 overflow-auto flex justify-center">
-            <div className={`${widthClass} min-h-[80vh] bg-white shadow-sm transition-all duration-300 ease-in-out`}>
-                {content}
-            </div>
+        <div className="min-h-screen w-full overflow-auto bg-white">
+            {content}
         </div>
     );
 }
