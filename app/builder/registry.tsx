@@ -7,11 +7,14 @@ import {
     TextCursorInput as InputIcon,
     List as SelectIcon,
     CheckSquare as CheckboxIcon,
+    ToggleLeft as SwitchIcon,
     Layout as ContainerIcon,
     Table as TableIcon,
     Star as StarIcon,
     Calendar as CalendarIcon,
-    ListOrdered as StepperIcon
+    ListOrdered as StepperIcon,
+    Clock3 as TimePickerIcon,
+    StarHalf as RatingIcon
 } from 'lucide-react';
 import { type RegisteredComponent, type ComponentType } from './types';
 
@@ -20,6 +23,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Checkbox } from '../components/ui/Checkbox';
+import { Switch as SwitchUI } from '../components/ui/Switch';
 import { Box } from '../components/ui/Box';
 import { Typography } from '../components/ui/Typography';
 import { DataGrid } from './components/DataGrid';
@@ -28,9 +32,12 @@ import { Group } from './components/Group';
 import { Tabs } from './components/Tabs';
 import { MaterialIcon } from './components/MaterialIcon';
 import { DatePicker } from './components/DatePicker';
+import { TimePicker } from './components/TimePicker';
+import { DateTimePicker } from './components/DateTimePicker';
 import { MultiSelect } from '../components/ui/MultiSelect';
 import { Stepper } from './components/Stepper';
 import { RadioGroup as RadioGroupUI } from '../components/ui/RadioGroup';
+import { Rating as RatingUI } from '../components/ui/Rating';
 
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Container: {
@@ -244,6 +251,17 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             label: 'Check me',
         },
     },
+    Switch: {
+        name: 'Switch',
+        icon: SwitchIcon,
+        component: SwitchUI,
+        defaultProps: {
+            label: 'Enable option',
+            checked: false,
+            size: 'medium',
+            className: ''
+        },
+    },
     RadioGroup: {
         name: 'RadioGroup',
         icon: SelectIcon,
@@ -258,6 +276,22 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             ],
             value: '',
             row: false,
+            className: ''
+        },
+    },
+    Rating: {
+        name: 'Rating',
+        icon: RatingIcon,
+        component: (props: any) => (
+            <RatingUI {...props} />
+        ),
+        defaultProps: {
+            label: 'Rate this',
+            value: 3,
+            max: 5,
+            precision: 1,
+            readOnly: false,
+            size: 'medium',
             className: ''
         },
     },
@@ -314,6 +348,26 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         component: DatePicker,
         defaultProps: {
             label: 'Select Date',
+            className: '',
+            helperText: ''
+        }
+    },
+    TimePicker: {
+        name: 'TimePicker',
+        icon: TimePickerIcon,
+        component: TimePicker,
+        defaultProps: {
+            label: 'Select Time',
+            className: '',
+            helperText: ''
+        }
+    },
+    DateTimePicker: {
+        name: 'DateTimePicker',
+        icon: CalendarIcon,
+        component: DateTimePicker,
+        defaultProps: {
+            label: 'Select Date & Time',
             className: '',
             helperText: ''
         }

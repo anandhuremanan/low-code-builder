@@ -1793,6 +1793,173 @@ export const PropertiesPanel = () => {
                     </div>
                 )}
 
+                {/* Time Picker Section */}
+                {selectedNode.type === 'TimePicker' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Time Picker</label>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Label</label>
+                            <Input
+                                size="small"
+                                value={localProps.label || ''}
+                                onChange={(e) => handleChange('label', e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Helper Text</label>
+                            <Input
+                                size="small"
+                                value={localProps.helperText || ''}
+                                onChange={(e) => handleChange('helperText', e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Form Name</label>
+                            <Input
+                                size="small"
+                                value={localProps.name || ''}
+                                onChange={(e) => handleChange('name', e.target.value)}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {/* Date Time Picker Section */}
+                {selectedNode.type === 'DateTimePicker' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Date Time Picker</label>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Label</label>
+                            <Input
+                                size="small"
+                                value={localProps.label || ''}
+                                onChange={(e) => handleChange('label', e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Helper Text</label>
+                            <Input
+                                size="small"
+                                value={localProps.helperText || ''}
+                                onChange={(e) => handleChange('helperText', e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Form Name</label>
+                            <Input
+                                size="small"
+                                value={localProps.name || ''}
+                                onChange={(e) => handleChange('name', e.target.value)}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {/* Switch Section */}
+                {selectedNode.type === 'Switch' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Switch</label>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Label</label>
+                            <Input
+                                size="small"
+                                value={localProps.label || ''}
+                                onChange={(e) => handleChange('label', e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Size</label>
+                            <select
+                                className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                                value={localProps.size || 'medium'}
+                                onChange={(e) => handleChange('size', e.target.value)}
+                            >
+                                <option value="small">Small</option>
+                                <option value="medium">Medium</option>
+                            </select>
+                        </div>
+                        <label className="flex items-center gap-2 text-xs text-gray-400">
+                            <input
+                                type="checkbox"
+                                checked={Boolean(localProps.checked)}
+                                onChange={(e) => handleChange('checked', e.target.checked)}
+                            />
+                            Checked
+                        </label>
+                    </div>
+                )}
+
+                {/* Rating Section */}
+                {selectedNode.type === 'Rating' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Rating</label>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Label</label>
+                            <Input
+                                size="small"
+                                value={localProps.label || ''}
+                                onChange={(e) => handleChange('label', e.target.value)}
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Value</label>
+                                <Input
+                                    size="small"
+                                    type="number"
+                                    inputProps={{ step: '0.5', min: 0 }}
+                                    value={localProps.value ?? 0}
+                                    onChange={(e) => handleChange('value', Number(e.target.value || 0))}
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Max</label>
+                                <Input
+                                    size="small"
+                                    type="number"
+                                    inputProps={{ step: '1', min: 1 }}
+                                    value={localProps.max ?? 5}
+                                    onChange={(e) => handleChange('max', Math.max(1, Number(e.target.value || 1)))}
+                                />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Precision</label>
+                                <select
+                                    className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                                    value={String(localProps.precision ?? 1)}
+                                    onChange={(e) => handleChange('precision', Number(e.target.value))}
+                                >
+                                    <option value="1">1</option>
+                                    <option value="0.5">0.5</option>
+                                    <option value="0.25">0.25</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Size</label>
+                                <select
+                                    className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                                    value={localProps.size || 'medium'}
+                                    onChange={(e) => handleChange('size', e.target.value)}
+                                >
+                                    <option value="small">Small</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="large">Large</option>
+                                </select>
+                            </div>
+                        </div>
+                        <label className="flex items-center gap-2 text-xs text-gray-400">
+                            <input
+                                type="checkbox"
+                                checked={Boolean(localProps.readOnly)}
+                                onChange={(e) => handleChange('readOnly', e.target.checked)}
+                            />
+                            Read only
+                        </label>
+                    </div>
+                )}
+
                 <div className="border-t border-gray-200 pt-4 mt-8">
                     <button
                         onClick={handleDelete}

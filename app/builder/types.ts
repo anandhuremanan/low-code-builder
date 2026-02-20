@@ -11,15 +11,19 @@ export type ComponentType =
   | "Image"
   | "Select"
   | "Checkbox"
+  | "Switch"
   | "Textarea"
   | "DataGrid"
   | "MaterialIcon"
   | "DatePicker"
+  | "TimePicker"
+  | "DateTimePicker"
   | "MultiSelect"
   | "Tabs"
   | "Stepper"
   | "Group"
-  | "RadioGroup";
+  | "RadioGroup"
+  | "Rating";
 
 export type ComponentNode = {
   id: string;

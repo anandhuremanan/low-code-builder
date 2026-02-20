@@ -6,6 +6,8 @@ import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { MultiSelect } from '../components/ui/MultiSelect';
 import { RadioGroup } from '../components/ui/RadioGroup';
+import { Rating } from '../components/ui/Rating';
+import { Switch } from '../components/ui/Switch';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
 import { type ComponentNode, type Page } from '../builder/types';
@@ -13,6 +15,8 @@ import { DataGrid } from '../builder/components/DataGrid';
 import { MaterialIcon } from '../builder/components/MaterialIcon';
 import { DatePicker } from '../builder/components/DatePicker';
 import { Stepper } from '../builder/components/Stepper';
+import { TimePicker } from '../builder/components/TimePicker';
+import { DateTimePicker } from '../builder/components/DateTimePicker';
 
 const PREVIEW_STORAGE_KEY = 'builder-preview-site';
 
@@ -153,6 +157,77 @@ const PreviewRadioGroupField = ({
     );
 };
 
+const PreviewRatingField = ({
+    className,
+    style,
+    label,
+    value,
+    max,
+    precision,
+    readOnly,
+    size
+}: {
+    className?: string;
+    style?: React.CSSProperties;
+    label?: string;
+    value?: number | null;
+    max?: number;
+    precision?: number;
+    readOnly?: boolean;
+    size?: 'small' | 'medium' | 'large';
+}) => {
+    const [selectedValue, setSelectedValue] = useState<number | null>(value ?? 0);
+
+    useEffect(() => {
+        setSelectedValue(value ?? 0);
+    }, [value]);
+
+    return (
+        <Rating
+            className={className}
+            style={style}
+            label={label}
+            value={selectedValue}
+            max={max ?? 5}
+            precision={precision ?? 1}
+            readOnly={Boolean(readOnly)}
+            size={size ?? 'medium'}
+            onChange={(nextValue) => setSelectedValue(nextValue)}
+        />
+    );
+};
+
+const PreviewSwitchField = ({
+    className,
+    style,
+    label,
+    checked,
+    size
+}: {
+    className?: string;
+    style?: React.CSSProperties;
+    label?: string;
+    checked?: boolean;
+    size?: 'small' | 'medium';
+}) => {
+    const [isChecked, setIsChecked] = useState(Boolean(checked));
+
+    useEffect(() => {
+        setIsChecked(Boolean(checked));
+    }, [checked]);
+
+    return (
+        <Switch
+            className={className}
+            style={style}
+            label={label}
+            size={size || 'medium'}
+            checked={isChecked}
+            onChange={(event) => setIsChecked(event.target.checked)}
+        />
+    );
+};
+
 const PreviewNode = ({ node }: { node: ComponentNode }) => {
     const childNodes = node.children.map((child) => <PreviewNode key={child.id} node={child} />);
     const menuItems = (node.props.menuItems || []) as MenuItem[];
@@ -274,12 +349,35 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                     row={node.props.row}
                 />
             );
+        case 'Rating':
+            return (
+                <PreviewRatingField
+                    className={node.props.className}
+                    style={node.props.style}
+                    label={node.props.label}
+                    value={node.props.value}
+                    max={node.props.max}
+                    precision={node.props.precision}
+                    readOnly={node.props.readOnly}
+                    size={node.props.size}
+                />
+            );
         case 'Checkbox':
             return (
                 <Checkbox
                     label={node.props.label}
                     className={node.props.className}
                     style={node.props.style}
+                />
+            );
+        case 'Switch':
+            return (
+                <PreviewSwitchField
+                    className={node.props.className}
+                    style={node.props.style}
+                    label={node.props.label}
+                    checked={node.props.checked}
+                    size={node.props.size}
                 />
             );
         case 'Image':
@@ -321,6 +419,22 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
         case 'DatePicker':
             return (
                 <DatePicker
+                    {...node.props}
+                    className={node.props.className}
+                    style={node.props.style}
+                />
+            );
+        case 'TimePicker':
+            return (
+                <TimePicker
+                    {...node.props}
+                    className={node.props.className}
+                    style={node.props.style}
+                />
+            );
+        case 'DateTimePicker':
+            return (
+                <DateTimePicker
                     {...node.props}
                     className={node.props.className}
                     style={node.props.style}

@@ -3,12 +3,20 @@ import { Switch as MuiSwitch, type SwitchProps, FormControlLabel } from '@mui/ma
 
 export interface CustomSwitchProps extends SwitchProps {
     label?: string;
+    className?: string;
+    style?: React.CSSProperties;
 }
 
-export const Switch: React.FC<CustomSwitchProps> = ({ label, ...props }) => {
+export const Switch: React.FC<CustomSwitchProps> = ({ label, className, style, checked, onChange, ...props }) => {
+    const switchProps = onChange
+        ? { checked, onChange }
+        : { defaultChecked: Boolean(checked) };
+
     return (
         <FormControlLabel
-            control={<MuiSwitch {...props} />}
+            className={className}
+            style={style}
+            control={<MuiSwitch {...props} {...switchProps} />}
             label={label || ''}
         />
     );
