@@ -44,7 +44,7 @@ export const BuilderLayout = () => {
         const handleKeyDown = (e: KeyboardEvent) => {
             // Check if user is typing in an input/textarea to avoid triggering undo/redo
             const target = e.target as HTMLElement;
-            if (['INPUT', 'TEXTAREA'].includes(target.tagName) || target.isContentEditable) {
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) {
                 return;
             }
 
@@ -60,12 +60,19 @@ export const BuilderLayout = () => {
                     e.preventDefault();
                     dispatch({ type: 'REDO' });
                 }
+                return;
+            }
+
+            if (e.key === 'Delete' && state.selectedNodeId && state.selectedNodeId !== 'root-container') {
+                e.preventDefault();
+                dispatch({ type: 'DELETE_NODE', payload: { id: state.selectedNodeId } });
+                dispatch({ type: 'SELECT_NODE', payload: { id: null } });
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [dispatch]);
+    }, [dispatch, state.selectedNodeId]);
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
