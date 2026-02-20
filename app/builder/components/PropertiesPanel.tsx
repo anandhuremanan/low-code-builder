@@ -663,6 +663,47 @@ export const PropertiesPanel = () => {
         updateTabsItems(items);
     };
 
+    // Stepper handlers
+    const getStepperItems = (): { label: string; optional?: boolean }[] => {
+        const steps = localProps.steps;
+        if (!Array.isArray(steps)) return [];
+        return steps as { label: string; optional?: boolean }[];
+    };
+
+    const updateStepperItems = (steps: { label: string; optional?: boolean }[]) => {
+        const nextProps = { ...localProps, steps };
+        setLocalProps(nextProps);
+        dispatch({
+            type: 'UPDATE_NODE',
+            payload: { id: selectedNode.id, props: { steps } }
+        });
+    };
+
+    const addStepperItem = () => {
+        const steps = [...getStepperItems()];
+        steps.push({
+            label: `Step ${steps.length + 1}`,
+            optional: false
+        });
+        updateStepperItems(steps);
+    };
+
+    const removeStepperItem = (index: number) => {
+        const steps = [...getStepperItems()];
+        steps.splice(index, 1);
+        updateStepperItems(steps);
+
+        const nextActiveStep = Math.max(0, Math.min(Number(localProps.activeStep || 0), steps.length));
+        handleChange('activeStep', nextActiveStep);
+    };
+
+    const updateStepperItem = (index: number, key: 'label' | 'optional', value: string | boolean) => {
+        const steps = [...getStepperItems()];
+        if (!steps[index]) return;
+        steps[index] = { ...steps[index], [key]: value };
+        updateStepperItems(steps);
+    };
+
     return (
         <div className="w-80 h-full bg-white border-l border-gray-200 flex flex-col" >
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
@@ -708,6 +749,172 @@ export const PropertiesPanel = () => {
                                 Add Tab
                             </button>
                         </div>
+                        <div className="h-px bg-gray-200 my-4" />
+                    </div>
+                )}
+
+                {/* Stepper Settings */}
+                {selectedNode.type === 'Stepper' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Stepper Settings</label>
+                        <div className="space-y-2">
+                            {getStepperItems().map((step, index) => (
+                                <div key={`${step.label}-${index}`} className="rounded border border-gray-200 p-2 space-y-2">
+                                    <div className="flex gap-2 items-center">
+                                        <Input
+                                            size="small"
+                                            value={step.label}
+                                            onChange={(e) => updateStepperItem(index, 'label', e.target.value)}
+                                            placeholder="Step label"
+                                            className="flex-1"
+                                        />
+                                        <button
+                                            onClick={() => removeStepperItem(index)}
+                                            className="text-gray-400 hover:text-red-500 p-1 rounded hover:bg-red-50"
+                                            disabled={getStepperItems().length <= 1}
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                    <label className="flex items-center gap-2 text-xs text-gray-500">
+                                        <input
+                                            type="checkbox"
+                                            checked={Boolean(step.optional)}
+                                            onChange={(e) => updateStepperItem(index, 'optional', e.target.checked)}
+                                        />
+                                        Optional step
+                                    </label>
+                                </div>
+                            ))}
+                            <button
+                                onClick={addStepperItem}
+                                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium mt-2"
+                            >
+                                <Plus size={14} />
+                                Add Step
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Active Step</label>
+                                <Input
+                                    size="small"
+                                    type="number"
+                                    value={localProps.activeStep ?? 0}
+                                    onChange={(e) => handleChange('activeStep', Number(e.target.value))}
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Orientation</label>
+                                <select
+                                    className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                                    value={localProps.orientation || 'horizontal'}
+                                    onChange={(e) => handleChange('orientation', e.target.value)}
+                                >
+                                    <option value="horizontal">Horizontal</option>
+                                    <option value="vertical">Vertical</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <label className="flex items-center gap-2 text-xs text-gray-500">
+                            <input
+                                type="checkbox"
+                                checked={Boolean(localProps.linear)}
+                                onChange={(e) => handleChange('linear', e.target.checked)}
+                            />
+                            Linear flow
+                        </label>
+
+                        <label className="flex items-center gap-2 text-xs text-gray-500">
+                            <input
+                                type="checkbox"
+                                checked={Boolean(localProps.alternativeLabel)}
+                                onChange={(e) => handleChange('alternativeLabel', e.target.checked)}
+                            />
+                            Alternative labels (horizontal only)
+                        </label>
+
+                        <label className="flex items-center gap-2 text-xs text-gray-500">
+                            <input
+                                type="checkbox"
+                                checked={Boolean(localProps.showStatusText)}
+                                onChange={(e) => handleChange('showStatusText', e.target.checked)}
+                            />
+                            Show status text
+                        </label>
+
+                        <label className="flex items-center gap-2 text-xs text-gray-500">
+                            <input
+                                type="checkbox"
+                                checked={Boolean(localProps.showControls)}
+                                onChange={(e) => handleChange('showControls', e.target.checked)}
+                            />
+                            Show controls
+                        </label>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Back Label</label>
+                                <Input
+                                    size="small"
+                                    value={localProps.backLabel || ''}
+                                    onChange={(e) => handleChange('backLabel', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Next Label</label>
+                                <Input
+                                    size="small"
+                                    value={localProps.nextLabel || ''}
+                                    onChange={(e) => handleChange('nextLabel', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Skip Label</label>
+                                <Input
+                                    size="small"
+                                    value={localProps.skipLabel || ''}
+                                    onChange={(e) => handleChange('skipLabel', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Finish Label</label>
+                                <Input
+                                    size="small"
+                                    value={localProps.finishLabel || ''}
+                                    onChange={(e) => handleChange('finishLabel', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Reset Label</label>
+                                <Input
+                                    size="small"
+                                    value={localProps.resetLabel || ''}
+                                    onChange={(e) => handleChange('resetLabel', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Step Prefix</label>
+                                <Input
+                                    size="small"
+                                    value={localProps.stepPrefixText || ''}
+                                    onChange={(e) => handleChange('stepPrefixText', e.target.value)}
+                                    placeholder="Step"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Completed Text</label>
+                            <Input
+                                size="small"
+                                value={localProps.completedText || ''}
+                                onChange={(e) => handleChange('completedText', e.target.value)}
+                            />
+                        </div>
+
                         <div className="h-px bg-gray-200 my-4" />
                     </div>
                 )}

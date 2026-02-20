@@ -10,7 +10,8 @@ import {
     Layout as ContainerIcon,
     Table as TableIcon,
     Star as StarIcon,
-    Calendar as CalendarIcon
+    Calendar as CalendarIcon,
+    ListOrdered as StepperIcon
 } from 'lucide-react';
 import { type RegisteredComponent, type ComponentType } from './types';
 
@@ -27,6 +28,7 @@ import { Tabs } from './components/Tabs';
 import { MaterialIcon } from './components/MaterialIcon';
 import { DatePicker } from './components/DatePicker';
 import { MultiSelect } from '../components/ui/MultiSelect';
+import { Stepper } from './components/Stepper';
 
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Container: {
@@ -315,6 +317,32 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             ],
             defaultValue: 0,
             className: ''
+        }
+    },
+    Stepper: {
+        name: 'Stepper',
+        icon: StepperIcon,
+        component: Stepper,
+        defaultProps: {
+            steps: [
+                { label: 'Select campaign settings', optional: false },
+                { label: 'Create an ad group', optional: true },
+                { label: 'Create an ad', optional: false }
+            ],
+            activeStep: 1,
+            orientation: 'horizontal',
+            linear: true,
+            alternativeLabel: true,
+            showControls: true,
+            showStatusText: true,
+            stepPrefixText: 'Step',
+            completedText: "All steps completed - you're finished",
+            backLabel: 'BACK',
+            nextLabel: 'NEXT',
+            skipLabel: 'SKIP',
+            finishLabel: 'FINISH',
+            resetLabel: 'RESET',
+            className: 'w-full'
         }
     }
 };
