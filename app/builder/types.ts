@@ -16,7 +16,9 @@ export type ComponentType =
   | "MaterialIcon"
   | "DatePicker"
   | "MultiSelect"
-  | "Tabs";
+  | "Tabs"
+  | "Group"
+  | "RadioGroup";
 
 export type ComponentNode = {
   id: string;
