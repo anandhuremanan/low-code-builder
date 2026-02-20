@@ -12,6 +12,7 @@ import { type ComponentNode, type Page } from '../builder/types';
 import { DataGrid } from '../builder/components/DataGrid';
 import { MaterialIcon } from '../builder/components/MaterialIcon';
 import { DatePicker } from '../builder/components/DatePicker';
+import { Stepper } from '../builder/components/Stepper';
 
 const PREVIEW_STORAGE_KEY = 'builder-preview-site';
 
@@ -335,6 +336,13 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                 >
                     {childNodes}
                 </PreviewTabs>
+            );
+        case 'Stepper':
+            return (
+                <Stepper
+                    {...node.props}
+                    className={node.props.className}
+                />
             );
         default:
             return null;

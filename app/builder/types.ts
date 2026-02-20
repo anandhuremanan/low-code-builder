@@ -17,6 +17,7 @@ export type ComponentType =
   | "DatePicker"
   | "MultiSelect"
   | "Tabs"
+  | "Stepper"
   | "Group"
   | "RadioGroup";
 
