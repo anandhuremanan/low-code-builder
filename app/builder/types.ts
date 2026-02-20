@@ -17,7 +17,9 @@ export type ComponentType =
   | "DatePicker"
   | "MultiSelect"
   | "Tabs"
-  | "Stepper";
+  | "Stepper"
+  | "Group"
+  | "RadioGroup";
 
 export type ComponentNode = {
   id: string;

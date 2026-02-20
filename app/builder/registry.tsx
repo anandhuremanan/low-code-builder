@@ -24,11 +24,13 @@ import { Box } from '../components/ui/Box';
 import { Typography } from '../components/ui/Typography';
 import { DataGrid } from './components/DataGrid';
 import { Container } from './components/Container';
+import { Group } from './components/Group';
 import { Tabs } from './components/Tabs';
 import { MaterialIcon } from './components/MaterialIcon';
 import { DatePicker } from './components/DatePicker';
 import { MultiSelect } from '../components/ui/MultiSelect';
 import { Stepper } from './components/Stepper';
+import { RadioGroup as RadioGroupUI } from '../components/ui/RadioGroup';
 
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Container: {
@@ -38,6 +40,17 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         defaultProps: {
             className: 'p-4 border border-dashed border-gray-300 w-full',
         },
+    },
+    Group: {
+        name: 'Group',
+        icon: ContainerIcon,
+        component: Group,
+        defaultProps: {
+            title: 'Group',
+            className: 'w-full border rounded',
+            collapsed: false,
+            contentClassName: ''
+        }
     },
     Header: {
         name: 'Header',
@@ -229,6 +242,23 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         component: Checkbox,
         defaultProps: {
             label: 'Check me',
+        },
+    },
+    RadioGroup: {
+        name: 'RadioGroup',
+        icon: SelectIcon,
+        component: ({ options, ...props }: any) => (
+            <RadioGroupUI {...props} options={options || []} />
+        ),
+        defaultProps: {
+            label: 'Choose an option',
+            options: [
+                { value: 'option1', label: 'Option 1' },
+                { value: 'option2', label: 'Option 2' }
+            ],
+            value: '',
+            row: false,
+            className: ''
         },
     },
     Image: {

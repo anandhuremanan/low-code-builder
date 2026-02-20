@@ -13,6 +13,22 @@ Example target files:
 ## 2. Add the component type
 
 Update `app/builder/types.ts`:
+````markdown
+# Builder Guide: Add a New Drag-and-Drop Component
+
+This guide explains how to add a new component so it appears in the builder sidebar, can be dragged onto the canvas, and can be configured in the properties panel.
+
+## 1. Create or choose the render component
+
+Use an existing UI component from `app/components/ui/*` or add a new builder-specific component under `app/builder/components/*`.
+
+Example target files:
+- `app/components/ui/YourComponent.tsx`
+- `app/builder/components/YourComponent.tsx`
+
+## 2. Add the component type
+
+Update `app/builder/types.ts`:
 
 1. Add the new literal to `ComponentType`.
 
@@ -144,3 +160,46 @@ Then verify:
 - [ ] Added properties UI in `app/builder/components/PropertiesPanel.tsx` (if needed)
 - [ ] Added droppable container support in `app/builder/components/Canvas.tsx` (if container)
 - [ ] Tested drag/drop + edit flow in browser
+ 
+## Add Group component (example)
+
+- **Purpose**: a simple, collapsible wrapper that groups child nodes under a header/title.
+- **Location**: `app/builder/components/Group.tsx`.
+- **Registration**: add `Group` to the `ComponentType` union and register it in `app/builder/registry.tsx` with sensible `defaultProps`:
+
+```tsx
+Group: {
+  name: 'Group',
+  icon: ContainerIcon,
+  component: Group,
+  defaultProps: { title: 'Group', collapsed: false, className: 'w-full border rounded' }
+}
+```
+
+- **Droppable**: if the `Group` should accept children, update the container check in `app/builder/components/Canvas.tsx`:
+
+```ts
+const isContainer = node.type === 'Container' || node.type === 'Group';
+```
+
+- **Properties panel**: expose `title` and `collapsed` in `PropertiesPanel` so users can rename and collapse/expand the group.
+
+````
+
+## Add RadioGroup component (example)
+
+- **Purpose**: a horizontal or vertical set of radio options (MUI-backed) for choosing a single value.
+- **Location**: `app/components/ui/RadioGroup.tsx` (new MUI wrapper) and register in `app/builder/registry.tsx` as `RadioGroup`.
+- **Registration**: add `RadioGroup` to the `ComponentType` union and register it in `app/builder/registry.tsx` with `defaultProps` including `label`, `options`, and `value`.
+
+```tsx
+RadioGroup: {
+  name: 'RadioGroup',
+  icon: SelectIcon,
+  component: (props) => <RadioGroup {...props} options={props.options || []} />,
+  defaultProps: { label: 'Choose an option', options: [{ value: 'option1', label: 'Option 1' }], value: '' }
+}
+```
+
+- **Properties panel**: expose `label`, `options` (array editor) and `value` so editors can rename choices and set the selected value.
+

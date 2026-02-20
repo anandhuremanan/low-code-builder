@@ -1585,8 +1585,8 @@ export const PropertiesPanel = () => {
 
 
 
-                    {/* Select Options */}
-                    {(selectedNode.type === 'Select' || selectedNode.type === 'MultiSelect') && (
+                    {/* Select / MultiSelect / RadioGroup Options */}
+                    {(selectedNode.type === 'Select' || selectedNode.type === 'MultiSelect' || selectedNode.type === 'RadioGroup') && (
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
                                 <label className="text-xs text-gray-400">Options</label>
@@ -1727,8 +1727,8 @@ export const PropertiesPanel = () => {
                 )}
 
 
-                {/* Select / MultiSelect Settings */}
-                {(selectedNode.type === 'Select' || selectedNode.type === 'MultiSelect') && (
+                {/* Select / MultiSelect / RadioGroup Settings */}
+                {(selectedNode.type === 'Select' || selectedNode.type === 'MultiSelect' || selectedNode.type === 'RadioGroup') && (
                     <div className="space-y-3">
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Field Settings</label>
                         <div className="space-y-1">
@@ -1739,6 +1739,26 @@ export const PropertiesPanel = () => {
                                 onChange={(e) => handleChange('label', e.target.value)}
                             />
                         </div>
+                        {selectedNode.type === 'RadioGroup' && (
+                            <>
+                                <div className="space-y-1">
+                                    <label className="text-xs text-gray-400">Value</label>
+                                    <Input
+                                        size="small"
+                                        value={localProps.value || ''}
+                                        onChange={(e) => handleChange('value', e.target.value)}
+                                    />
+                                </div>
+                                <label className="flex items-center gap-2 text-xs text-gray-400">
+                                    <input
+                                        type="checkbox"
+                                        checked={Boolean(localProps.row)}
+                                        onChange={(e) => handleChange('row', e.target.checked)}
+                                    />
+                                    Horizontal layout
+                                </label>
+                            </>
+                        )}
                     </div>
                 )}
 

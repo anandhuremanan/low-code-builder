@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { MultiSelect } from '../components/ui/MultiSelect';
+import { RadioGroup } from '../components/ui/RadioGroup';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
 import { type ComponentNode, type Page } from '../builder/types';
@@ -117,6 +118,41 @@ const PreviewTabs = ({
     );
 };
 
+const PreviewRadioGroupField = ({
+    className,
+    style,
+    label,
+    options,
+    value,
+    row
+}: {
+    className?: string;
+    style?: React.CSSProperties;
+    label?: string;
+    options: Array<{ label: string; value: string | number }>;
+    value?: string | number;
+    row?: boolean;
+}) => {
+    const initialValue = value ?? options?.[0]?.value ?? '';
+    const [selectedValue, setSelectedValue] = useState<string | number>(initialValue);
+
+    useEffect(() => {
+        setSelectedValue(value ?? options?.[0]?.value ?? '');
+    }, [value, options]);
+
+    return (
+        <RadioGroup
+            className={className}
+            style={style}
+            label={label}
+            options={options || []}
+            value={selectedValue}
+            row={Boolean(row)}
+            onChange={(nextValue) => setSelectedValue(nextValue)}
+        />
+    );
+};
+
 const PreviewNode = ({ node }: { node: ComponentNode }) => {
     const childNodes = node.children.map((child) => <PreviewNode key={child.id} node={child} />);
     const menuItems = (node.props.menuItems || []) as MenuItem[];
@@ -225,6 +261,17 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                     options={node.props.options || []}
                     style={node.props.style}
                     value={node.props.value || []}
+                />
+            );
+        case 'RadioGroup':
+            return (
+                <PreviewRadioGroupField
+                    className={node.props.className}
+                    style={node.props.style}
+                    label={node.props.label}
+                    options={node.props.options || []}
+                    value={node.props.value}
+                    row={node.props.row}
                 />
             );
         case 'Checkbox':
