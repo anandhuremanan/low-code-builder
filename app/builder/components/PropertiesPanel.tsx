@@ -679,13 +679,45 @@ export const PropertiesPanel = () => {
         });
     };
 
+    const createStepperContentContainer = (label?: string) => ({
+        id: `step-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        type: 'Container' as const,
+        props: {
+            className: 'p-4 border border-dashed border-gray-200 min-h-[100px]',
+            children: `Content for ${label || 'step'}`
+        },
+        children: []
+    });
+
+    const addStepperContentContainer = (index: number, label?: string) => {
+        dispatch({
+            type: 'ADD_NODE',
+            payload: {
+                parentId: selectedNode.id,
+                node: createStepperContentContainer(label),
+                index
+            }
+        });
+    };
+
+    const ensureStepperStepContainers = (steps: { label: string; optional?: boolean }[]) => {
+        const existingCount = selectedNode.children?.length || 0;
+        if (existingCount >= steps.length) return;
+
+        for (let i = existingCount; i < steps.length; i += 1) {
+            addStepperContentContainer(i, steps[i]?.label);
+        }
+    };
+
     const addStepperItem = () => {
         const steps = [...getStepperItems()];
-        steps.push({
+        const newStep = {
             label: `Step ${steps.length + 1}`,
             optional: false
-        });
+        };
+        steps.push(newStep);
         updateStepperItems(steps);
+        addStepperContentContainer(steps.length - 1, newStep.label);
     };
 
     const removeStepperItem = (index: number) => {
@@ -695,6 +727,13 @@ export const PropertiesPanel = () => {
 
         const nextActiveStep = Math.max(0, Math.min(Number(localProps.activeStep || 0), steps.length));
         handleChange('activeStep', nextActiveStep);
+
+        if (selectedNode.children && selectedNode.children[index]) {
+            dispatch({
+                type: 'DELETE_NODE',
+                payload: { id: selectedNode.children[index].id }
+            });
+        }
     };
 
     const updateStepperItem = (index: number, key: 'label' | 'optional', value: string | boolean) => {
@@ -793,6 +832,15 @@ export const PropertiesPanel = () => {
                                 <Plus size={14} />
                                 Add Step
                             </button>
+                            {(selectedNode.children?.length || 0) < getStepperItems().length && (
+                                <button
+                                    onClick={() => ensureStepperStepContainers(getStepperItems())}
+                                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
+                                >
+                                    <Plus size={14} />
+                                    Add Missing Step Containers
+                                </button>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">

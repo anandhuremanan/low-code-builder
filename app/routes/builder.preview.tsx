@@ -456,7 +456,9 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                 <Stepper
                     {...node.props}
                     className={node.props.className}
-                />
+                >
+                    {childNodes}
+                </Stepper>
             );
         default:
             return null;

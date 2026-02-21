@@ -87,6 +87,17 @@ export const BuilderLayout = () => {
             const newId = `node-${Date.now()}`;
             const defaultProps = COMPONENT_REGISTRY[type]?.defaultProps || {};
             const clonedDefaultProps = JSON.parse(JSON.stringify(defaultProps));
+            const initialChildren = type === 'Stepper' && Array.isArray(clonedDefaultProps.steps)
+                ? clonedDefaultProps.steps.map((step: { label?: string }, index: number) => ({
+                    id: `step-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 6)}`,
+                    type: 'Container' as const,
+                    props: {
+                        className: 'p-4 border border-dashed border-gray-200 min-h-[100px]',
+                        children: `Content for ${step?.label || `Step ${index + 1}`}`
+                    },
+                    children: []
+                }))
+                : [];
 
             // Logic to determine parent.
             let parentId: string | null = null;
@@ -114,7 +125,7 @@ export const BuilderLayout = () => {
                             id: newId,
                             type,
                             props: clonedDefaultProps,
-                            children: []
+                            children: initialChildren
                         }
                     }
                 });
