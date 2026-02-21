@@ -29,6 +29,7 @@ type BuilderStepperProps = {
     finishLabel?: string;
     resetLabel?: string;
     className?: string;
+    children?: React.ReactNode;
 };
 
 const FALLBACK_STEPS: StepperItem[] = [
@@ -52,7 +53,8 @@ export const Stepper = ({
     skipLabel = 'Skip',
     finishLabel = 'Finish',
     resetLabel = 'Reset',
-    className = ''
+    className = '',
+    children
 }: BuilderStepperProps) => {
     const safeSteps = useMemo(
         () => (Array.isArray(steps) && steps.length > 0 ? steps : FALLBACK_STEPS),
@@ -71,6 +73,8 @@ export const Stepper = ({
     const isStepOptional = (stepIndex: number) => Boolean(safeSteps[stepIndex]?.optional);
     const isStepSkipped = (stepIndex: number) => skipped.has(stepIndex);
     const completedAll = currentStep >= safeSteps.length;
+    const stepPanels = React.Children.toArray(children);
+    const activePanel = stepPanels[currentStep] || null;
 
     const handleNext = () => {
         const nextSkipped = new Set(skipped);
@@ -126,6 +130,25 @@ export const Stepper = ({
                             ? completedText
                             : `${stepPrefixText} ${Math.min(currentStep + 1, safeSteps.length)}`}
                     </Typography>
+                </Box>
+            )}
+
+            {!completedAll && (
+                <Box sx={{ pt: 2 }}>
+                    {activePanel || (
+                        <Box
+                            sx={{
+                                border: '1px dashed',
+                                borderColor: 'divider',
+                                borderRadius: 1.5,
+                                p: 2,
+                                color: 'text.secondary',
+                                fontSize: 14
+                            }}
+                        >
+                            No content for this step yet.
+                        </Box>
+                    )}
                 </Box>
             )}
 
