@@ -315,6 +315,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                         placeholder={node.props.placeholder}
                         size={node.props.size}
                         type={node.props.type || 'text'}
+                        disableBorder={Boolean(node.props.disableBorder)}
                     />
                 </div>
             );

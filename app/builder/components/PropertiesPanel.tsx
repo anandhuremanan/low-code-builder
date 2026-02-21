@@ -1007,6 +1007,14 @@ export const PropertiesPanel = () => {
                                     placeholder="Placeholder text"
                                 />
                             </div>
+                            <label className="flex items-center gap-2 text-xs text-gray-400">
+                                <input
+                                    type="checkbox"
+                                    checked={Boolean(localProps.disableBorder)}
+                                    onChange={(e) => handleChange('disableBorder', e.target.checked)}
+                                />
+                                Disable Border
+                            </label>
                             <div className="space-y-1">
                                 <label className="text-xs text-gray-400">Background Color</label>
                                 <div className="flex items-center gap-2">

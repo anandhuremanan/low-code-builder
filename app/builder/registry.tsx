@@ -213,6 +213,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             labelColor: '#374151',
             type: 'text',
             placeholder: 'Enter text...',
+            disableBorder: false,
             className: '',
             fullWidth: false,
         },
