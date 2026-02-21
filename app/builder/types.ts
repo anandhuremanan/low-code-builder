@@ -16,6 +16,7 @@ export type ComponentType =
   | "MaterialIcon"
   | "DatePicker"
   | "MultiSelect"
+  | "Charts"
   | "Tabs"
   | "Stepper"
   | "Group"

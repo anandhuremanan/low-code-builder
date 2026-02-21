@@ -610,6 +610,34 @@ export const PropertiesPanel = () => {
         handleDataGridChange('columns', columns);
     };
 
+    const parseCsvLabels = (raw: string): string[] =>
+        raw
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean);
+
+    const parseCsvNumbers = (raw: string): number[] =>
+        raw
+            .split(',')
+            .map((item) => Number(item.trim()))
+            .filter((item) => Number.isFinite(item));
+
+    const getChartPointColors = (): string[] => {
+        const colors = localProps.pointColors;
+        if (!Array.isArray(colors)) return [];
+        return colors as string[];
+    };
+
+    const updateChartPointColor = (index: number, value: string) => {
+        const labels = Array.isArray(localProps.labels) ? localProps.labels : [];
+        const targetLength = Math.max(labels.length, index + 1);
+        const base = getChartPointColors();
+        const fallback = localProps.color || '#1976d2';
+        const next = Array.from({ length: targetLength }, (_, i) => base[i] || fallback);
+        next[index] = value;
+        handleChange('pointColors', next);
+    };
+
     // Tabs Handlers
     const getTabsItems = (): { label: string; id: string }[] => {
         const items = localProps.items;
@@ -1723,6 +1751,166 @@ export const PropertiesPanel = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Charts Section */}
+                {selectedNode.type === 'Charts' && (
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Charts</label>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Title</label>
+                            <Input
+                                size="small"
+                                value={localProps.title || ''}
+                                onChange={(e) => handleChange('title', e.target.value)}
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Chart Type</label>
+                                <select
+                                    className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                                    value={localProps.chartType || 'bar'}
+                                    onChange={(e) => handleChange('chartType', e.target.value)}
+                                >
+                                    <option value="bar">Bar</option>
+                                    <option value="line">Line</option>
+                                    <option value="pie">Pie</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Height</label>
+                                <Input
+                                    size="small"
+                                    type="number"
+                                    value={localProps.height ?? 320}
+                                    onChange={(e) => handleChange('height', Number(e.target.value) || 320)}
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Labels (comma separated)</label>
+                            <Input
+                                size="small"
+                                multiline
+                                minRows={2}
+                                value={Array.isArray(localProps.labels) ? localProps.labels.join(', ') : ''}
+                                onChange={(e) => handleChange('labels', parseCsvLabels(e.target.value))}
+                                placeholder="Jan, Feb, Mar, Apr"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Values (comma separated)</label>
+                            <Input
+                                size="small"
+                                multiline
+                                minRows={2}
+                                value={Array.isArray(localProps.values) ? localProps.values.join(', ') : ''}
+                                onChange={(e) => handleChange('values', parseCsvNumbers(e.target.value))}
+                                placeholder="12, 19, 8, 15"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs text-gray-400">Per Day Colors</label>
+                            {(Array.isArray(localProps.labels) ? localProps.labels : []).map((label: string, idx: number) => (
+                                <div key={`${label}-${idx}`} className="flex items-center gap-2">
+                                    <div className="w-24 text-[11px] text-gray-500 truncate" title={label || `Item ${idx + 1}`}>
+                                        {label || `Item ${idx + 1}`}
+                                    </div>
+                                    <input
+                                        type="color"
+                                        value={getChartPointColors()[idx] || localProps.color || '#1976d2'}
+                                        onChange={(e) => updateChartPointColor(idx, e.target.value)}
+                                        className="h-8 w-12 rounded border border-gray-300 bg-white p-1 cursor-pointer"
+                                    />
+                                    <Input
+                                        size="small"
+                                        value={getChartPointColors()[idx] || localProps.color || '#1976d2'}
+                                        onChange={(e) => updateChartPointColor(idx, e.target.value)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <label className="flex items-center gap-2 text-xs text-gray-500">
+                            <input
+                                type="checkbox"
+                                checked={Boolean(localProps.showLegend)}
+                                onChange={(e) => handleChange('showLegend', e.target.checked)}
+                            />
+                            Show legend
+                        </label>
+                        {(localProps.chartType === 'bar' || localProps.chartType === 'line') && (
+                            <>
+                                <label className="flex items-center gap-2 text-xs text-gray-500">
+                                    <input
+                                        type="checkbox"
+                                        checked={Boolean(localProps.showGrid)}
+                                        onChange={(e) => handleChange('showGrid', e.target.checked)}
+                                    />
+                                    Show grid
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-400">X Axis Label</label>
+                                        <Input
+                                            size="small"
+                                            value={localProps.xAxisLabel || ''}
+                                            onChange={(e) => handleChange('xAxisLabel', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-400">Y Axis Label</label>
+                                        <Input
+                                            size="small"
+                                            value={localProps.yAxisLabel || ''}
+                                            onChange={(e) => handleChange('yAxisLabel', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        {localProps.chartType === 'line' && (
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Line Curve</label>
+                                <select
+                                    className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                                    value={localProps.lineCurve || 'monotoneX'}
+                                    onChange={(e) => handleChange('lineCurve', e.target.value)}
+                                >
+                                    <option value="linear">Linear</option>
+                                    <option value="monotoneX">Monotone</option>
+                                    <option value="step">Step</option>
+                                </select>
+                            </div>
+                        )}
+                        {localProps.chartType === 'pie' && (
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-400">Inner Radius (donut)</label>
+                                <Input
+                                    size="small"
+                                    type="number"
+                                    value={localProps.pieInnerRadius ?? 0}
+                                    onChange={(e) => handleChange('pieInnerRadius', Number(e.target.value) || 0)}
+                                />
+                            </div>
+                        )}
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-400">Primary Color</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="color"
+                                    value={localProps.color || '#1976d2'}
+                                    onChange={(e) => handleChange('color', e.target.value)}
+                                    className="h-8 w-12 rounded border border-gray-300 bg-white p-1 cursor-pointer"
+                                />
+                                <Input
+                                    size="small"
+                                    value={localProps.color || '#1976d2'}
+                                    onChange={(e) => handleChange('color', e.target.value)}
+                                />
                             </div>
                         </div>
                     </div>

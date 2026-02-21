@@ -10,6 +10,7 @@ import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
 import { type ComponentNode, type Page } from '../builder/types';
 import { DataGrid } from '../builder/components/DataGrid';
+import { Charts } from '../builder/components/Charts';
 import { MaterialIcon } from '../builder/components/MaterialIcon';
 import { DatePicker } from '../builder/components/DatePicker';
 import { Stepper } from '../builder/components/Stepper';
@@ -314,6 +315,14 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                 <DataGrid
                     {...node.props}
                     isPreview={true}
+                    className={node.props.className}
+                    style={node.props.style}
+                />
+            );
+        case 'Charts':
+            return (
+                <Charts
+                    {...node.props}
                     className={node.props.className}
                     style={node.props.style}
                 />
