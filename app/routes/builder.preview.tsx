@@ -12,6 +12,7 @@ import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
 import { type ComponentNode, type CustomStyle, type Page } from '../builder/types';
 import { DataGrid } from '../builder/components/DataGrid';
+import { Charts } from '../builder/components/Charts';
 import { MaterialIcon } from '../builder/components/MaterialIcon';
 import { DatePicker } from '../builder/components/DatePicker';
 import { Stepper } from '../builder/components/Stepper';
@@ -438,6 +439,14 @@ const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customSty
                     {...node.props}
                     isPreview={true}
                     className={resolvedClassName}
+                    style={node.props.style}
+                />
+            );
+        case 'Charts':
+            return (
+                <Charts
+                    {...node.props}
+                    className={node.props.className}
                     style={node.props.style}
                 />
             );

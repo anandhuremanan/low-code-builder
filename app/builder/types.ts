@@ -19,6 +19,7 @@ export type ComponentType =
   | "TimePicker"
   | "DateTimePicker"
   | "MultiSelect"
+  | "Charts"
   | "Tabs"
   | "Stepper"
   | "Group"

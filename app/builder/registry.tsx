@@ -10,6 +10,7 @@ import {
     ToggleLeft as SwitchIcon,
     Layout as ContainerIcon,
     Table as TableIcon,
+    BarChart3 as ChartIcon,
     Star as StarIcon,
     Calendar as CalendarIcon,
     ListOrdered as StepperIcon,
@@ -27,6 +28,7 @@ import { Switch as SwitchUI } from '../components/ui/Switch';
 import { Box } from '../components/ui/Box';
 import { Typography } from '../components/ui/Typography';
 import { DataGrid } from './components/DataGrid';
+import { Charts } from './components/Charts';
 import { Container } from './components/Container';
 import { Group } from './components/Group';
 import { Tabs } from './components/Tabs';
@@ -335,6 +337,27 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
                 { field: 'lastName', headerName: 'Last name', width: 130 },
             ],
             style: { width: '100%', height: '400px' }
+        }
+    },
+    Charts: {
+        name: 'Charts',
+        icon: ChartIcon,
+        component: Charts,
+        defaultProps: {
+            chartType: 'bar',
+            title: 'Sales Overview',
+            labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+            values: [12, 19, 8, 15],
+            height: 320,
+            showLegend: true,
+            showGrid: true,
+            color: '#1976d2',
+            pointColors: ['#1976d2', '#2e7d32', '#ed6c02', '#9c27b0'],
+            lineCurve: 'monotoneX',
+            xAxisLabel: '',
+            yAxisLabel: '',
+            pieInnerRadius: 0,
+            className: 'w-full'
         }
     },
     MaterialIcon: {
