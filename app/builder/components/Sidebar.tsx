@@ -3,7 +3,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { useBuilder } from '../context';
 import { COMPONENT_REGISTRY } from '../registry';
 import { type ComponentType } from '../types';
-import { Plus, File, Layers } from 'lucide-react';
+import { Plus, File, Layers, Search } from 'lucide-react';
 
 const SidebarItem = ({ type }: { type: ComponentType }) => {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -43,6 +43,18 @@ export const Sidebar = () => {
     const { state, dispatch } = useBuilder();
     const [activeTab, setActiveTab] = useState<'components' | 'pages'>('components');
     const [newPageName, setNewPageName] = useState('');
+    const [componentSearch, setComponentSearch] = useState('');
+
+    const filteredComponentTypes = Object.keys(COMPONENT_REGISTRY).filter((key) => {
+        const entry = COMPONENT_REGISTRY[key as ComponentType];
+        const query = componentSearch.trim().toLowerCase();
+        if (!query) return true;
+
+        return (
+            key.toLowerCase().includes(query) ||
+            entry.name.toLowerCase().includes(query)
+        );
+    });
 
     const handleAddPage = () => {
         if (newPageName.trim()) {
@@ -71,10 +83,24 @@ export const Sidebar = () => {
 
             {activeTab === 'components' ? (
                 <div className="flex-1 overflow-y-auto p-4">
+                    <div className="relative mb-4">
+                        <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            value={componentSearch}
+                            onChange={(e) => setComponentSearch(e.target.value)}
+                            placeholder="Search components..."
+                            className="w-full text-sm border border-gray-300 rounded pl-8 pr-2 py-1.5 bg-white"
+                        />
+                    </div>
                     <h2 className="text-xs font-semibold text-gray-500 uppercase mb-4">Elements</h2>
-                    {Object.keys(COMPONENT_REGISTRY).map((key) => (
-                        <SidebarItem key={key} type={key as ComponentType} />
-                    ))}
+                    {filteredComponentTypes.length > 0 ? (
+                        filteredComponentTypes.map((key) => (
+                            <SidebarItem key={key} type={key as ComponentType} />
+                        ))
+                    ) : (
+                        <p className="text-xs text-gray-500">No components found.</p>
+                    )}
                 </div>
             ) : (
                 <div className="flex-1 overflow-y-auto p-4">
