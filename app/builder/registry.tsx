@@ -65,7 +65,9 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         component: ({ brand, menuItems = [], onNavigateToPageSlug, ...props }: any) => (
             <header
                 {...props}
-                className={`w-full px-6 py-4 bg-white border-b border-gray-200 ${props.className || ''}`}
+                className={props?.node?.props?.customStyleId
+                    ? (props.className || '')
+                    : `w-full px-6 py-4 bg-white border-b border-gray-200 ${props.className || ''}`}
             >
                 <div className="max-w-6xl mx-auto flex items-center justify-between gap-6">
                     <div className="font-bold text-lg text-gray-900">{brand || 'My Site'}</div>
@@ -136,7 +138,9 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         component: ({ copyrightText, menuItems = [], onNavigateToPageSlug, ...props }: any) => (
             <footer
                 {...props}
-                className={`w-full px-6 py-5 bg-gray-900 text-white ${props.className || ''}`}
+                className={props?.node?.props?.customStyleId
+                    ? (props.className || '')
+                    : `w-full px-6 py-5 bg-gray-900 text-white ${props.className || ''}`}
             >
                 <div className="max-w-6xl mx-auto flex items-center justify-between gap-6">
                     <p className="text-sm text-gray-200">{copyrightText || '© 2026 My Site'}</p>

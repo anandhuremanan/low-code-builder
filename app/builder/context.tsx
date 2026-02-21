@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useReducer, type ReactNode } from 'react';
-import { type ComponentNode, type Page } from './types';
+import { type ComponentNode, type CustomStyle, type Page } from './types';
 
 // Simple ID generator if we don't want to add another dependency
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -16,6 +16,7 @@ type BuilderState = {
     selectedNodeId: string | null;
     draggedComponentType: string | null; // For sidebar drag
     viewMode: 'desktop' | 'tablet' | 'mobile';
+    customStyles: CustomStyle[];
     history: HistoryState;
 };
 
@@ -29,6 +30,8 @@ type Action =
     | { type: 'ADD_PAGE'; payload: { name: string } }
     | { type: 'SWITCH_PAGE'; payload: { id: string } }
     | { type: 'MOVE_NODE'; payload: { nodeId: string; newParentId: string | null; index: number } }
+    | { type: 'ADD_CUSTOM_STYLE'; payload: { style: CustomStyle } }
+    | { type: 'REMOVE_CUSTOM_STYLE'; payload: { id: string } }
     | { type: 'UNDO' }
     | { type: 'REDO' };
 
@@ -52,6 +55,7 @@ const initialState: BuilderState = {
     selectedNodeId: null,
     draggedComponentType: null,
     viewMode: 'desktop',
+    customStyles: [],
     history: {
         past: [],
         future: []
@@ -311,6 +315,20 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                 history: pushToHistory(state),
                 pages: [...state.pages, newPage],
                 currentPageId: newPage.id
+            };
+        }
+
+        case 'ADD_CUSTOM_STYLE': {
+            return {
+                ...state,
+                customStyles: [...state.customStyles, action.payload.style]
+            };
+        }
+
+        case 'REMOVE_CUSTOM_STYLE': {
+            return {
+                ...state,
+                customStyles: state.customStyles.filter((style) => style.id !== action.payload.id)
             };
         }
 

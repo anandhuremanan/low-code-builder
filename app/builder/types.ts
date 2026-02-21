@@ -42,6 +42,13 @@ export type Page = {
   nodes: ComponentNode[];
 };
 
+export type CustomStyle = {
+  id: string;
+  name: string;
+  className: string;
+  css: string;
+};
+
 export type RegisteredComponent = {
   name: string;
   icon: React.ElementType;

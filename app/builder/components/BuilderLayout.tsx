@@ -16,10 +16,17 @@ import { PropertiesPanel } from './PropertiesPanel';
 import { useBuilder } from '../context';
 import { COMPONENT_REGISTRY } from '../registry';
 import { type ComponentType } from '../types';
+import { Dialog } from '../../components/ui/Dialog';
+import { Input } from '../../components/ui/Input';
+import { Typography } from '../../components/ui/Typography';
 
 export const BuilderLayout = () => {
     const { state, dispatch } = useBuilder();
     const [activeDragType, setActiveDragType] = useState<ComponentType | null>(null);
+    const [isCustomStyleDialogOpen, setIsCustomStyleDialogOpen] = useState(false);
+    const [customStyleName, setCustomStyleName] = useState('');
+    const [customStyleClassName, setCustomStyleClassName] = useState('');
+    const [customStyleCss, setCustomStyleCss] = useState('');
     const PREVIEW_STORAGE_KEY = 'builder-preview-site';
 
     const sensors = useSensors(
@@ -150,9 +157,43 @@ export const BuilderLayout = () => {
         localStorage.setItem(PREVIEW_STORAGE_KEY, JSON.stringify({
             pages: state.pages,
             currentPageId: state.currentPageId,
-            viewMode: state.viewMode
+            viewMode: state.viewMode,
+            customStyles: state.customStyles
         }));
         window.open('/builder/preview', '_blank', 'noopener,noreferrer');
+    };
+
+    const resetCustomStyleDialog = () => {
+        setCustomStyleName('');
+        setCustomStyleClassName('');
+        setCustomStyleCss('');
+    };
+
+    const normalizeClassName = (value: string): string => {
+        return value.trim().replace(/^\./, '');
+    };
+
+    const handleAddCustomStyle = () => {
+        const name = customStyleName.trim();
+        const className = normalizeClassName(customStyleClassName);
+        const css = customStyleCss.trim();
+        if (!name || !className || !css) return;
+
+        const duplicate = state.customStyles.some((style) => style.className === className || style.name === name);
+        if (duplicate) return;
+
+        dispatch({
+            type: 'ADD_CUSTOM_STYLE',
+            payload: {
+                style: {
+                    id: `custom-style-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                    name,
+                    className,
+                    css
+                }
+            }
+        });
+        resetCustomStyleDialog();
     };
 
     return (
@@ -205,6 +246,12 @@ export const BuilderLayout = () => {
                                 </button>
                             </div>
                             <button
+                                onClick={() => setIsCustomStyleDialogOpen(true)}
+                                className="text-sm border border-gray-300 px-3 py-1.5 rounded"
+                            >
+                                Global Styles
+                            </button>
+                            <button
                                 onClick={handlePreview}
                                 className="text-sm border border-gray-300 px-3 py-1.5 rounded"
                             >
@@ -224,6 +271,84 @@ export const BuilderLayout = () => {
                     </div>
                 ) : null}
             </DragOverlay>
+
+            <Dialog
+                open={isCustomStyleDialogOpen}
+                title="Global Custom Styles"
+                onClose={() => {
+                    setIsCustomStyleDialogOpen(false);
+                    resetCustomStyleDialog();
+                }}
+                cancelText="Close"
+            >
+                <div className="space-y-4 min-w-[560px] max-w-[720px]">
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Style Name</label>
+                        <Input
+                            size="small"
+                            placeholder="Primary CTA"
+                            value={customStyleName}
+                            onChange={(e) => setCustomStyleName(e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">CSS Class Name</label>
+                        <Input
+                            size="small"
+                            placeholder="cta-primary"
+                            value={customStyleClassName}
+                            onChange={(e) => setCustomStyleClassName(e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">CSS Code</label>
+                        <Input
+                            multiline
+                            minRows={6}
+                            placeholder="background: #111827; color: #fff; border-radius: 10px;"
+                            value={customStyleCss}
+                            onChange={(e) => setCustomStyleCss(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleAddCustomStyle}
+                        disabled={!customStyleName.trim() || !normalizeClassName(customStyleClassName) || !customStyleCss.trim()}
+                        className="px-3 py-1.5 text-sm rounded border border-blue-300 text-blue-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Add Style
+                    </button>
+
+                    <div className="pt-2 border-t border-gray-200 space-y-2">
+                        <Typography variant="body2" className="text-gray-700 font-medium">
+                            Added Styles
+                        </Typography>
+                        {state.customStyles.length === 0 ? (
+                            <Typography variant="body2" className="text-gray-500 text-sm">
+                                No styles added yet.
+                            </Typography>
+                        ) : (
+                            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                                {state.customStyles.map((style) => (
+                                    <div key={style.id} className="rounded border border-gray-200 p-2 flex items-start justify-between gap-2">
+                                        <div className="min-w-0">
+                                            <div className="text-sm font-medium text-gray-900">{style.name}</div>
+                                            <div className="text-xs text-gray-500">.{style.className}</div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => dispatch({ type: 'REMOVE_CUSTOM_STYLE', payload: { id: style.id } })}
+                                            className="text-xs px-2 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </Dialog>
         </DndContext>
     );
 };

@@ -122,6 +122,50 @@ const sizeTokenToStyle = (token: string): Record<string, string> => {
     return axis === 'w' ? { width: cssValue } : { height: cssValue };
 };
 
+const isHexColor = (value: string): boolean => /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value.trim());
+const widthTokenToPx = (token: string): string => {
+    if (token === 'border') return '1px';
+    if (token === 'border-2') return '2px';
+    if (token === 'border-4') return '4px';
+    if (token === 'border-8') return '8px';
+    return '';
+};
+const styleTokenToCss = (token: string): string => {
+    if (token === 'border-dashed') return 'dashed';
+    if (token === 'border-dotted') return 'dotted';
+    if (token === 'border-double') return 'double';
+    if (token === 'border-none') return 'none';
+    return '';
+};
+const sideToBorderProp = (
+    side: 'all' | 'top' | 'right' | 'bottom' | 'left',
+    field: 'width' | 'color' | 'style'
+): keyof React.CSSProperties => {
+    if (side === 'all') {
+        if (field === 'width') return 'borderWidth';
+        if (field === 'color') return 'borderColor';
+        return 'borderStyle';
+    }
+    if (side === 'top') {
+        if (field === 'width') return 'borderTopWidth';
+        if (field === 'color') return 'borderTopColor';
+        return 'borderTopStyle';
+    }
+    if (side === 'right') {
+        if (field === 'width') return 'borderRightWidth';
+        if (field === 'color') return 'borderRightColor';
+        return 'borderRightStyle';
+    }
+    if (side === 'bottom') {
+        if (field === 'width') return 'borderBottomWidth';
+        if (field === 'color') return 'borderBottomColor';
+        return 'borderBottomStyle';
+    }
+    if (field === 'width') return 'borderLeftWidth';
+    if (field === 'color') return 'borderLeftColor';
+    return 'borderLeftStyle';
+};
+
 const TEXT_ELEMENT_OPTIONS = [
     { value: 'h1', label: 'H1', variant: 'h1', component: 'h1' },
     { value: 'h2', label: 'H2', variant: 'h2', component: 'h2' },
@@ -174,6 +218,7 @@ export const PropertiesPanel = () => {
         color: '',
         style: ''
     });
+    const [borderSide, setBorderSide] = useState<'all' | 'top' | 'right' | 'bottom' | 'left'>('all');
     const [effectState, setEffectState] = useState({
         shadow: '',
         opacity: ''
@@ -209,9 +254,9 @@ export const PropertiesPanel = () => {
             });
             setBorderState({
                 radius: getBorderValue(className, 'radius'),
-                width: getBorderValue(className, 'width'),
-                color: getBorderValue(className, 'color'),
-                style: getBorderValue(className, 'style')
+                width: String(selectedNode.props?.style?.borderWidth || widthTokenToPx(getBorderValue(className, 'width')) || ''),
+                color: selectedNode.props?.style?.borderColor || '',
+                style: String(selectedNode.props?.style?.borderStyle || styleTokenToCss(getBorderValue(className, 'style')) || '')
             });
             setEffectState({
                 shadow: getEffectValue(className, 'shadow'),
@@ -254,6 +299,21 @@ export const PropertiesPanel = () => {
         dispatch({
             type: 'UPDATE_NODE',
             payload: { id: selectedNode.id, props: { [key]: value } }
+        });
+    };
+
+    const handleCustomStyleChange = (styleId: string) => {
+        const nextProps = { ...localProps };
+        if (styleId) {
+            nextProps.customStyleId = styleId;
+        } else {
+            delete nextProps.customStyleId;
+        }
+
+        setLocalProps(nextProps);
+        dispatch({
+            type: 'UPDATE_NODE',
+            payload: { id: selectedNode.id, props: { customStyleId: styleId || undefined } }
         });
     };
 
@@ -558,9 +618,28 @@ export const PropertiesPanel = () => {
     const handleBorderChange = (field: 'radius' | 'width' | 'color' | 'style', value: string) => {
         setBorderState(prev => ({ ...prev, [field]: value }));
         const currentClass = localProps.className || '';
-        const newClass = updateBorderClass(currentClass, field, value);
+        if (field === 'radius') {
+            const newClass = updateBorderClass(currentClass, field, value);
+            const nextProps = { ...localProps, className: newClass };
+            setLocalProps(nextProps);
+            dispatch({
+                type: 'UPDATE_NODE',
+                payload: { id: selectedNode.id, props: nextProps }
+            });
+            return;
+        }
 
-        const nextProps = { ...localProps, className: newClass };
+        const sideProp = sideToBorderProp(borderSide, field);
+        const nextStyle = { ...(localProps.style || {}) } as Record<string, any>;
+        const cleanedClass = updateBorderClass(updateBorderClass(updateBorderClass(currentClass, 'width', ''), 'style', ''), 'color', '');
+        const nextValue = field === 'width' || field === 'style' ? value.trim() : value.trim();
+        if (nextValue) {
+            nextStyle[sideProp] = nextValue;
+        } else {
+            delete nextStyle[sideProp];
+        }
+
+        const nextProps = { ...localProps, className: cleanedClass, style: nextStyle };
         setLocalProps(nextProps);
         dispatch({
             type: 'UPDATE_NODE',
@@ -1052,6 +1131,30 @@ export const PropertiesPanel = () => {
                     </div>
                 )}
 
+                <div className="space-y-3">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Custom CSS Style</label>
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-400">Global Style</label>
+                        <select
+                            className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                            value={localProps.customStyleId || ''}
+                            onChange={(e) => handleCustomStyleChange(e.target.value)}
+                        >
+                            <option value="">None (use component defaults)</option>
+                            {state.customStyles.map((style) => (
+                                <option key={style.id} value={style.id}>
+                                    {style.name} (.{style.className})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    {state.customStyles.length === 0 && (
+                        <p className="text-[11px] text-gray-500">
+                            No global styles yet. Add them from the top toolbar.
+                        </p>
+                    )}
+                </div>
+
                 {/* Layout Section */}
                 <div className="space-y-3">
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Layout & Sizing</label>
@@ -1105,6 +1208,20 @@ export const PropertiesPanel = () => {
                 {/* Borders Section */}
                 <div className="space-y-3">
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Borders</label>
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-400">Apply To</label>
+                        <select
+                            className="w-full text-sm border rounded p-1"
+                            value={borderSide}
+                            onChange={(e) => setBorderSide(e.target.value as 'all' | 'top' | 'right' | 'bottom' | 'left')}
+                        >
+                            <option value="all">All Sides</option>
+                            <option value="top">Top</option>
+                            <option value="right">Right</option>
+                            <option value="bottom">Bottom</option>
+                            <option value="left">Left</option>
+                        </select>
+                    </div>
                     <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-1">
                             <label className="text-xs text-gray-400">Radius</label>
@@ -1131,10 +1248,10 @@ export const PropertiesPanel = () => {
                                 onChange={(e) => handleBorderChange('width', e.target.value)}
                             >
                                 <option value="">None</option>
-                                <option value="border">1px</option>
-                                <option value="border-2">2px</option>
-                                <option value="border-4">4px</option>
-                                <option value="border-8">8px</option>
+                                <option value="1px">1px</option>
+                                <option value="2px">2px</option>
+                                <option value="4px">4px</option>
+                                <option value="8px">8px</option>
                             </select>
                         </div>
                         <div className="space-y-1">
@@ -1142,18 +1259,13 @@ export const PropertiesPanel = () => {
                             <div className="flex items-center gap-2">
                                 <input
                                     type="color"
-                                    // Extract hex from class if possible, or default
-                                    // This is hard with tailwind classes unless we have a map.
-                                    // For now just let them type or pick from a limited set.
-                                    // Let's use a text input for class for now, or a simple color picker that sets arbitrary style?
-                                    // Actually we are setting tailwind classes like border-red-500.
-                                    // Let's simplified input for now:
-                                    disabled
-                                    className="h-8 w-8 rounded border border-gray-300 bg-gray-100 p-1 cursor-not-allowed"
+                                    value={isHexColor(borderState.color) ? borderState.color : '#d1d5db'}
+                                    onChange={(e) => handleBorderChange('color', e.target.value)}
+                                    className="h-8 w-8 rounded border border-gray-300 bg-white p-1 cursor-pointer"
                                 />
                                 <Input
                                     size="small"
-                                    placeholder="border-gray-300"
+                                    placeholder="#d1d5db"
                                     value={borderState.color}
                                     onChange={(e) => handleBorderChange('color', e.target.value)}
                                 />
@@ -1166,11 +1278,12 @@ export const PropertiesPanel = () => {
                                 value={borderState.style}
                                 onChange={(e) => handleBorderChange('style', e.target.value)}
                             >
-                                <option value="">Solid</option>
-                                <option value="border-dashed">Dashed</option>
-                                <option value="border-dotted">Dotted</option>
-                                <option value="border-double">Double</option>
-                                <option value="border-none">None</option>
+                                <option value="">Default</option>
+                                <option value="solid">Solid</option>
+                                <option value="dashed">Dashed</option>
+                                <option value="dotted">Dotted</option>
+                                <option value="double">Double</option>
+                                <option value="none">None</option>
                             </select>
                         </div>
                     </div>

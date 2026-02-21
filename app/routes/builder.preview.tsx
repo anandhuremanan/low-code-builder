@@ -10,13 +10,14 @@ import { Rating } from '../components/ui/Rating';
 import { Switch } from '../components/ui/Switch';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
-import { type ComponentNode, type Page } from '../builder/types';
+import { type ComponentNode, type CustomStyle, type Page } from '../builder/types';
 import { DataGrid } from '../builder/components/DataGrid';
 import { MaterialIcon } from '../builder/components/MaterialIcon';
 import { DatePicker } from '../builder/components/DatePicker';
 import { Stepper } from '../builder/components/Stepper';
 import { TimePicker } from '../builder/components/TimePicker';
 import { DateTimePicker } from '../builder/components/DateTimePicker';
+import { compileCustomStylesCss } from '../lib/customStyleUtils';
 
 const PREVIEW_STORAGE_KEY = 'builder-preview-site';
 
@@ -24,6 +25,7 @@ type SiteSnapshot = {
     pages: Page[];
     currentPageId: string | null;
     viewMode?: 'desktop' | 'tablet' | 'mobile';
+    customStyles?: CustomStyle[];
 };
 
 type MenuItem = {
@@ -228,20 +230,37 @@ const PreviewSwitchField = ({
     );
 };
 
-const PreviewNode = ({ node }: { node: ComponentNode }) => {
-    const childNodes = node.children.map((child) => <PreviewNode key={child.id} node={child} />);
+const resolveNodeClassName = (
+    props: Record<string, any>,
+    customStyleById: Map<string, CustomStyle>
+): string => {
+    const customStyleId = props?.customStyleId;
+    if (typeof customStyleId === 'string' && customStyleById.has(customStyleId)) {
+        return customStyleById.get(customStyleId)?.className || '';
+    }
+    return props?.className || '';
+};
+
+const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customStyleById: Map<string, CustomStyle> }) => {
+    const childNodes = node.children.map((child) => <PreviewNode key={child.id} node={child} customStyleById={customStyleById} />);
     const menuItems = (node.props.menuItems || []) as MenuItem[];
+    const resolvedClassName = resolveNodeClassName(node.props, customStyleById);
 
     switch (node.type) {
         case 'Container':
             return (
-                <Box className={sanitizePreviewContainerClassName(node.props.className)} style={node.props.style}>
+                <Box className={sanitizePreviewContainerClassName(resolvedClassName)} style={node.props.style}>
                     {childNodes}
                 </Box>
             );
         case 'Header':
             return (
-                <header className={`w-full px-6 py-4 bg-white border-b border-gray-200 ${node.props.className || ''}`} style={node.props.style}>
+                <header
+                    className={node.props.customStyleId
+                        ? resolvedClassName
+                        : `w-full px-6 py-4 bg-white border-b border-gray-200 ${resolvedClassName}`}
+                    style={node.props.style}
+                >
                     <div className="max-w-6xl mx-auto flex items-center justify-between gap-6">
                         <div className="font-bold text-lg text-gray-900">{node.props.brand || 'My Site'}</div>
                         <nav>
@@ -252,7 +271,12 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
             );
         case 'Footer':
             return (
-                <footer className={`w-full px-6 py-5 bg-gray-900 text-white ${node.props.className || ''}`} style={node.props.style}>
+                <footer
+                    className={node.props.customStyleId
+                        ? resolvedClassName
+                        : `w-full px-6 py-5 bg-gray-900 text-white ${resolvedClassName}`}
+                    style={node.props.style}
+                >
                     <div className="max-w-6xl mx-auto flex items-center justify-between gap-6">
                         <p className="text-sm text-gray-200">{node.props.copyrightText || '© 2026 My Site'}</p>
                         <nav>
@@ -272,7 +296,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
         case 'Text':
             return (
                 <Typography
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                     variant={node.props.variant}
                     component={node.props.component}
@@ -286,7 +310,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                 : undefined;
             return (
                 <Button
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                     variant={node.props.variant}
                     icon={node.props.icon}
@@ -310,7 +334,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                         </label>
                     )}
                     <Input
-                        className={node.props.className}
+                        className={resolvedClassName}
                         style={node.props.style}
                         placeholder={node.props.placeholder}
                         size={node.props.size}
@@ -322,7 +346,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
         case 'Select':
             return (
                 <Select
-                    className={node.props.className}
+                    className={resolvedClassName}
                     label={node.props.label}
                     options={node.props.options || []}
                     style={node.props.style}
@@ -332,7 +356,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
         case 'MultiSelect':
             return (
                 <MultiSelect
-                    className={node.props.className}
+                    className={resolvedClassName}
                     label={node.props.label}
                     options={node.props.options || []}
                     style={node.props.style}
@@ -342,7 +366,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
         case 'RadioGroup':
             return (
                 <PreviewRadioGroupField
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                     label={node.props.label}
                     options={node.props.options || []}
@@ -353,7 +377,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
         case 'Rating':
             return (
                 <PreviewRatingField
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                     label={node.props.label}
                     value={node.props.value}
@@ -367,14 +391,14 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
             return (
                 <Checkbox
                     label={node.props.label}
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                 />
             );
         case 'Switch':
             return (
                 <PreviewSwitchField
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                     label={node.props.label}
                     checked={node.props.checked}
@@ -386,14 +410,14 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                 <img
                     src={node.props.src || 'https://placehold.co/300x180'}
                     alt={node.props.alt || 'image'}
-                    className={node.props.className || 'max-w-full h-auto'}
+                    className={resolvedClassName || 'max-w-full h-auto'}
                     style={node.props.style}
                 />
             );
         case 'Textarea':
             return (
                 <textarea
-                    className={node.props.className || 'border p-2 rounded w-full'}
+                    className={resolvedClassName || 'border p-2 rounded w-full'}
                     style={node.props.style}
                     placeholder={node.props.placeholder}
                 />
@@ -404,7 +428,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
             return (
                 <MaterialIcon
                     {...node.props}
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                 />
             );
@@ -413,7 +437,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                 <DataGrid
                     {...node.props}
                     isPreview={true}
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                 />
             );
@@ -421,7 +445,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
             return (
                 <DatePicker
                     {...node.props}
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                 />
             );
@@ -429,7 +453,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
             return (
                 <TimePicker
                     {...node.props}
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                 />
             );
@@ -437,7 +461,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
             return (
                 <DateTimePicker
                     {...node.props}
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                 />
             );
@@ -446,7 +470,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
                 <PreviewTabs
                     items={(node.props.items || []) as TabItem[]}
                     defaultValue={node.props.defaultValue ?? 0}
-                    className={node.props.className}
+                    className={resolvedClassName}
                     style={node.props.style}
                 >
                     {childNodes}
@@ -456,7 +480,7 @@ const PreviewNode = ({ node }: { node: ComponentNode }) => {
             return (
                 <Stepper
                     {...node.props}
-                    className={node.props.className}
+                    className={resolvedClassName}
                 >
                     {childNodes}
                 </Stepper>
@@ -508,10 +532,19 @@ export default function BuilderPreviewPage() {
         return site.pages.find((page) => page.id === site.currentPageId) || site.pages[0] || null;
     }, [site, location.search]);
 
+    const customStyleById = useMemo(() => {
+        const styles = site?.customStyles || [];
+        return new Map(styles.map((style) => [style.id, style]));
+    }, [site]);
+
+    const customCss = useMemo(() => {
+        return compileCustomStylesCss(site?.customStyles || []);
+    }, [site]);
+
     const content = useMemo(() => {
         if (!selectedPage) return null;
-        return selectedPage.nodes.map((node) => <PreviewNode key={node.id} node={node} />);
-    }, [selectedPage]);
+        return selectedPage.nodes.map((node) => <PreviewNode key={node.id} node={node} customStyleById={customStyleById} />);
+    }, [selectedPage, customStyleById]);
 
     if (!selectedPage) {
         return (
@@ -528,6 +561,7 @@ export default function BuilderPreviewPage() {
 
     return (
         <div className="min-h-screen w-full overflow-auto bg-white">
+            {customCss ? <style>{customCss}</style> : null}
             {content}
         </div>
     );

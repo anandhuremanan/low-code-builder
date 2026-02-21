@@ -5,6 +5,7 @@ import { useBuilder } from '../context';
 import { COMPONENT_REGISTRY } from '../registry';
 import { type ComponentNode } from '../types';
 import clsx from 'clsx';
+import { compileCustomStylesCss } from '../../lib/customStyleUtils';
 
 // Helper for class merging if not exists, I will use clsx + tailwind-merge locally if needed
 // For now I will assume I can use clsx directly or create a util.
@@ -93,18 +94,21 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
     const isSelected = state.selectedNodeId === node.id;
     const hasChildNodes = node.children.length > 0;
     const hasOwnChildrenProp = Object.prototype.hasOwnProperty.call(node.props, 'children');
+    const selectedCustomStyle = state.customStyles.find((style) => style.id === node.props.customStyleId);
+    const resolvedClassName = selectedCustomStyle?.className || node.props.className || '';
     const componentProps: Record<string, any> = {
         ...componentEntry.defaultProps,
         ...node.props,
         node
     };
+    componentProps.className = resolvedClassName;
     componentProps.onNavigateToPageSlug = (pageSlug: string) => {
         const targetPage = state.pages.find((page) => page.slug === pageSlug);
         if (!targetPage) return;
         dispatch({ type: 'SWITCH_PAGE', payload: { id: targetPage.id } });
     };
-    const wrapperMarginClasses = extractMarginClasses(node.props.className);
-    const wrapperLayoutClasses = extractLayoutClasses(node.props.className);
+    const wrapperMarginClasses = extractMarginClasses(resolvedClassName);
+    const wrapperLayoutClasses = extractLayoutClasses(resolvedClassName);
     const wrapperSizeStyle = {
         width: node.props?.style?.width,
         height: node.props?.style?.height,
@@ -258,6 +262,7 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
 export const Canvas = () => {
     const { state } = useBuilder();
     const currentPage = state.pages.find(p => p.id === state.currentPageId);
+    const customCss = compileCustomStylesCss(state.customStyles);
 
     // Root droppable area
     const { setNodeRef, isOver } = useDroppable({
@@ -278,6 +283,7 @@ export const Canvas = () => {
 
     return (
         <div className="flex-1 h-full bg-gray-100 p-8 pb-16 overflow-auto flex items-start justify-center transition-all">
+            {customCss ? <style>{customCss}</style> : null}
             <div
                 ref={setNodeRef}
                 className={clsx(
