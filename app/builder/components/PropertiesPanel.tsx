@@ -4,6 +4,7 @@ import { Input } from '../../components/ui/Input';
 import { Typography } from '../../components/ui/Typography';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { updateClass, getTailwindValue, getBorderValue, updateBorderClass, getEffectValue, updateEffectClass } from '../../lib/styleUtils';
+import { twMerge } from 'tailwind-merge';
 
 const TEXT_SIZE_CLASSES = new Set([
     'text-xs',
@@ -51,10 +52,48 @@ const replaceTokenInClass = (className: string, allowed: Set<string>, nextToken:
     return [...filtered, nextToken.trim()].join(' ').trim();
 };
 
-const extractMarginToken = (className: string): string => {
+const extractMarginTokens = (className: string): string => {
     if (!className) return '';
-    const match = className.match(/(?:^|\s)(-?m[trblxy]?-(?:[\w./-]+|\[[^[\]]+\]))(?:$|\s)/);
-    return match ? match[1] : '';
+    return className
+        .split(/\s+/)
+        .filter((token) => /^-?m[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token))
+        .join(' ');
+};
+
+const replaceMarginTokens = (className: string, nextMarginValue: string): string => {
+    const cleaned = className
+        .split(/\s+/)
+        .filter(Boolean)
+        .filter((token) => !/^-?m[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token))
+        .join(' ');
+
+    const normalizedMargin = normalizeSpacingInput(nextMarginValue);
+    if (!normalizedMargin) return cleaned.trim();
+    return twMerge(cleaned, normalizedMargin);
+};
+
+const extractPaddingTokens = (className: string): string => {
+    if (!className) return '';
+    return className
+        .split(/\s+/)
+        .filter((token) => /^p[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token))
+        .join(' ');
+};
+
+const normalizeSpacingInput = (value: string): string => {
+    return value.replace(/,/g, ' ').trim().replace(/\s+/g, ' ');
+};
+
+const replacePaddingTokens = (className: string, nextPaddingValue: string): string => {
+    const cleaned = className
+        .split(/\s+/)
+        .filter(Boolean)
+        .filter((token) => !/^p[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token))
+        .join(' ');
+
+    const normalizedPadding = normalizeSpacingInput(nextPaddingValue);
+    if (!normalizedPadding) return cleaned.trim();
+    return twMerge(cleaned, normalizedPadding);
 };
 
 const spacingTokenToCssValue = (raw: string): string => {
@@ -90,6 +129,45 @@ const marginTokenToStyle = (token: string): Record<string, string> => {
     if (axis === 'y') return { marginTop: finalValue, marginBottom: finalValue };
 
     return {};
+};
+
+const paddingTokenToStyle = (token: string): Record<string, string> => {
+    const match = token.trim().match(/^p([trblxy]?)-(.+)$/);
+    if (!match) return {};
+
+    const [, axis, rawValue] = match;
+    const value = spacingTokenToCssValue(rawValue);
+    if (!value) return {};
+
+    if (axis === '') return { padding: value };
+    if (axis === 't') return { paddingTop: value };
+    if (axis === 'r') return { paddingRight: value };
+    if (axis === 'b') return { paddingBottom: value };
+    if (axis === 'l') return { paddingLeft: value };
+    if (axis === 'x') return { paddingLeft: value, paddingRight: value };
+    if (axis === 'y') return { paddingTop: value, paddingBottom: value };
+
+    return {};
+};
+
+const paddingTokensToStyle = (value: string): Record<string, string> => {
+    const tokens = normalizeSpacingInput(value)
+        .split(/\s+/)
+        .filter((token) => /^p[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token));
+
+    return tokens.reduce<Record<string, string>>((acc, token) => {
+        return { ...acc, ...paddingTokenToStyle(token) };
+    }, {});
+};
+
+const marginTokensToStyle = (value: string): Record<string, string> => {
+    const tokens = normalizeSpacingInput(value)
+        .split(/\s+/)
+        .filter((token) => /^-?m[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token));
+
+    return tokens.reduce<Record<string, string>>((acc, token) => {
+        return { ...acc, ...marginTokenToStyle(token) };
+    }, {});
 };
 
 const spacingOrArbitraryToCss = (raw: string): string => {
@@ -246,8 +324,8 @@ export const PropertiesPanel = () => {
             setStyles({
                 width: getTailwindValue(className, 'w-'),
                 height: getTailwindValue(className, 'h-'),
-                padding: getTailwindValue(className, 'p-'),
-                margin: extractMarginToken(className),
+                padding: extractPaddingTokens(className),
+                margin: extractMarginTokens(className),
                 fontSize: extractTokenFromClass(className, TEXT_SIZE_CLASSES),
                 textAlign: extractTokenFromClass(className, TEXT_ALIGN_CLASSES),
                 objectFit: extractTokenFromClass(className, OBJECT_FIT_CLASSES)
@@ -322,19 +400,25 @@ export const PropertiesPanel = () => {
         // Update local state immediately so input reflects user typing
         setStyles(prev => ({ ...prev, [field]: value }));
 
+        const normalizedValue = field === 'padding' || field === 'margin' ? normalizeSpacingInput(value) : value;
+
         // Update node prop
         const currentClass = localProps.className || '';
         const newClass = field === 'fontSize'
-            ? replaceTokenInClass(currentClass, TEXT_SIZE_CLASSES, value)
+            ? replaceTokenInClass(currentClass, TEXT_SIZE_CLASSES, normalizedValue)
             : field === 'textAlign'
-                ? replaceTokenInClass(currentClass, TEXT_ALIGN_CLASSES, value)
+                ? replaceTokenInClass(currentClass, TEXT_ALIGN_CLASSES, normalizedValue)
                 : field === 'objectFit'
-                    ? replaceTokenInClass(currentClass, OBJECT_FIT_CLASSES, value)
-                    : updateClass(currentClass, prefix, value);
+                    ? replaceTokenInClass(currentClass, OBJECT_FIT_CLASSES, normalizedValue)
+                    : field === 'padding'
+                        ? replacePaddingTokens(currentClass, normalizedValue)
+                        : field === 'margin'
+                            ? replaceMarginTokens(currentClass, normalizedValue)
+                            : updateClass(currentClass, prefix, normalizedValue);
 
         const nextProps: Record<string, any> = { className: newClass };
         if (field === 'margin') {
-            const marginStyle = marginTokenToStyle(value);
+            const marginStyle = marginTokensToStyle(normalizedValue);
             const currentStyle = { ...(localProps.style || {}) };
             delete currentStyle.margin;
             delete currentStyle.marginTop;
@@ -348,6 +432,15 @@ export const PropertiesPanel = () => {
             if (field === 'width') delete currentStyle.width;
             if (field === 'height') delete currentStyle.height;
             nextProps.style = { ...currentStyle, ...sizeStyle };
+        } else if (field === 'padding') {
+            const paddingStyle = paddingTokensToStyle(normalizedValue);
+            const currentStyle = { ...(localProps.style || {}) };
+            delete currentStyle.padding;
+            delete currentStyle.paddingTop;
+            delete currentStyle.paddingRight;
+            delete currentStyle.paddingBottom;
+            delete currentStyle.paddingLeft;
+            nextProps.style = { ...currentStyle, ...paddingStyle };
         }
 
         // Update localProps to keep it in sync for next render
@@ -1216,7 +1309,7 @@ export const PropertiesPanel = () => {
                             <label className="text-xs text-gray-400">Padding</label>
                             <Input
                                 size="small"
-                                placeholder="p-4, p-[10px]"
+                                placeholder="p-4 px-2 py-2 pt-1"
                                 value={styles.padding}
                                 onChange={(e) => handleStyleChange('padding', 'p-', e.target.value)}
                             />
