@@ -112,6 +112,15 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
     const wrapperSizeStyle = {
         width: node.props?.style?.width,
         height: node.props?.style?.height,
+        ...(node.type === 'Container'
+            ? {
+                padding: node.props?.style?.padding,
+                paddingTop: node.props?.style?.paddingTop,
+                paddingRight: node.props?.style?.paddingRight,
+                paddingBottom: node.props?.style?.paddingBottom,
+                paddingLeft: node.props?.style?.paddingLeft
+            }
+            : {})
     } as React.CSSProperties;
 
     const stopResizeTracking = () => {

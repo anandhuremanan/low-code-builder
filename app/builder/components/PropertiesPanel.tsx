@@ -45,6 +45,23 @@ const extractTokenFromClass = (className: string, allowed: Set<string>): string 
     return tokens.find((token) => allowed.has(token)) || '';
 };
 
+const isPaddingToken = (token: string): boolean => {
+    if (!token.startsWith('p')) return false;
+    const parts = token.split('-');
+    if (parts.length < 2) return false;
+    const axis = parts[0];
+    return axis === 'p' || axis === 'px' || axis === 'py' || axis === 'pt' || axis === 'pr' || axis === 'pb' || axis === 'pl';
+};
+
+const isMarginToken = (token: string): boolean => {
+    const normalized = token.startsWith('-') ? token.slice(1) : token;
+    if (!normalized.startsWith('m')) return false;
+    const parts = normalized.split('-');
+    if (parts.length < 2) return false;
+    const axis = parts[0];
+    return axis === 'm' || axis === 'mx' || axis === 'my' || axis === 'mt' || axis === 'mr' || axis === 'mb' || axis === 'ml';
+};
+
 const replaceTokenInClass = (className: string, allowed: Set<string>, nextToken: string): string => {
     const tokens = className.split(/\s+/).filter(Boolean);
     const filtered = tokens.filter((token) => !allowed.has(token));
@@ -56,7 +73,7 @@ const extractMarginTokens = (className: string): string => {
     if (!className) return '';
     return className
         .split(/\s+/)
-        .filter((token) => /^-?m[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token))
+        .filter((token) => isMarginToken(token))
         .join(' ');
 };
 
@@ -64,7 +81,7 @@ const replaceMarginTokens = (className: string, nextMarginValue: string): string
     const cleaned = className
         .split(/\s+/)
         .filter(Boolean)
-        .filter((token) => !/^-?m[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token))
+        .filter((token) => !isMarginToken(token))
         .join(' ');
 
     const normalizedMargin = normalizeSpacingInput(nextMarginValue);
@@ -76,7 +93,7 @@ const extractPaddingTokens = (className: string): string => {
     if (!className) return '';
     return className
         .split(/\s+/)
-        .filter((token) => /^p[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token))
+        .filter((token) => isPaddingToken(token))
         .join(' ');
 };
 
@@ -88,7 +105,7 @@ const replacePaddingTokens = (className: string, nextPaddingValue: string): stri
     const cleaned = className
         .split(/\s+/)
         .filter(Boolean)
-        .filter((token) => !/^p[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token))
+        .filter((token) => !isPaddingToken(token))
         .join(' ');
 
     const normalizedPadding = normalizeSpacingInput(nextPaddingValue);
@@ -153,7 +170,7 @@ const paddingTokenToStyle = (token: string): Record<string, string> => {
 const paddingTokensToStyle = (value: string): Record<string, string> => {
     const tokens = normalizeSpacingInput(value)
         .split(/\s+/)
-        .filter((token) => /^p[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token));
+        .filter((token) => isPaddingToken(token));
 
     return tokens.reduce<Record<string, string>>((acc, token) => {
         return { ...acc, ...paddingTokenToStyle(token) };
@@ -163,7 +180,7 @@ const paddingTokensToStyle = (value: string): Record<string, string> => {
 const marginTokensToStyle = (value: string): Record<string, string> => {
     const tokens = normalizeSpacingInput(value)
         .split(/\s+/)
-        .filter((token) => /^-?m[trblxy]?-(?:[\w./-]+|\[[^[\]]+\])$/.test(token));
+        .filter((token) => isMarginToken(token));
 
     return tokens.reduce<Record<string, string>>((acc, token) => {
         return { ...acc, ...marginTokenToStyle(token) };
@@ -398,9 +415,8 @@ export const PropertiesPanel = () => {
     // Updates a specific style field in local state AND the node's className
     const handleStyleChange = (field: keyof typeof styles, prefix: string, value: string) => {
         // Update local state immediately so input reflects user typing
-        setStyles(prev => ({ ...prev, [field]: value }));
-
         const normalizedValue = field === 'padding' || field === 'margin' ? normalizeSpacingInput(value) : value;
+        setStyles(prev => ({ ...prev, [field]: normalizedValue }));
 
         // Update node prop
         const currentClass = localProps.className || '';
