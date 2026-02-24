@@ -28,7 +28,6 @@ import { Box } from '../components/ui/Box';
 import { Typography } from '../components/ui/Typography';
 import { DataGrid } from './components/DataGrid';
 import { Container } from './components/Container';
-import { Group } from './components/Group';
 import { Tabs } from './components/Tabs';
 import { MaterialIcon } from './components/MaterialIcon';
 import { DatePicker } from './components/DatePicker';
@@ -48,17 +47,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             className: 'p-4 border border-dashed border-gray-300 w-full',
         },
     },
-    Group: {
-        name: 'Group',
-        icon: ContainerIcon,
-        component: Group,
-        defaultProps: {
-            title: 'Group',
-            className: 'w-full border rounded',
-            collapsed: false,
-            contentClassName: ''
-        }
-    },
+  
     Header: {
         name: 'Header',
         icon: ContainerIcon,

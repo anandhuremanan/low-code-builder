@@ -21,7 +21,6 @@ export type ComponentType =
   | "MultiSelect"
   | "Tabs"
   | "Stepper"
-  | "Group"
   | "RadioGroup"
   | "Rating";
 
