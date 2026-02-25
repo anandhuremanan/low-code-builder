@@ -49,7 +49,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             className: 'p-4 border border-dashed border-gray-300 w-full',
         },
     },
-  
+
     Header: {
         name: 'Header',
         icon: ContainerIcon,
@@ -193,7 +193,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Input: {
         name: 'Input',
         icon: InputIcon,
-        component: ({ label, type, labelColor, ...props }: any) => (
+        component: ({ label, type, labelColor, onNavigateToPageSlug, ...props }: any) => (
             <div className="flex flex-col gap-1 w-full">
                 {label && (
                     <label className="text-sm font-medium text-gray-700" style={labelColor ? { color: labelColor } : undefined}>
@@ -226,7 +226,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Select: {
         name: 'Select',
         icon: SelectIcon,
-        component: ({ options, ...props }: any) => (
+        component: ({ options, onNavigateToPageSlug, ...props }: any) => (
             <Select {...props} options={options || []} />
         ),
         defaultProps: {
@@ -261,7 +261,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     RadioGroup: {
         name: 'RadioGroup',
         icon: SelectIcon,
-        component: ({ options, ...props }: any) => (
+        component: ({ options, onNavigateToPageSlug, ...props }: any) => (
             <RadioGroupUI {...props} options={options || []} />
         ),
         defaultProps: {
@@ -278,7 +278,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Rating: {
         name: 'Rating',
         icon: RatingIcon,
-        component: (props: any) => (
+        component: ({ onNavigateToPageSlug, ...props }: any) => (
             <RatingUI {...props} />
         ),
         defaultProps: {
@@ -294,7 +294,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Image: {
         name: 'Image',
         icon: BoxIcon, // Default icon
-        component: ({ src, alt, className, ...props }: any) => (
+        component: ({ src, alt, className, onNavigateToPageSlug, ...props }: any) => (
             <img
                 src={src || "https://placehold.co/150"}
                 alt={alt || "placeholder"}
@@ -307,7 +307,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Textarea: {
         name: 'Textarea',
         icon: TextIcon,
-        component: ({ className, ...props }: any) => <textarea {...props} className={className || "border p-2 rounded"} />,
+        component: ({ className, onNavigateToPageSlug, ...props }: any) => <textarea {...props} className={className || "border p-2 rounded"} />,
         defaultProps: {
             placeholder: 'Enter long text...',
             className: ''
@@ -392,7 +392,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     MultiSelect: {
         name: 'MultiSelect',
         icon: SelectIcon,
-        component: ({ options, ...props }: any) => (
+        component: ({ options, onNavigateToPageSlug, ...props }: any) => (
             <MultiSelect {...props} options={options || []} />
         ),
         defaultProps: {

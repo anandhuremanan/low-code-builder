@@ -102,11 +102,13 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
         node
     };
     componentProps.className = resolvedClassName;
-    componentProps.onNavigateToPageSlug = (pageSlug: string) => {
-        const targetPage = state.pages.find((page) => page.slug === pageSlug);
-        if (!targetPage) return;
-        dispatch({ type: 'SWITCH_PAGE', payload: { id: targetPage.id } });
-    };
+    if (node.type === 'Header' || node.type === 'Footer' || node.type === 'Button') {
+        componentProps.onNavigateToPageSlug = (pageSlug: string) => {
+            const targetPage = state.pages.find((page) => page.slug === pageSlug);
+            if (!targetPage) return;
+            dispatch({ type: 'SWITCH_PAGE', payload: { id: targetPage.id } });
+        };
+    }
     const wrapperMarginClasses = extractMarginClasses(resolvedClassName);
     const wrapperLayoutClasses = extractLayoutClasses(resolvedClassName);
     const wrapperSizeStyle = {
