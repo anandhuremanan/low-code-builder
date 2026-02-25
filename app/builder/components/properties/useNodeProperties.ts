@@ -9,16 +9,15 @@ import {
   extractMarginTokens,
   widthTokenToPx,
   styleTokenToCss,
-  normalizeSpacingInput,
   replaceTokenInClass,
   replacePaddingTokens,
   replaceMarginTokens,
-  marginTokensToStyle,
   paddingTokensToStyle,
   sizeTokenToStyle,
   isHexColor,
   sideToBorderProp,
   TEXT_ELEMENT_OPTIONS,
+  marginTokensToStyle,
 } from "./styleHelpers";
 import {
   updateClass,
@@ -60,8 +59,14 @@ export const useNodeProperties = () => {
   const [styles, setStyles] = useState({
     width: "",
     height: "",
-    padding: "",
-    margin: "",
+    paddingTop: "",
+    paddingRight: "",
+    paddingBottom: "",
+    paddingLeft: "",
+    marginTop: "",
+    marginRight: "",
+    marginBottom: "",
+    marginLeft: "",
     fontSize: "",
     textAlign: "",
     objectFit: "",
@@ -94,15 +99,65 @@ export const useNodeProperties = () => {
 
   const [localProps, setLocalProps] = useState<Record<string, any>>({});
 
+  const cssLengthToPixelInput = (value: unknown): string => {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return String(value);
+    }
+    if (typeof value !== "string") return "";
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+    if (/^-?\d+(\.\d+)?px$/.test(trimmed)) {
+      return String(Number(trimmed.replace("px", "")));
+    }
+    if (/^-?\d+(\.\d+)?rem$/.test(trimmed)) {
+      const rem = Number(trimmed.replace("rem", ""));
+      return String(rem * 16);
+    }
+    if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
+      return String(Number(trimmed));
+    }
+    return "";
+  };
+
   useEffect(() => {
     if (selectedNode) {
       setLocalProps(selectedNode.props);
       const className = selectedNode.props.className || "";
+      const paddingFromClass = paddingTokensToStyle(extractPaddingTokens(className));
+      const marginFromClass = marginTokensToStyle(extractMarginTokens(className));
+      const resolvedStyle = {
+        ...paddingFromClass,
+        ...marginFromClass,
+        ...(selectedNode.props?.style || {}),
+      } as Record<string, any>;
+
       setStyles({
         width: getTailwindValue(className, "w-"),
         height: getTailwindValue(className, "h-"),
-        padding: extractPaddingTokens(className),
-        margin: extractMarginTokens(className),
+        paddingTop: cssLengthToPixelInput(
+          resolvedStyle.paddingTop ?? resolvedStyle.padding,
+        ),
+        paddingRight: cssLengthToPixelInput(
+          resolvedStyle.paddingRight ?? resolvedStyle.padding,
+        ),
+        paddingBottom: cssLengthToPixelInput(
+          resolvedStyle.paddingBottom ?? resolvedStyle.padding,
+        ),
+        paddingLeft: cssLengthToPixelInput(
+          resolvedStyle.paddingLeft ?? resolvedStyle.padding,
+        ),
+        marginTop: cssLengthToPixelInput(
+          resolvedStyle.marginTop ?? resolvedStyle.margin,
+        ),
+        marginRight: cssLengthToPixelInput(
+          resolvedStyle.marginRight ?? resolvedStyle.margin,
+        ),
+        marginBottom: cssLengthToPixelInput(
+          resolvedStyle.marginBottom ?? resolvedStyle.margin,
+        ),
+        marginLeft: cssLengthToPixelInput(
+          resolvedStyle.marginLeft ?? resolvedStyle.margin,
+        ),
         fontSize: extractTokenFromClass(className, TEXT_SIZE_CLASSES),
         textAlign: extractTokenFromClass(className, TEXT_ALIGN_CLASSES),
         objectFit: extractTokenFromClass(className, OBJECT_FIT_CLASSES),
@@ -179,68 +234,92 @@ export const useNodeProperties = () => {
   };
 
   const handleStyleChange = (
-    field: keyof typeof styles,
+    field: "width" | "height" | "fontSize" | "textAlign" | "objectFit",
     prefix: string,
     value: string,
   ) => {
     if (!selectedNode) return;
-    const normalizedValue =
-      field === "padding" || field === "margin"
-        ? normalizeSpacingInput(value)
-        : value;
-    setStyles((prev) => ({ ...prev, [field]: normalizedValue }));
+    setStyles((prev) => ({ ...prev, [field]: value }));
 
     const currentClass = localProps.className || "";
     const newClass =
       field === "fontSize"
-        ? replaceTokenInClass(currentClass, TEXT_SIZE_CLASSES, normalizedValue)
+        ? replaceTokenInClass(currentClass, TEXT_SIZE_CLASSES, value)
         : field === "textAlign"
           ? replaceTokenInClass(
               currentClass,
               TEXT_ALIGN_CLASSES,
-              normalizedValue,
+              value,
             )
           : field === "objectFit"
             ? replaceTokenInClass(
                 currentClass,
                 OBJECT_FIT_CLASSES,
-                normalizedValue,
+                value,
               )
-            : field === "padding"
-              ? replacePaddingTokens(currentClass, normalizedValue)
-              : field === "margin"
-                ? replaceMarginTokens(currentClass, normalizedValue)
-                : updateClass(currentClass, prefix, normalizedValue);
+            : updateClass(currentClass, prefix, value);
 
     const nextProps: Record<string, any> = { className: newClass };
-    if (field === "margin") {
-      const marginStyle = marginTokensToStyle(normalizedValue);
-      const currentStyle = { ...(localProps.style || {}) };
-      delete currentStyle.margin;
-      delete currentStyle.marginTop;
-      delete currentStyle.marginRight;
-      delete currentStyle.marginBottom;
-      delete currentStyle.marginLeft;
-      nextProps.style = { ...currentStyle, ...marginStyle };
-    } else if (field === "width" || field === "height") {
+    if (field === "width" || field === "height") {
       const sizeStyle = sizeTokenToStyle(value);
       const currentStyle = { ...(localProps.style || {}) };
       if (field === "width") delete currentStyle.width;
       if (field === "height") delete currentStyle.height;
       nextProps.style = { ...currentStyle, ...sizeStyle };
-    } else if (field === "padding") {
-      const paddingStyle = paddingTokensToStyle(normalizedValue);
-      const currentStyle = { ...(localProps.style || {}) };
-      delete currentStyle.padding;
-      delete currentStyle.paddingTop;
-      delete currentStyle.paddingRight;
-      delete currentStyle.paddingBottom;
-      delete currentStyle.paddingLeft;
-      nextProps.style = { ...currentStyle, ...paddingStyle };
     }
 
     setLocalProps((prev) => ({ ...prev, ...nextProps }));
 
+    dispatch({
+      type: "UPDATE_NODE",
+      payload: { id: selectedNode.id, props: nextProps },
+    });
+  };
+
+  const handleBoxSpacingChange = (
+    kind: "padding" | "margin",
+    side: "top" | "right" | "bottom" | "left",
+    value: string,
+  ) => {
+    if (!selectedNode) return;
+    const normalized = value.replace(/[^0-9.-]/g, "");
+    const styleKey =
+      `${kind}${side[0].toUpperCase()}${side.slice(1)}` as
+        | "paddingTop"
+        | "paddingRight"
+        | "paddingBottom"
+        | "paddingLeft"
+        | "marginTop"
+        | "marginRight"
+        | "marginBottom"
+        | "marginLeft";
+
+    setStyles((prev) => ({ ...prev, [styleKey]: normalized }));
+
+    const nextStyle = { ...(localProps.style || {}) } as Record<string, any>;
+    delete nextStyle[kind];
+
+    if (!normalized.trim()) {
+      delete nextStyle[styleKey];
+    } else {
+      const numeric = Number(normalized);
+      if (!Number.isFinite(numeric)) return;
+      nextStyle[styleKey] = `${numeric}px`;
+    }
+
+    const currentClass = localProps.className || "";
+    const cleanedClass =
+      kind === "padding"
+        ? replacePaddingTokens(currentClass, "")
+        : replaceMarginTokens(currentClass, "");
+
+    const nextProps = {
+      ...localProps,
+      className: cleanedClass,
+      style: nextStyle,
+    };
+
+    setLocalProps(nextProps);
     dispatch({
       type: "UPDATE_NODE",
       payload: { id: selectedNode.id, props: nextProps },
@@ -813,6 +892,7 @@ export const useNodeProperties = () => {
     handleChange,
     handleCustomStyleChange,
     handleStyleChange,
+    handleBoxSpacingChange,
     handleDelete,
     handleNodeStyleChange,
     handleImageUpload,

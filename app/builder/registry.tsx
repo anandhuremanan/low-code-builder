@@ -168,10 +168,15 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Button: {
         name: 'Button',
         icon: ButtonIcon,
-        component: ({ pageSlug, onNavigateToPageSlug, onClick, ...props }: any) => (
+        component: ({ pageSlug, onNavigateToPageSlug, onClick, node, ...props }: any) => (
             <Button
                 {...props}
                 onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                    // In builder canvas mode, clicking should select the node, not trigger button action.
+                    if (node) {
+                        event.preventDefault();
+                        return;
+                    }
                     event.stopPropagation();
                     if (pageSlug && onNavigateToPageSlug) {
                         onNavigateToPageSlug(pageSlug);
