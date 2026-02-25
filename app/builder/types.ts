@@ -22,7 +22,6 @@ export type ComponentType =
   | "Charts"
   | "Tabs"
   | "Stepper"
-  | "Group"
   | "RadioGroup"
   | "Rating";
 
