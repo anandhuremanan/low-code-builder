@@ -64,7 +64,7 @@ export const Sidebar = () => {
     };
 
     return (
-        <div className="w-64 h-full bg-gray-50 border-r border-gray-200 flex flex-col">
+        <div className="w-64 shrink-0 h-full bg-gray-50 border-r border-gray-200 flex flex-col">
             {/* Tabs */}
             <div className="flex border-b border-gray-200">
                 <button

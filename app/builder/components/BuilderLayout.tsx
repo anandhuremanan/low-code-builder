@@ -211,7 +211,7 @@ export const BuilderLayout = () => {
                 >
                     <div className="flex h-screen w-full overflow-hidden">
                         <Sidebar />
-                        <div className="flex-1 flex flex-col relative">
+                        <div className="flex-1 min-w-0 flex flex-col relative">
                             {/* Header / Toolbar could go here */}
                             <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 justify-between">
                                 <span className="font-bold">Builder</span>
