@@ -22,10 +22,11 @@ import { Typography } from '../../components/ui/Typography';
 const PREVIEW_STORAGE_KEY = 'builder-preview-site';
 
 type BuilderLayoutProps = {
-    mode?: 'builder' | 'configure';
+    mode?: 'builder' | 'section';
+    sectionTarget?: SiteSectionKey;
 };
 
-export const BuilderLayout = ({ mode = 'builder' }: BuilderLayoutProps) => {
+export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayoutProps) => {
     const { state, dispatch } = useBuilder();
     const [activeDragType, setActiveDragType] = useState<ComponentType | null>(null);
     const [isCustomStyleDialogOpen, setIsCustomStyleDialogOpen] = useState(false);
@@ -44,11 +45,10 @@ export const BuilderLayout = ({ mode = 'builder' }: BuilderLayoutProps) => {
             return;
         }
 
-        if (mode === 'configure' && state.editingTarget === 'page') {
-            const defaultTarget: SiteSectionKey = state.siteSections.header.enabled || !state.siteSections.footer.enabled ? 'header' : 'footer';
-            dispatch({ type: 'SET_EDITING_TARGET', payload: { target: defaultTarget } });
+        if (mode === 'section' && sectionTarget && state.editingTarget !== sectionTarget) {
+            dispatch({ type: 'SET_EDITING_TARGET', payload: { target: sectionTarget } });
         }
-    }, [dispatch, mode, state.editingTarget, state.siteSections.footer.enabled, state.siteSections.header.enabled]);
+    }, [dispatch, mode, sectionTarget, state.editingTarget]);
 
     const sensors = useSensors(
         useSensor(MouseSensor, {
@@ -195,44 +195,6 @@ export const BuilderLayout = ({ mode = 'builder' }: BuilderLayoutProps) => {
         return state.editingTarget === 'header' ? 'Header' : 'Footer';
     }, [state.editingTarget]);
 
-    const renderConfigureControls = () => (
-        <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input
-                    type="checkbox"
-                    checked={state.siteSections.header.enabled}
-                    onChange={(e) => dispatch({ type: 'TOGGLE_SITE_SECTION', payload: { section: 'header', enabled: e.target.checked } })}
-                />
-                Header enabled
-            </label>
-            <button
-                type="button"
-                onClick={() => dispatch({ type: 'SET_EDITING_TARGET', payload: { target: 'header' } })}
-                className={`text-sm border px-3 py-1.5 rounded ${state.editingTarget === 'header' ? 'border-blue-300 text-blue-700 bg-blue-50' : 'border-gray-300'}`}
-            >
-                Edit Header
-            </button>
-            <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input
-                    type="checkbox"
-                    checked={state.siteSections.footer.enabled}
-                    onChange={(e) => dispatch({ type: 'TOGGLE_SITE_SECTION', payload: { section: 'footer', enabled: e.target.checked } })}
-                />
-                Footer enabled
-            </label>
-            <button
-                type="button"
-                onClick={() => dispatch({ type: 'SET_EDITING_TARGET', payload: { target: 'footer' } })}
-                className={`text-sm border px-3 py-1.5 rounded ${state.editingTarget === 'footer' ? 'border-blue-300 text-blue-700 bg-blue-50' : 'border-gray-300'}`}
-            >
-                Edit Footer
-            </button>
-            <a href="/builder" className="text-sm border border-gray-300 px-3 py-1.5 rounded">
-                Go To Builder
-            </a>
-        </div>
-    );
-
     return (
         <>
             {isClient ? (
@@ -242,7 +204,7 @@ export const BuilderLayout = ({ mode = 'builder' }: BuilderLayoutProps) => {
                         <div className="flex-1 flex flex-col relative">
                             <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 justify-between">
                                 <div className="flex items-center gap-3">
-                                    <span className="font-bold">{mode === 'configure' ? 'Configure' : 'Builder'}</span>
+                                    <span className="font-bold">Builder</span>
                                     <span className="text-xs text-gray-500 uppercase tracking-wide">Editing: {editingLabel}</span>
                                 </div>
                                 <div className="flex bg-gray-100 rounded-lg p-1 gap-1">
@@ -266,7 +228,11 @@ export const BuilderLayout = ({ mode = 'builder' }: BuilderLayoutProps) => {
                                     </button>
                                 </div>
                                 <div className="flex gap-2 items-center">
-                                    {mode === 'configure' ? renderConfigureControls() : <a href="/configure" className="text-sm border border-gray-300 px-3 py-1.5 rounded">Configure</a>}
+                                    {mode === 'section' ? (
+                                        <a href="/configure" className="text-sm border border-gray-300 px-3 py-1.5 rounded">
+                                            Configure
+                                        </a>
+                                    ) : null}
                                     <div className="flex bg-gray-100 rounded-lg p-1 gap-1 mr-2">
                                         <button
                                             onClick={() => dispatch({ type: 'UNDO' })}
