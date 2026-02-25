@@ -219,6 +219,13 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         defaultProps: {
             chartType: 'bar',
             title: 'Sales Overview',
+            dataSource: 'manual',
+            apiUrl: '',
+            jsonData: '',
+            dataPath: '',
+            xAxisKey: '',
+            yAxisKey: '',
+            colorKey: '',
             labels: ['Jan', 'Feb', 'Mar', 'Apr'],
             values: [12, 19, 8, 15],
             height: 320,

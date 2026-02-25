@@ -201,7 +201,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                 <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                     <div className="flex h-screen w-full overflow-hidden">
                         <Sidebar showPages={mode === 'builder'} />
-                        <div className="flex-1 flex flex-col relative">
+                        <div className="flex-1 min-w-0 flex flex-col relative">
                             <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 justify-between">
                                 <div className="flex items-center gap-3">
                                     <span className="font-bold">Builder</span>

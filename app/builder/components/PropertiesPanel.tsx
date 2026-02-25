@@ -22,7 +22,7 @@ export const PropertiesPanel = () => {
 
     if (!selectedNode) {
         return (
-            <div className="w-80 h-full bg-white border-l border-gray-200 p-4">
+            <div className="w-80 shrink-0 h-full bg-white border-l border-gray-200 p-4">
                 <Typography variant="body2" className="text-gray-500">
                     Select a component to edit properties.
                 </Typography>
@@ -31,7 +31,7 @@ export const PropertiesPanel = () => {
     }
 
     return (
-        <div className="w-80 h-full bg-white border-l border-gray-200 flex flex-col" >
+        <div className="w-80 shrink-0 h-full bg-white border-l border-gray-200 flex flex-col" >
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
                 <Typography variant="h6" className="font-semibold">
                     Properties
