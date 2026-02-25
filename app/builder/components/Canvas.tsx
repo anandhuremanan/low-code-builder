@@ -315,6 +315,12 @@ export const Canvas = () => {
                         <p>Drop components here</p>
                     </div>
                 )}
+
+                {state.editingTarget === 'header' && (
+                    <div className="w-full border-t border-dashed border-gray-300 bg-gray-50 py-8 text-center text-sm text-gray-500">
+                        Your page content here
+                    </div>
+                )}
             </div>
         </div>
     );

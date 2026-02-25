@@ -14,7 +14,7 @@ const createRootContainerNode = (className: string): ComponentNode => ({
 const createDefaultSiteSections = (): SiteSections => ({
     header: {
         enabled: false,
-        nodes: [createRootContainerNode('w-full p-4 bg-white')]
+        nodes: [createRootContainerNode('w-full p-4 bg-white min-h-[100px]')]
     },
     footer: {
         enabled: false,

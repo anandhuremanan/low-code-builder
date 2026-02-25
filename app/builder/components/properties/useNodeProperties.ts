@@ -123,6 +123,59 @@ export const useNodeProperties = () => {
     return "";
   };
 
+  const cssSizeToInput = (value: unknown): string => {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return `${value}px`;
+    }
+    if (typeof value === "string") return value.trim();
+    return "";
+  };
+
+  const toCssSizeValue = (value: string): string | null => {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    if (/^-?\d+(\.\d+)?$/.test(trimmed)) return `${trimmed}px`;
+    if (/^-?\d+(\.\d+)?(px|rem|em|%|vh|vw)$/.test(trimmed)) return trimmed;
+    if (trimmed === "full") return "100%";
+    if (trimmed === "screen") return "100vh";
+    if (/^calc\(.+\)$/.test(trimmed)) return trimmed;
+    return null;
+  };
+
+  const removeDimensionClassTokens = (
+    className: string,
+    field: "width" | "height",
+  ): string => {
+    const tokens = className.split(/\s+/).filter(Boolean);
+    return tokens
+      .filter((token) => {
+        if (field === "width") {
+          return (
+            !/^w-/.test(token) &&
+            !/^min-w-/.test(token) &&
+            !/^max-w-/.test(token)
+          );
+        }
+        return (
+          !/^h-/.test(token) &&
+          !/^min-h-/.test(token) &&
+          !/^max-h-/.test(token)
+        );
+      })
+      .join(" ");
+  };
+
+  const classSizeTokenToInput = (
+    token: string,
+    field: "width" | "height",
+  ): string => {
+    if (!token) return "";
+    const converted = sizeTokenToStyle(token);
+    const value = converted[field];
+    if (typeof value !== "string") return "";
+    return value;
+  };
+
   useEffect(() => {
     if (selectedNode) {
       setLocalProps(selectedNode.props);
@@ -135,9 +188,15 @@ export const useNodeProperties = () => {
         ...(selectedNode.props?.style || {}),
       } as Record<string, any>;
 
+      const widthToken = getTailwindValue(className, "w-");
+      const heightToken = getTailwindValue(className, "h-");
       setStyles({
-        width: getTailwindValue(className, "w-"),
-        height: getTailwindValue(className, "h-"),
+        width:
+          cssSizeToInput(resolvedStyle.width) ||
+          classSizeTokenToInput(widthToken, "width"),
+        height:
+          cssSizeToInput(resolvedStyle.height) ||
+          classSizeTokenToInput(heightToken, "height"),
         paddingTop: cssLengthToPixelInput(
           resolvedStyle.paddingTop ?? resolvedStyle.padding,
         ),
@@ -246,6 +305,10 @@ export const useNodeProperties = () => {
     setStyles((prev) => ({ ...prev, [field]: value }));
 
     const currentClass = localProps.className || "";
+    const isSizeField = field === "width" || field === "height";
+    const rawInput = value.trim();
+    const cssSizeValue = isSizeField ? toCssSizeValue(rawInput) : null;
+
     const newClass =
       field === "fontSize"
         ? replaceTokenInClass(currentClass, TEXT_SIZE_CLASSES, value)
@@ -257,19 +320,23 @@ export const useNodeProperties = () => {
             )
           : field === "objectFit"
             ? replaceTokenInClass(
-                currentClass,
-                OBJECT_FIT_CLASSES,
-                value,
-              )
-            : updateClass(currentClass, prefix, value);
+              currentClass,
+              OBJECT_FIT_CLASSES,
+              value,
+            )
+            : removeDimensionClassTokens(currentClass, field);
 
     const nextProps: Record<string, any> = { className: newClass };
-    if (field === "width" || field === "height") {
-      const sizeStyle = sizeTokenToStyle(value);
+    if (isSizeField) {
       const currentStyle = { ...(localProps.style || {}) };
       if (field === "width") delete currentStyle.width;
       if (field === "height") delete currentStyle.height;
-      nextProps.style = { ...currentStyle, ...sizeStyle };
+      const nextStyle = { ...currentStyle };
+      if (cssSizeValue) {
+        if (field === "width") nextStyle.width = cssSizeValue;
+        if (field === "height") nextStyle.height = cssSizeValue;
+      }
+      nextProps.style = nextStyle;
     }
 
     setLocalProps((prev) => ({ ...prev, ...nextProps }));

@@ -11,7 +11,7 @@ export const LayoutSizingSettings = ({ p }: { p: NodeProperties }) => {
                     <label className="text-xs text-gray-400">Width</label>
                     <Input
                         size="small"
-                        placeholder="w-full, w-[100px]"
+                        placeholder="e.g. 120 or 120px"
                         value={p.styles.width}
                         onChange={(e) => p.handleStyleChange('width', 'w-', e.target.value)}
                     />
@@ -20,7 +20,7 @@ export const LayoutSizingSettings = ({ p }: { p: NodeProperties }) => {
                     <label className="text-xs text-gray-400">Height</label>
                     <Input
                         size="small"
-                        placeholder="h-full, h-[100px]"
+                        placeholder="e.g. 120 or 120px"
                         value={p.styles.height}
                         onChange={(e) => p.handleStyleChange('height', 'h-', e.target.value)}
                     />

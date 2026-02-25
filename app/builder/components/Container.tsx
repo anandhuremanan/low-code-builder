@@ -93,7 +93,7 @@ export const Container = ({ node, children, className, ...props }: ContainerProp
             {...props}
         >
             {shouldShowStructureSelector ? (
-                <div className="flex flex-col items-center justify-center p-6 bg-gray-50/50 rounded border-2 border-dashed border-gray-300">
+                <div className="w-full h-full min-h-0 overflow-auto flex flex-col items-center justify-center p-3 bg-gray-50/50 rounded border-2 border-dashed border-gray-300">
                     <p className="text-sm font-medium text-gray-500 mb-4">Select Structure</p>
                     <div className="flex gap-2">
                         <Button
