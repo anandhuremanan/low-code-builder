@@ -102,7 +102,7 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
         node
     };
     componentProps.className = resolvedClassName;
-    if (node.type === 'Header' || node.type === 'Footer' || node.type === 'Button') {
+    if (node.type === 'Button') {
         componentProps.onNavigateToPageSlug = (pageSlug: string) => {
             const targetPage = state.pages.find((page) => page.slug === pageSlug);
             if (!targetPage) return;
@@ -273,6 +273,9 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
 export const Canvas = () => {
     const { state } = useBuilder();
     const currentPage = state.pages.find(p => p.id === state.currentPageId);
+    const activeNodes = state.editingTarget === 'page'
+        ? (currentPage?.nodes || [])
+        : state.siteSections[state.editingTarget].nodes;
     const customCss = compileCustomStylesCss(state.customStyles);
 
     // Root droppable area
@@ -284,7 +287,7 @@ export const Canvas = () => {
         }
     });
 
-    if (!currentPage) return <div>No page selected</div>;
+    if (state.editingTarget === 'page' && !currentPage) return <div>No page selected</div>;
 
     const widthClass = {
         desktop: 'w-full max-w-6xl',
@@ -303,13 +306,19 @@ export const Canvas = () => {
                     isOver ? "bg-blue-50 ring-2 ring-blue-400" : ""
                 )}
             >
-                {currentPage.nodes.map(node => (
+                {activeNodes.map(node => (
                     <NodeRenderer key={node.id} node={node} />
                 ))}
 
-                {currentPage.nodes.length === 0 && (
+                {activeNodes.length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center text-gray-400 p-10">
                         <p>Drop components here</p>
+                    </div>
+                )}
+
+                {state.editingTarget === 'header' && (
+                    <div className="w-full border-t border-dashed border-gray-300 bg-gray-50 py-8 text-center text-sm text-gray-500">
+                        Your page content here
                     </div>
                 )}
             </div>

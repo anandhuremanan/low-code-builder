@@ -3,8 +3,6 @@ import * as LucideIcons from "lucide-react";
 
 export type ComponentType =
   | "Container"
-  | "Header"
-  | "Footer"
   | "Button"
   | "Input"
   | "Text"
@@ -41,6 +39,15 @@ export type Page = {
   slug: string;
   nodes: ComponentNode[];
 };
+
+export type SiteSectionKey = "header" | "footer";
+
+export type SiteSection = {
+  enabled: boolean;
+  nodes: ComponentNode[];
+};
+
+export type SiteSections = Record<SiteSectionKey, SiteSection>;
 
 export type CustomStyle = {
   id: string;

@@ -21,12 +21,12 @@ export default function Home() {
         </p>
 
         <div className="mt-8">
-          <Link to="/builder" className="inline-block">
+          <Link to="/configure" className="inline-block">
             <Button
               variant="contained"
               color="primary"
               size="large"
-              label="Start Building Now"
+              label="Start Configuring"
             />
           </Link>
         </div>

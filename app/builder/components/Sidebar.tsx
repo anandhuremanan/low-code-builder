@@ -39,7 +39,7 @@ const SidebarItem = ({ type }: { type: ComponentType }) => {
     );
 };
 
-export const Sidebar = () => {
+export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
     const { state, dispatch } = useBuilder();
     const [activeTab, setActiveTab] = useState<'components' | 'pages'>('components');
     const [newPageName, setNewPageName] = useState('');
@@ -69,19 +69,21 @@ export const Sidebar = () => {
             <div className="flex border-b border-gray-200">
                 <button
                     onClick={() => setActiveTab('components')}
-                    className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === 'components' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+                    className={`py-3 text-sm font-medium flex items-center justify-center gap-2 ${showPages ? 'flex-1' : 'w-full'} ${activeTab === 'components' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
                 >
                     <Layers size={16} /> Components
                 </button>
-                <button
-                    onClick={() => setActiveTab('pages')}
-                    className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === 'pages' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-                >
-                    <File size={16} /> Pages
-                </button>
+                {showPages && (
+                    <button
+                        onClick={() => setActiveTab('pages')}
+                        className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === 'pages' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+                    >
+                        <File size={16} /> Pages
+                    </button>
+                )}
             </div>
 
-            {activeTab === 'components' ? (
+            {!showPages || activeTab === 'components' ? (
                 <div className="flex-1 overflow-y-auto p-4">
                     <div className="relative mb-4">
                         <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />

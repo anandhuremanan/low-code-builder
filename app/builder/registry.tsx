@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
     Box as BoxIcon,
@@ -19,7 +18,6 @@ import {
 } from 'lucide-react';
 import { type RegisteredComponent, type ComponentType } from './types';
 
-// Import existing UI components
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
@@ -49,129 +47,17 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             className: 'p-4 border border-dashed border-gray-300 w-full',
         },
     },
-
-    Header: {
-        name: 'Header',
-        icon: ContainerIcon,
-        component: ({ brand, menuItems = [], onNavigateToPageSlug, ...props }: any) => (
-            <header
-                {...props}
-                className={props?.node?.props?.customStyleId
-                    ? (props.className || '')
-                    : `w-full px-6 py-4 bg-white border-b border-gray-200 ${props.className || ''}`}
-            >
-                <div className="max-w-6xl mx-auto flex items-center justify-between gap-6">
-                    <div className="font-bold text-lg text-gray-900">{brand || 'My Site'}</div>
-                    <nav>
-                        <ul className="flex items-center gap-6">
-                            {menuItems.map((item: any) => (
-                                <li key={item.id} className="relative group text-sm text-gray-700">
-                                    <button
-                                        type="button"
-                                        className="hover:text-blue-600"
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-                                            if (item.pageSlug && onNavigateToPageSlug) {
-                                                onNavigateToPageSlug(item.pageSlug);
-                                            }
-                                        }}
-                                    >
-                                        {item.label}
-                                    </button>
-                                    {item.children?.length > 0 && (
-                                        <ul className="absolute left-0 top-full mt-2 hidden min-w-[180px] rounded-md border border-gray-200 bg-white p-2 shadow-md group-hover:block">
-                                            {item.children.map((child: any) => (
-                                                <li key={child.id} className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
-                                                    <button
-                                                        type="button"
-                                                        className="w-full text-left"
-                                                        onClick={(event) => {
-                                                            event.stopPropagation();
-                                                            if (child.pageSlug && onNavigateToPageSlug) {
-                                                                onNavigateToPageSlug(child.pageSlug);
-                                                            }
-                                                        }}
-                                                    >
-                                                        {child.label}
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
-                </div>
-            </header>
-        ),
-        defaultProps: {
-            brand: 'My Site',
-            className: '',
-            menuItems: [
-                { id: 'menu-home', label: 'Home', pageSlug: '/', children: [] },
-                {
-                    id: 'menu-services',
-                    label: 'Services',
-                    pageSlug: '/',
-                    children: [
-                        { id: 'submenu-design', label: 'Design', pageSlug: '/' },
-                        { id: 'submenu-dev', label: 'Development', pageSlug: '/' }
-                    ]
-                },
-                { id: 'menu-contact', label: 'Contact', pageSlug: '/', children: [] }
-            ]
-        },
-    },
-    Footer: {
-        name: 'Footer',
-        icon: ContainerIcon,
-        component: ({ copyrightText, menuItems = [], onNavigateToPageSlug, ...props }: any) => (
-            <footer
-                {...props}
-                className={props?.node?.props?.customStyleId
-                    ? (props.className || '')
-                    : `w-full px-6 py-5 bg-gray-900 text-white ${props.className || ''}`}
-            >
-                <div className="max-w-6xl mx-auto flex items-center justify-between gap-6">
-                    <p className="text-sm text-gray-200">{copyrightText || '© 2026 My Site'}</p>
-                    <ul className="flex items-center gap-4 text-sm text-gray-200">
-                        {menuItems.map((item: any) => (
-                            <li key={item.id}>
-                                <button
-                                    type="button"
-                                    className="hover:text-white"
-                                    onClick={(event) => {
-                                        event.stopPropagation();
-                                        if (item.pageSlug && onNavigateToPageSlug) {
-                                            onNavigateToPageSlug(item.pageSlug);
-                                        }
-                                    }}
-                                >
-                                    {item.label}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </footer>
-        ),
-        defaultProps: {
-            className: '',
-            copyrightText: '© 2026 My Site',
-            menuItems: [
-                { id: 'footer-privacy', label: 'Privacy', pageSlug: '/', children: [] },
-                { id: 'footer-terms', label: 'Terms', pageSlug: '/', children: [] }
-            ]
-        },
-    },
     Button: {
         name: 'Button',
         icon: ButtonIcon,
-        component: ({ pageSlug, onNavigateToPageSlug, onClick, ...props }: any) => (
+        component: ({ pageSlug, onNavigateToPageSlug, onClick, node, ...props }: any) => (
             <Button
                 {...props}
                 onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                    if (node) {
+                        event.preventDefault();
+                        return;
+                    }
                     event.stopPropagation();
                     if (pageSlug && onNavigateToPageSlug) {
                         onNavigateToPageSlug(pageSlug);
@@ -193,7 +79,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Input: {
         name: 'Input',
         icon: InputIcon,
-        component: ({ label, type, labelColor, onNavigateToPageSlug, ...props }: any) => (
+        component: ({ label, type, labelColor, ...props }: any) => (
             <div className="flex flex-col gap-1 w-full">
                 {label && (
                     <label className="text-sm font-medium text-gray-700" style={labelColor ? { color: labelColor } : undefined}>
@@ -226,7 +112,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Select: {
         name: 'Select',
         icon: SelectIcon,
-        component: ({ options, onNavigateToPageSlug, ...props }: any) => (
+        component: ({ options, ...props }: any) => (
             <Select {...props} options={options || []} />
         ),
         defaultProps: {
@@ -261,7 +147,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     RadioGroup: {
         name: 'RadioGroup',
         icon: SelectIcon,
-        component: ({ options, onNavigateToPageSlug, ...props }: any) => (
+        component: ({ options, ...props }: any) => (
             <RadioGroupUI {...props} options={options || []} />
         ),
         defaultProps: {
@@ -278,9 +164,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Rating: {
         name: 'Rating',
         icon: RatingIcon,
-        component: ({ onNavigateToPageSlug, ...props }: any) => (
-            <RatingUI {...props} />
-        ),
+        component: (props: any) => <RatingUI {...props} />,
         defaultProps: {
             label: 'Rate this',
             value: 3,
@@ -293,11 +177,11 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     },
     Image: {
         name: 'Image',
-        icon: BoxIcon, // Default icon
-        component: ({ src, alt, className, onNavigateToPageSlug, ...props }: any) => (
+        icon: BoxIcon,
+        component: ({ src, alt, className, ...props }: any) => (
             <img
-                src={src || "https://placehold.co/150"}
-                alt={alt || "placeholder"}
+                src={src || 'https://placehold.co/150'}
+                alt={alt || 'placeholder'}
                 className={`max-w-full ${className || ''}`}
                 {...props}
             />
@@ -307,7 +191,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Textarea: {
         name: 'Textarea',
         icon: TextIcon,
-        component: ({ className, onNavigateToPageSlug, ...props }: any) => <textarea {...props} className={className || "border p-2 rounded"} />,
+        component: ({ className, ...props }: any) => <textarea {...props} className={className || 'border p-2 rounded'} />,
         defaultProps: {
             placeholder: 'Enter long text...',
             className: ''
@@ -399,7 +283,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     MultiSelect: {
         name: 'MultiSelect',
         icon: SelectIcon,
-        component: ({ options, onNavigateToPageSlug, ...props }: any) => (
+        component: ({ options, ...props }: any) => (
             <MultiSelect {...props} options={options || []} />
         ),
         defaultProps: {
