@@ -47,9 +47,13 @@ export const useNodeProperties = () => {
   };
 
   const currentPage = state.pages.find((p) => p.id === state.currentPageId);
+  const activeNodes =
+    state.editingTarget === "page"
+      ? currentPage?.nodes || []
+      : state.siteSections[state.editingTarget].nodes;
   const selectedNode =
-    selectedNodeId && currentPage
-      ? findNode(currentPage.nodes, selectedNodeId)
+    selectedNodeId && activeNodes.length > 0
+      ? findNode(activeNodes, selectedNodeId)
       : null;
   const pageOptions = state.pages.map((page) => ({
     label: page.name,

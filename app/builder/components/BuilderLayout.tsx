@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     DndContext,
     DragOverlay,
@@ -15,29 +14,46 @@ import { Canvas } from './Canvas';
 import { PropertiesPanel } from './PropertiesPanel';
 import { useBuilder } from '../context';
 import { COMPONENT_REGISTRY } from '../registry';
-import { type ComponentType } from '../types';
+import { type ComponentType, type SiteSectionKey } from '../types';
 import { Dialog } from '../../components/ui/Dialog';
 import { Input } from '../../components/ui/Input';
 import { Typography } from '../../components/ui/Typography';
 
-export const BuilderLayout = () => {
+const PREVIEW_STORAGE_KEY = 'builder-preview-site';
+
+type BuilderLayoutProps = {
+    mode?: 'builder' | 'configure';
+};
+
+export const BuilderLayout = ({ mode = 'builder' }: BuilderLayoutProps) => {
     const { state, dispatch } = useBuilder();
     const [activeDragType, setActiveDragType] = useState<ComponentType | null>(null);
     const [isCustomStyleDialogOpen, setIsCustomStyleDialogOpen] = useState(false);
     const [customStyleName, setCustomStyleName] = useState('');
     const [customStyleClassName, setCustomStyleClassName] = useState('');
     const [customStyleCss, setCustomStyleCss] = useState('');
-    const PREVIEW_STORAGE_KEY = 'builder-preview-site';
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
     }, []);
 
+    useEffect(() => {
+        if (mode === 'builder' && state.editingTarget !== 'page') {
+            dispatch({ type: 'SET_EDITING_TARGET', payload: { target: 'page' } });
+            return;
+        }
+
+        if (mode === 'configure' && state.editingTarget === 'page') {
+            const defaultTarget: SiteSectionKey = state.siteSections.header.enabled || !state.siteSections.footer.enabled ? 'header' : 'footer';
+            dispatch({ type: 'SET_EDITING_TARGET', payload: { target: defaultTarget } });
+        }
+    }, [dispatch, mode, state.editingTarget, state.siteSections.footer.enabled, state.siteSections.header.enabled]);
+
     const sensors = useSensors(
         useSensor(MouseSensor, {
             activationConstraint: {
-                distance: 10, // Must drag 10px to start (prevents accidental clicks)
+                distance: 10,
             },
         }),
         useSensor(TouchSensor)
@@ -54,20 +70,14 @@ export const BuilderLayout = () => {
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Check if user is typing in an input/textarea to avoid triggering undo/redo
             const target = e.target as HTMLElement;
-            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) {
-                return;
-            }
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) return;
 
             if (e.ctrlKey || e.metaKey) {
                 if (e.key === 'z') {
                     e.preventDefault();
-                    if (e.shiftKey) {
-                        dispatch({ type: 'REDO' });
-                    } else {
-                        dispatch({ type: 'UNDO' });
-                    }
+                    if (e.shiftKey) dispatch({ type: 'REDO' });
+                    else dispatch({ type: 'UNDO' });
                 } else if (e.key === 'y') {
                     e.preventDefault();
                     dispatch({ type: 'REDO' });
@@ -90,10 +100,8 @@ export const BuilderLayout = () => {
         const { active, over } = event;
         setActiveDragType(null);
         dispatch({ type: 'SET_DRAGGED_COMPONENT', payload: { type: null } });
-
         if (!over) return;
 
-        // Verify if we are dropping a new component from sidebar
         if (active.data.current?.isNew) {
             const type = active.data.current.type as ComponentType;
             const newId = `node-${Date.now()}`;
@@ -111,37 +119,19 @@ export const BuilderLayout = () => {
                 }))
                 : [];
 
-            // Logic to determine parent.
-            let parentId: string | null = null;
-            const shouldForceRootParent = type === 'Footer';
-
-            if (shouldForceRootParent) {
-                parentId = 'root-container';
-            } else {
-                // If dropping on 'canvas-root', or if we default to root
-                if (over.id === 'canvas-root') {
-                    parentId = 'root-container';
-                } else {
-                    // If over.id is NOT canvas-root, it means we dropped ON a container
-                    // We trust over.id is the container ID
-                    parentId = over.id as string;
-                }
-            }
-
-            if (parentId) {
-                dispatch({
-                    type: 'ADD_NODE',
-                    payload: {
-                        parentId,
-                        node: {
-                            id: newId,
-                            type,
-                            props: clonedDefaultProps,
-                            children: initialChildren
-                        }
+            const parentId = over.id === 'canvas-root' ? 'root-container' : String(over.id);
+            dispatch({
+                type: 'ADD_NODE',
+                payload: {
+                    parentId,
+                    node: {
+                        id: newId,
+                        type,
+                        props: clonedDefaultProps,
+                        children: initialChildren
                     }
-                });
-            }
+                }
+            });
         } else {
             const nodeId = active.data.current?.nodeId as string | undefined;
             if (!nodeId) return;
@@ -163,7 +153,8 @@ export const BuilderLayout = () => {
             pages: state.pages,
             currentPageId: state.currentPageId,
             viewMode: state.viewMode,
-            customStyles: state.customStyles
+            customStyles: state.customStyles,
+            siteSections: state.siteSections
         }));
         window.open('/builder/preview', '_blank', 'noopener,noreferrer');
     };
@@ -174,9 +165,7 @@ export const BuilderLayout = () => {
         setCustomStyleCss('');
     };
 
-    const normalizeClassName = (value: string): string => {
-        return value.trim().replace(/^\./, '');
-    };
+    const normalizeClassName = (value: string): string => value.trim().replace(/^\./, '');
 
     const handleAddCustomStyle = () => {
         const name = customStyleName.trim();
@@ -201,20 +190,61 @@ export const BuilderLayout = () => {
         resetCustomStyleDialog();
     };
 
+    const editingLabel = useMemo(() => {
+        if (state.editingTarget === 'page') return 'Page';
+        return state.editingTarget === 'header' ? 'Header' : 'Footer';
+    }, [state.editingTarget]);
+
+    const renderConfigureControls = () => (
+        <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                    type="checkbox"
+                    checked={state.siteSections.header.enabled}
+                    onChange={(e) => dispatch({ type: 'TOGGLE_SITE_SECTION', payload: { section: 'header', enabled: e.target.checked } })}
+                />
+                Header enabled
+            </label>
+            <button
+                type="button"
+                onClick={() => dispatch({ type: 'SET_EDITING_TARGET', payload: { target: 'header' } })}
+                className={`text-sm border px-3 py-1.5 rounded ${state.editingTarget === 'header' ? 'border-blue-300 text-blue-700 bg-blue-50' : 'border-gray-300'}`}
+            >
+                Edit Header
+            </button>
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                    type="checkbox"
+                    checked={state.siteSections.footer.enabled}
+                    onChange={(e) => dispatch({ type: 'TOGGLE_SITE_SECTION', payload: { section: 'footer', enabled: e.target.checked } })}
+                />
+                Footer enabled
+            </label>
+            <button
+                type="button"
+                onClick={() => dispatch({ type: 'SET_EDITING_TARGET', payload: { target: 'footer' } })}
+                className={`text-sm border px-3 py-1.5 rounded ${state.editingTarget === 'footer' ? 'border-blue-300 text-blue-700 bg-blue-50' : 'border-gray-300'}`}
+            >
+                Edit Footer
+            </button>
+            <a href="/builder" className="text-sm border border-gray-300 px-3 py-1.5 rounded">
+                Go To Builder
+            </a>
+        </div>
+    );
+
     return (
         <>
             {isClient ? (
-                <DndContext
-                    sensors={sensors}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                >
+                <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                     <div className="flex h-screen w-full overflow-hidden">
-                        <Sidebar />
+                        <Sidebar showPages={mode === 'builder'} />
                         <div className="flex-1 flex flex-col relative">
-                            {/* Header / Toolbar could go here */}
                             <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 justify-between">
-                                <span className="font-bold">Builder</span>
+                                <div className="flex items-center gap-3">
+                                    <span className="font-bold">{mode === 'configure' ? 'Configure' : 'Builder'}</span>
+                                    <span className="text-xs text-gray-500 uppercase tracking-wide">Editing: {editingLabel}</span>
+                                </div>
                                 <div className="flex bg-gray-100 rounded-lg p-1 gap-1">
                                     <button
                                         onClick={() => dispatch({ type: 'SET_VIEW_MODE', payload: { mode: 'desktop' } })}
@@ -236,6 +266,7 @@ export const BuilderLayout = () => {
                                     </button>
                                 </div>
                                 <div className="flex gap-2 items-center">
+                                    {mode === 'configure' ? renderConfigureControls() : <a href="/configure" className="text-sm border border-gray-300 px-3 py-1.5 rounded">Configure</a>}
                                     <div className="flex bg-gray-100 rounded-lg p-1 gap-1 mr-2">
                                         <button
                                             onClick={() => dispatch({ type: 'UNDO' })}
@@ -291,21 +322,11 @@ export const BuilderLayout = () => {
                         <div className="space-y-4 min-w-[560px] max-w-[720px]">
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Style Name</label>
-                                <Input
-                                    size="small"
-                                    placeholder="Primary CTA"
-                                    value={customStyleName}
-                                    onChange={(e) => setCustomStyleName(e.target.value)}
-                                />
+                                <Input size="small" placeholder="Primary CTA" value={customStyleName} onChange={(e) => setCustomStyleName(e.target.value)} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">CSS Class Name</label>
-                                <Input
-                                    size="small"
-                                    placeholder="cta-primary"
-                                    value={customStyleClassName}
-                                    onChange={(e) => setCustomStyleClassName(e.target.value)}
-                                />
+                                <Input size="small" placeholder="cta-primary" value={customStyleClassName} onChange={(e) => setCustomStyleClassName(e.target.value)} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">CSS Code</label>
@@ -327,13 +348,9 @@ export const BuilderLayout = () => {
                             </button>
 
                             <div className="pt-2 border-t border-gray-200 space-y-2">
-                                <Typography variant="body2" className="text-gray-700 font-medium">
-                                    Added Styles
-                                </Typography>
+                                <Typography variant="body2" className="text-gray-700 font-medium">Added Styles</Typography>
                                 {state.customStyles.length === 0 ? (
-                                    <Typography variant="body2" className="text-gray-500 text-sm">
-                                        No styles added yet.
-                                    </Typography>
+                                    <Typography variant="body2" className="text-gray-500 text-sm">No styles added yet.</Typography>
                                 ) : (
                                     <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                                         {state.customStyles.map((style) => (
@@ -361,8 +378,7 @@ export const BuilderLayout = () => {
                 <div className="flex h-screen w-full overflow-hidden bg-gray-50 flex items-center justify-center">
                     Loading Builder...
                 </div>
-            )
-            }
+            )}
         </>
     );
 };

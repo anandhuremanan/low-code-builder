@@ -10,7 +10,7 @@ import { Rating } from '../components/ui/Rating';
 import { Switch } from '../components/ui/Switch';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
-import { type ComponentNode, type CustomStyle, type Page } from '../builder/types';
+import { type ComponentNode, type CustomStyle, type Page, type SiteSections } from '../builder/types';
 import { DataGrid } from '../builder/components/DataGrid';
 import { Charts } from '../builder/components/Charts';
 import { MaterialIcon } from '../builder/components/MaterialIcon';
@@ -27,13 +27,7 @@ type SiteSnapshot = {
     currentPageId: string | null;
     viewMode?: 'desktop' | 'tablet' | 'mobile';
     customStyles?: CustomStyle[];
-};
-
-type MenuItem = {
-    id: string;
-    label: string;
-    pageSlug?: string;
-    children?: MenuItem[];
+    siteSections?: SiteSections;
 };
 
 type TabItem = {
@@ -51,34 +45,6 @@ const sanitizePreviewContainerClassName = (className?: string): string => {
         .filter((token) => !/^border-gray-\d+$/.test(token))
         .filter((token) => !(hasDashedBorder && token === 'border'))
         .join(' ');
-};
-
-const PreviewMenu = ({ items }: { items: MenuItem[] }) => {
-    return (
-        <ul className="flex items-center gap-6">
-            {items.map((item) => (
-                <li key={item.id} className="relative group text-sm text-gray-700">
-                    <a href={`/builder/preview?page=${encodeURIComponent(item.pageSlug || '/')}`} className="hover:text-blue-600">
-                        {item.label}
-                    </a>
-                    {item.children && item.children.length > 0 && (
-                        <ul className="absolute left-0 top-full z-20 mt-2 hidden min-w-50 rounded-md border border-gray-200 bg-white p-2 shadow-md group-hover:block">
-                            {item.children.map((child) => (
-                                <li key={child.id}>
-                                    <a
-                                        href={`/builder/preview?page=${encodeURIComponent(child.pageSlug || '/')}`}
-                                        className="block rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                    >
-                                        {child.label}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </li>
-            ))}
-        </ul>
-    );
 };
 
 const PreviewTabs = ({
@@ -244,7 +210,6 @@ const resolveNodeClassName = (
 
 const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customStyleById: Map<string, CustomStyle> }) => {
     const childNodes = node.children.map((child) => <PreviewNode key={child.id} node={child} customStyleById={customStyleById} />);
-    const menuItems = (node.props.menuItems || []) as MenuItem[];
     const resolvedClassName = resolveNodeClassName(node.props, customStyleById);
 
     switch (node.type) {
@@ -253,46 +218,6 @@ const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customSty
                 <Box className={sanitizePreviewContainerClassName(resolvedClassName)} style={node.props.style}>
                     {childNodes}
                 </Box>
-            );
-        case 'Header':
-            return (
-                <header
-                    className={node.props.customStyleId
-                        ? resolvedClassName
-                        : `w-full px-6 py-4 bg-white border-b border-gray-200 ${resolvedClassName}`}
-                    style={node.props.style}
-                >
-                    <div className="max-w-6xl mx-auto flex items-center justify-between gap-6">
-                        <div className="font-bold text-lg text-gray-900">{node.props.brand || 'My Site'}</div>
-                        <nav>
-                            <PreviewMenu items={menuItems} />
-                        </nav>
-                    </div>
-                </header>
-            );
-        case 'Footer':
-            return (
-                <footer
-                    className={node.props.customStyleId
-                        ? resolvedClassName
-                        : `w-full px-6 py-5 bg-gray-900 text-white ${resolvedClassName}`}
-                    style={node.props.style}
-                >
-                    <div className="max-w-6xl mx-auto flex items-center justify-between gap-6">
-                        <p className="text-sm text-gray-200">{node.props.copyrightText || '© 2026 My Site'}</p>
-                        <nav>
-                            <ul className="flex items-center gap-4 text-sm text-gray-200">
-                                {menuItems.map((item) => (
-                                    <li key={item.id}>
-                                        <a href={`/builder/preview?page=${encodeURIComponent(item.pageSlug || '/')}`} className="hover:text-white">
-                                            {item.label}
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
-                        </nav>
-                    </div>
-                </footer>
             );
         case 'Text':
             return (
@@ -389,13 +314,7 @@ const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customSty
                 />
             );
         case 'Checkbox':
-            return (
-                <Checkbox
-                    label={node.props.label}
-                    className={resolvedClassName}
-                    style={node.props.style}
-                />
-            );
+            return <Checkbox label={node.props.label} className={resolvedClassName} style={node.props.style} />;
         case 'Switch':
             return (
                 <PreviewSwitchField
@@ -423,57 +342,18 @@ const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customSty
                     placeholder={node.props.placeholder}
                 />
             );
-
-
         case 'MaterialIcon':
-            return (
-                <MaterialIcon
-                    {...node.props}
-                    className={resolvedClassName}
-                    style={node.props.style}
-                />
-            );
+            return <MaterialIcon {...node.props} className={resolvedClassName} style={node.props.style} />;
         case 'DataGrid':
-            return (
-                <DataGrid
-                    {...node.props}
-                    isPreview={true}
-                    className={resolvedClassName}
-                    style={node.props.style}
-                />
-            );
+            return <DataGrid {...node.props} isPreview={true} className={resolvedClassName} style={node.props.style} />;
         case 'Charts':
-            return (
-                <Charts
-                    {...node.props}
-                    className={node.props.className}
-                    style={node.props.style}
-                />
-            );
+            return <Charts {...node.props} className={node.props.className} style={node.props.style} />;
         case 'DatePicker':
-            return (
-                <DatePicker
-                    {...node.props}
-                    className={resolvedClassName}
-                    style={node.props.style}
-                />
-            );
+            return <DatePicker {...node.props} className={resolvedClassName} style={node.props.style} />;
         case 'TimePicker':
-            return (
-                <TimePicker
-                    {...node.props}
-                    className={resolvedClassName}
-                    style={node.props.style}
-                />
-            );
+            return <TimePicker {...node.props} className={resolvedClassName} style={node.props.style} />;
         case 'DateTimePicker':
-            return (
-                <DateTimePicker
-                    {...node.props}
-                    className={resolvedClassName}
-                    style={node.props.style}
-                />
-            );
+            return <DateTimePicker {...node.props} className={resolvedClassName} style={node.props.style} />;
         case 'Tabs':
             return (
                 <PreviewTabs
@@ -487,16 +367,12 @@ const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customSty
             );
         case 'Stepper':
             return (
-                <Stepper
-                    {...node.props}
-                    className={resolvedClassName}
-                >
+                <Stepper {...node.props} className={resolvedClassName}>
                     {childNodes}
                 </Stepper>
             );
         default:
             return null;
-
     }
 };
 
@@ -515,7 +391,6 @@ export default function BuilderPreviewPage() {
                 return;
             }
 
-            // Backward compatibility with old single-page preview payload.
             if (parsed?.nodes) {
                 const singlePage = parsed as Page;
                 setSite({
@@ -535,9 +410,7 @@ export default function BuilderPreviewPage() {
         if (!site) return null;
         const params = new URLSearchParams(location.search);
         const slug = params.get('page');
-        if (slug) {
-            return site.pages.find((page) => page.slug === slug) || null;
-        }
+        if (slug) return site.pages.find((page) => page.slug === slug) || null;
         return site.pages.find((page) => page.id === site.currentPageId) || site.pages[0] || null;
     }, [site, location.search]);
 
@@ -546,14 +419,22 @@ export default function BuilderPreviewPage() {
         return new Map(styles.map((style) => [style.id, style]));
     }, [site]);
 
-    const customCss = useMemo(() => {
-        return compileCustomStylesCss(site?.customStyles || []);
-    }, [site]);
+    const customCss = useMemo(() => compileCustomStylesCss(site?.customStyles || []), [site]);
 
-    const content = useMemo(() => {
+    const headerContent = useMemo(() => {
+        if (!site?.siteSections?.header?.enabled) return null;
+        return site.siteSections.header.nodes.map((node) => <PreviewNode key={`header-${node.id}`} node={node} customStyleById={customStyleById} />);
+    }, [customStyleById, site?.siteSections?.header?.enabled, site?.siteSections?.header?.nodes]);
+
+    const pageContent = useMemo(() => {
         if (!selectedPage) return null;
         return selectedPage.nodes.map((node) => <PreviewNode key={node.id} node={node} customStyleById={customStyleById} />);
     }, [selectedPage, customStyleById]);
+
+    const footerContent = useMemo(() => {
+        if (!site?.siteSections?.footer?.enabled) return null;
+        return site.siteSections.footer.nodes.map((node) => <PreviewNode key={`footer-${node.id}`} node={node} customStyleById={customStyleById} />);
+    }, [customStyleById, site?.siteSections?.footer?.enabled, site?.siteSections?.footer?.nodes]);
 
     if (!selectedPage) {
         return (
@@ -571,7 +452,9 @@ export default function BuilderPreviewPage() {
     return (
         <div className="min-h-screen w-full overflow-auto bg-white">
             {customCss ? <style>{customCss}</style> : null}
-            {content}
+            {headerContent}
+            {pageContent}
+            {footerContent}
         </div>
     );
 }

@@ -11,7 +11,6 @@ import { TypographySettings } from './properties/TypographySettings';
 import { ButtonSettings } from './properties/ButtonSettings';
 import { ContainerSettings } from './properties/ContainerSettings';
 import { ImageSettings } from './properties/ImageSettings';
-import { NavigationSettings } from './properties/NavigationSettings';
 import { LayoutSizingSettings } from './properties/LayoutSizingSettings';
 import { SpacingSettings } from './properties/SpacingSettings';
 import { BordersSettings } from './properties/BordersSettings';
@@ -82,7 +81,6 @@ export const PropertiesPanel = () => {
                 {selectedNode.type === 'Button' && <ButtonSettings p={p} />}
                 {selectedNode.type === 'Container' && <ContainerSettings p={p} />}
                 {selectedNode.type === 'Image' && <ImageSettings p={p} />}
-                {(selectedNode.type === 'Header' || selectedNode.type === 'Footer') && <NavigationSettings p={p} />}
 
                 <SecondaryPropertiesSections
                     selectedNode={selectedNode}
