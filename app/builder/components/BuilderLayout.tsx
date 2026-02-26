@@ -40,7 +40,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
     }, []);
 
     useEffect(() => {
-        if (mode === 'builder' && state.editingTarget !== 'page') {
+        if (mode === 'builder' && (state.editingTarget === 'header' || state.editingTarget === 'footer')) {
             dispatch({ type: 'SET_EDITING_TARGET', payload: { target: 'page' } });
             return;
         }
@@ -151,7 +151,9 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
     const handlePreview = () => {
         localStorage.setItem(PREVIEW_STORAGE_KEY, JSON.stringify({
             pages: state.pages,
+            popups: state.popups,
             currentPageId: state.currentPageId,
+            currentPopupId: state.currentPopupId,
             viewMode: state.viewMode,
             customStyles: state.customStyles,
             siteSections: state.siteSections
@@ -192,8 +194,12 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
 
     const editingLabel = useMemo(() => {
         if (state.editingTarget === 'page') return 'Page';
+        if (state.editingTarget === 'popup') {
+            const popup = state.popups.find((item) => item.id === state.currentPopupId);
+            return popup ? `Popup: ${popup.name}` : 'Popup';
+        }
         return state.editingTarget === 'header' ? 'Header' : 'Footer';
-    }, [state.editingTarget]);
+    }, [state.currentPopupId, state.editingTarget, state.popups]);
 
     return (
         <>

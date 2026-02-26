@@ -47,10 +47,13 @@ export const useNodeProperties = () => {
   };
 
   const currentPage = state.pages.find((p) => p.id === state.currentPageId);
+  const currentPopup = state.popups.find((popup) => popup.id === state.currentPopupId);
   const activeNodes =
     state.editingTarget === "page"
       ? currentPage?.nodes || []
-      : state.siteSections[state.editingTarget].nodes;
+      : state.editingTarget === "popup"
+        ? currentPopup?.nodes || []
+        : state.siteSections[state.editingTarget].nodes;
   const selectedNode =
     selectedNodeId && activeNodes.length > 0
       ? findNode(activeNodes, selectedNodeId)
@@ -58,6 +61,10 @@ export const useNodeProperties = () => {
   const pageOptions = state.pages.map((page) => ({
     label: page.name,
     value: page.slug,
+  }));
+  const popupOptions = state.popups.map((popup) => ({
+    label: popup.name,
+    value: popup.id,
   }));
 
   const [styles, setStyles] = useState({
@@ -946,6 +953,7 @@ export const useNodeProperties = () => {
     dispatch,
     selectedNode,
     pageOptions,
+    popupOptions,
     styles,
     setStyles,
     borderState,

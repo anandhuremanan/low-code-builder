@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react';
-import { type ComponentNode, type CustomStyle, type Page, type SiteSectionKey, type SiteSections } from './types';
+import { type ComponentNode, type CustomStyle, type EditingTarget, type Page, type Popup, type SiteSectionKey, type SiteSections } from './types';
 
 const BUILDER_STATE_STORAGE_KEY = 'builder-editor-state-v1';
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -24,9 +24,11 @@ const createDefaultSiteSections = (): SiteSections => ({
 
 type HistorySnapshot = {
     pages: Page[];
+    popups: Popup[];
     currentPageId: string | null;
+    currentPopupId: string | null;
     siteSections: SiteSections;
-    editingTarget: 'page' | SiteSectionKey;
+    editingTarget: EditingTarget;
 };
 
 type HistoryState = {
@@ -36,9 +38,11 @@ type HistoryState = {
 
 type BuilderState = {
     pages: Page[];
+    popups: Popup[];
     currentPageId: string | null;
+    currentPopupId: string | null;
     siteSections: SiteSections;
-    editingTarget: 'page' | SiteSectionKey;
+    editingTarget: EditingTarget;
     selectedNodeId: string | null;
     draggedComponentType: string | null;
     viewMode: 'desktop' | 'tablet' | 'mobile';
@@ -48,7 +52,7 @@ type BuilderState = {
 
 type Action =
     | { type: 'SET_VIEW_MODE'; payload: { mode: 'desktop' | 'tablet' | 'mobile' } }
-    | { type: 'SET_EDITING_TARGET'; payload: { target: 'page' | SiteSectionKey } }
+    | { type: 'SET_EDITING_TARGET'; payload: { target: EditingTarget; popupId?: string | null } }
     | { type: 'TOGGLE_SITE_SECTION'; payload: { section: SiteSectionKey; enabled: boolean } }
     | { type: 'ADD_NODE'; payload: { parentId: string | null; node: ComponentNode; index?: number } }
     | { type: 'UPDATE_NODE'; payload: { id: string; props: Record<string, any> } }
@@ -57,6 +61,9 @@ type Action =
     | { type: 'SET_DRAGGED_COMPONENT'; payload: { type: string | null } }
     | { type: 'ADD_PAGE'; payload: { name: string } }
     | { type: 'SWITCH_PAGE'; payload: { id: string } }
+    | { type: 'ADD_POPUP'; payload: { name: string } }
+    | { type: 'RENAME_POPUP'; payload: { id: string; name: string } }
+    | { type: 'SWITCH_POPUP'; payload: { id: string } }
     | { type: 'MOVE_NODE'; payload: { nodeId: string; newParentId: string | null; index: number } }
     | { type: 'ADD_CUSTOM_STYLE'; payload: { style: CustomStyle } }
     | { type: 'REMOVE_CUSTOM_STYLE'; payload: { id: string } }
@@ -72,7 +79,9 @@ const initialState: BuilderState = {
             nodes: [createRootContainerNode('min-h-screen p-8 bg-white')]
         }
     ],
+    popups: [],
     currentPageId: 'home',
+    currentPopupId: null,
     siteSections: createDefaultSiteSections(),
     editingTarget: 'page',
     selectedNodeId: null,
@@ -93,14 +102,27 @@ const hydrateState = (): BuilderState => {
     try {
         const parsed = JSON.parse(raw) as Partial<BuilderState>;
         const pages = Array.isArray(parsed.pages) && parsed.pages.length > 0 ? parsed.pages : initialState.pages;
+        const popups = Array.isArray(parsed.popups) ? parsed.popups : initialState.popups;
         const currentPageId = typeof parsed.currentPageId === 'string' ? parsed.currentPageId : pages[0]?.id || null;
-        const editingTarget = parsed.editingTarget === 'header' || parsed.editingTarget === 'footer' ? parsed.editingTarget : 'page';
+        const currentPopupId =
+            typeof parsed.currentPopupId === 'string' && popups.some((popup) => popup.id === parsed.currentPopupId)
+                ? parsed.currentPopupId
+                : null;
+        const parsedEditingTarget = parsed.editingTarget;
+        const editingTarget: EditingTarget =
+            parsedEditingTarget === 'header' || parsedEditingTarget === 'footer'
+                ? parsedEditingTarget
+                : parsedEditingTarget === 'popup' && currentPopupId
+                    ? 'popup'
+                    : 'page';
 
         return {
             ...initialState,
             ...parsed,
             pages,
+            popups,
             currentPageId,
+            currentPopupId,
             siteSections: {
                 ...createDefaultSiteSections(),
                 ...(parsed.siteSections || {})
@@ -204,6 +226,10 @@ const getActiveNodes = (state: BuilderState): ComponentNode[] => {
         const currentPage = state.pages.find((p) => p.id === state.currentPageId);
         return currentPage?.nodes || [];
     }
+    if (state.editingTarget === 'popup') {
+        const currentPopup = state.popups.find((popup) => popup.id === state.currentPopupId);
+        return currentPopup?.nodes || [];
+    }
     return state.siteSections[state.editingTarget].nodes;
 };
 
@@ -214,6 +240,14 @@ const withUpdatedActiveNodes = (state: BuilderState, nodes: ComponentNode[]): Bu
         return {
             ...state,
             pages: state.pages.map((page) => (page.id === currentPage.id ? { ...page, nodes } : page))
+        };
+    }
+    if (state.editingTarget === 'popup') {
+        const currentPopup = state.popups.find((popup) => popup.id === state.currentPopupId);
+        if (!currentPopup) return state;
+        return {
+            ...state,
+            popups: state.popups.map((popup) => (popup.id === currentPopup.id ? { ...popup, nodes } : popup))
         };
     }
 
@@ -232,7 +266,9 @@ const withUpdatedActiveNodes = (state: BuilderState, nodes: ComponentNode[]): Bu
 const pushToHistory = (state: BuilderState): HistoryState => {
     const snapshot: HistorySnapshot = {
         pages: state.pages,
+        popups: state.popups,
         currentPageId: state.currentPageId,
+        currentPopupId: state.currentPopupId,
         siteSections: state.siteSections,
         editingTarget: state.editingTarget
     };
@@ -253,7 +289,9 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             return {
                 ...state,
                 pages: previous.pages,
+                popups: previous.popups,
                 currentPageId: previous.currentPageId,
+                currentPopupId: previous.currentPopupId,
                 siteSections: previous.siteSections,
                 editingTarget: previous.editingTarget,
                 selectedNodeId: null,
@@ -261,7 +299,9 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                     past: newPast,
                     future: [{
                         pages: state.pages,
+                        popups: state.popups,
                         currentPageId: state.currentPageId,
+                        currentPopupId: state.currentPopupId,
                         siteSections: state.siteSections,
                         editingTarget: state.editingTarget
                     }, ...state.history.future]
@@ -277,14 +317,18 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             return {
                 ...state,
                 pages: next.pages,
+                popups: next.popups,
                 currentPageId: next.currentPageId,
+                currentPopupId: next.currentPopupId,
                 siteSections: next.siteSections,
                 editingTarget: next.editingTarget,
                 selectedNodeId: null,
                 history: {
                     past: [...state.history.past, {
                         pages: state.pages,
+                        popups: state.popups,
                         currentPageId: state.currentPageId,
+                        currentPopupId: state.currentPopupId,
                         siteSections: state.siteSections,
                         editingTarget: state.editingTarget
                     }],
@@ -297,7 +341,15 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             return { ...state, viewMode: action.payload.mode };
 
         case 'SET_EDITING_TARGET':
-            return { ...state, editingTarget: action.payload.target, selectedNodeId: null };
+            return {
+                ...state,
+                editingTarget: action.payload.target,
+                currentPopupId:
+                    action.payload.target === 'popup'
+                        ? action.payload.popupId || state.currentPopupId
+                        : null,
+                selectedNodeId: null
+            };
 
         case 'TOGGLE_SITE_SECTION': {
             const { section, enabled } = action.payload;
@@ -373,7 +425,7 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
         }
 
         case 'SWITCH_PAGE':
-            return { ...state, currentPageId: action.payload.id, editingTarget: 'page', selectedNodeId: null };
+            return { ...state, currentPageId: action.payload.id, currentPopupId: null, editingTarget: 'page', selectedNodeId: null };
 
         case 'ADD_PAGE': {
             const newPage: Page = {
@@ -388,9 +440,42 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                 history: pushToHistory(state),
                 pages: [...state.pages, newPage],
                 currentPageId: newPage.id,
+                currentPopupId: null,
                 editingTarget: 'page',
                 selectedNodeId: null
             };
+        }
+
+        case 'ADD_POPUP': {
+            const newPopup: Popup = {
+                id: generateId(),
+                name: action.payload.name,
+                nodes: [createRootContainerNode('w-full min-h-[260px] p-6 bg-white')]
+            };
+
+            return {
+                ...state,
+                history: pushToHistory(state),
+                popups: [...state.popups, newPopup],
+                currentPopupId: newPopup.id,
+                editingTarget: 'popup',
+                selectedNodeId: null
+            };
+        }
+
+        case 'RENAME_POPUP': {
+            const { id, name } = action.payload;
+            return {
+                ...state,
+                history: pushToHistory(state),
+                popups: state.popups.map((popup) => (popup.id === id ? { ...popup, name } : popup))
+            };
+        }
+
+        case 'SWITCH_POPUP': {
+            const popupExists = state.popups.some((popup) => popup.id === action.payload.id);
+            if (!popupExists) return state;
+            return { ...state, currentPopupId: action.payload.id, editingTarget: 'popup', selectedNodeId: null };
         }
 
         case 'ADD_CUSTOM_STYLE':
@@ -416,7 +501,9 @@ export const BuilderProvider = ({ children }: { children: ReactNode }) => {
         if (typeof window === 'undefined') return;
         window.localStorage.setItem(BUILDER_STATE_STORAGE_KEY, JSON.stringify({
             pages: state.pages,
+            popups: state.popups,
             currentPageId: state.currentPageId,
+            currentPopupId: state.currentPopupId,
             siteSections: state.siteSections,
             editingTarget: state.editingTarget,
             selectedNodeId: state.selectedNodeId,

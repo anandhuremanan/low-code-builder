@@ -3,6 +3,8 @@ import { Input } from '../../../components/ui/Input';
 import type { NodeProperties } from './useNodeProperties';
 
 export const ButtonSettings = ({ p }: { p: NodeProperties }) => {
+    const resolvedActionType = p.localProps.actionType || (p.localProps.pageSlug ? 'navigate' : 'none');
+
     return (
         <div className="space-y-3">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Button Style</label>
@@ -60,20 +62,56 @@ export const ButtonSettings = ({ p }: { p: NodeProperties }) => {
                 </div>
             </div>
             <div className="space-y-1">
-                <label className="text-xs text-gray-400">Link Page</label>
+                <label className="text-xs text-gray-400">Button Action</label>
                 <select
                     className="w-full text-sm border rounded p-1 bg-white border-gray-300"
-                    value={p.localProps.pageSlug || ''}
-                    onChange={(e) => p.handleChange('pageSlug', e.target.value)}
+                    value={resolvedActionType}
+                    onChange={(e) => p.handleChange('actionType', e.target.value)}
                 >
-                    <option value="">No Link</option>
-                    {p.pageOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
+                    <option value="none">None</option>
+                    <option value="navigate">Navigate Page</option>
+                    <option value="openPopup">Open Popup</option>
                 </select>
             </div>
+
+            {resolvedActionType === 'navigate' && (
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-400">Link Page</label>
+                    <select
+                        className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                        value={p.localProps.pageSlug || ''}
+                        onChange={(e) => p.handleChange('pageSlug', e.target.value)}
+                    >
+                        <option value="">No Link</option>
+                        {p.pageOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
+            {resolvedActionType === 'openPopup' && (
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-400">Popup Trigger</label>
+                    <select
+                        className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                        value={p.localProps.popupId || ''}
+                        onChange={(e) => p.handleChange('popupId', e.target.value)}
+                    >
+                        <option value="">Select popup</option>
+                        {p.popupOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                    {p.popupOptions.length === 0 ? (
+                        <p className="text-[11px] text-gray-500">Create popups from the Pages tab first.</p>
+                    ) : null}
+                </div>
+            )}
         </div>
     );
 };

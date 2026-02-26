@@ -40,7 +40,15 @@ export type Page = {
   nodes: ComponentNode[];
 };
 
+export type Popup = {
+  id: string;
+  name: string;
+  nodes: ComponentNode[];
+};
+
 export type SiteSectionKey = "header" | "footer";
+
+export type EditingTarget = "page" | SiteSectionKey | "popup";
 
 export type SiteSection = {
   enabled: boolean;

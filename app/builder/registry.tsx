@@ -50,7 +50,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Button: {
         name: 'Button',
         icon: ButtonIcon,
-        component: ({ pageSlug, onNavigateToPageSlug, onClick, node, ...props }: any) => (
+        component: ({ actionType, pageSlug, popupId, onNavigateToPageSlug, onOpenPopup, onClick, node, ...props }: any) => (
             <Button
                 {...props}
                 onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
@@ -59,7 +59,12 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
                         return;
                     }
                     event.stopPropagation();
-                    if (pageSlug && onNavigateToPageSlug) {
+                    const resolvedActionType = actionType || (pageSlug ? 'navigate' : 'none');
+                    if (resolvedActionType === 'openPopup' && popupId && onOpenPopup) {
+                        onOpenPopup(popupId);
+                        return;
+                    }
+                    if (resolvedActionType === 'navigate' && pageSlug && onNavigateToPageSlug) {
                         onNavigateToPageSlug(pageSlug);
                         return;
                     }
@@ -73,7 +78,9 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             className: '',
             icon: '',
             iconPos: 'start',
-            pageSlug: ''
+            actionType: 'none',
+            pageSlug: '',
+            popupId: ''
         },
     },
     Input: {

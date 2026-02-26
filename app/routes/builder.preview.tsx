@@ -10,7 +10,8 @@ import { Rating } from '../components/ui/Rating';
 import { Switch } from '../components/ui/Switch';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
-import { type ComponentNode, type CustomStyle, type Page, type SiteSections } from '../builder/types';
+import { Dialog as MuiDialog, DialogContent, DialogTitle } from '@mui/material';
+import { type ComponentNode, type CustomStyle, type Page, type Popup, type SiteSections } from '../builder/types';
 import { DataGrid } from '../builder/components/DataGrid';
 import { Charts } from '../builder/components/Charts';
 import { MaterialIcon } from '../builder/components/MaterialIcon';
@@ -24,7 +25,9 @@ const PREVIEW_STORAGE_KEY = 'builder-preview-site';
 
 type SiteSnapshot = {
     pages: Page[];
+    popups?: Popup[];
     currentPageId: string | null;
+    currentPopupId?: string | null;
     viewMode?: 'desktop' | 'tablet' | 'mobile';
     customStyles?: CustomStyle[];
     siteSections?: SiteSections;
@@ -208,8 +211,18 @@ const resolveNodeClassName = (
     return props?.className || '';
 };
 
-const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customStyleById: Map<string, CustomStyle> }) => {
-    const childNodes = node.children.map((child) => <PreviewNode key={child.id} node={child} customStyleById={customStyleById} />);
+const PreviewNode = ({
+    node,
+    customStyleById,
+    onOpenPopup
+}: {
+    node: ComponentNode;
+    customStyleById: Map<string, CustomStyle>;
+    onOpenPopup: (popupId: string) => void;
+}) => {
+    const childNodes = node.children.map((child) => (
+        <PreviewNode key={child.id} node={child} customStyleById={customStyleById} onOpenPopup={onOpenPopup} />
+    ));
     const resolvedClassName = resolveNodeClassName(node.props, customStyleById);
 
     switch (node.type) {
@@ -231,9 +244,11 @@ const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customSty
                 </Typography>
             );
         case 'Button': {
-            const buttonHref = node.props.pageSlug
-                ? `/builder/preview?page=${encodeURIComponent(node.props.pageSlug)}`
-                : undefined;
+            const resolvedActionType = node.props.actionType || (node.props.pageSlug ? 'navigate' : 'none');
+            const buttonHref =
+                resolvedActionType === 'navigate' && node.props.pageSlug
+                    ? `/builder/preview?page=${encodeURIComponent(node.props.pageSlug)}`
+                    : undefined;
             return (
                 <Button
                     className={resolvedClassName}
@@ -243,6 +258,11 @@ const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customSty
                     iconPos={node.props.iconPos}
                     component={buttonHref ? 'a' : undefined}
                     href={buttonHref}
+                    onClick={
+                        resolvedActionType === 'openPopup' && node.props.popupId
+                            ? () => onOpenPopup(node.props.popupId)
+                            : undefined
+                    }
                 >
                     {node.props.children}
                 </Button>
@@ -378,6 +398,7 @@ const PreviewNode = ({ node, customStyleById }: { node: ComponentNode; customSty
 
 export default function BuilderPreviewPage() {
     const [site, setSite] = useState<SiteSnapshot | null>(null);
+    const [openPopupId, setOpenPopupId] = useState<string | null>(null);
     const location = useLocation();
 
     useEffect(() => {
@@ -418,23 +439,45 @@ export default function BuilderPreviewPage() {
         const styles = site?.customStyles || [];
         return new Map(styles.map((style) => [style.id, style]));
     }, [site]);
+    const popupById = useMemo(() => {
+        const popups = site?.popups || [];
+        return new Map(popups.map((popup) => [popup.id, popup]));
+    }, [site]);
 
     const customCss = useMemo(() => compileCustomStylesCss(site?.customStyles || []), [site]);
 
     const headerContent = useMemo(() => {
         if (!site?.siteSections?.header?.enabled) return null;
-        return site.siteSections.header.nodes.map((node) => <PreviewNode key={`header-${node.id}`} node={node} customStyleById={customStyleById} />);
+        return site.siteSections.header.nodes.map((node) => (
+            <PreviewNode
+                key={`header-${node.id}`}
+                node={node}
+                customStyleById={customStyleById}
+                onOpenPopup={setOpenPopupId}
+            />
+        ));
     }, [customStyleById, site?.siteSections?.header?.enabled, site?.siteSections?.header?.nodes]);
 
     const pageContent = useMemo(() => {
         if (!selectedPage) return null;
-        return selectedPage.nodes.map((node) => <PreviewNode key={node.id} node={node} customStyleById={customStyleById} />);
+        return selectedPage.nodes.map((node) => (
+            <PreviewNode key={node.id} node={node} customStyleById={customStyleById} onOpenPopup={setOpenPopupId} />
+        ));
     }, [selectedPage, customStyleById]);
 
     const footerContent = useMemo(() => {
         if (!site?.siteSections?.footer?.enabled) return null;
-        return site.siteSections.footer.nodes.map((node) => <PreviewNode key={`footer-${node.id}`} node={node} customStyleById={customStyleById} />);
+        return site.siteSections.footer.nodes.map((node) => (
+            <PreviewNode
+                key={`footer-${node.id}`}
+                node={node}
+                customStyleById={customStyleById}
+                onOpenPopup={setOpenPopupId}
+            />
+        ));
     }, [customStyleById, site?.siteSections?.footer?.enabled, site?.siteSections?.footer?.nodes]);
+
+    const activePopup = openPopupId ? popupById.get(openPopupId) || null : null;
 
     if (!selectedPage) {
         return (
@@ -455,6 +498,28 @@ export default function BuilderPreviewPage() {
             {headerContent}
             {pageContent}
             {footerContent}
+            <MuiDialog
+                open={Boolean(activePopup)}
+                onClose={() => setOpenPopupId(null)}
+                fullWidth
+                maxWidth="md"
+            >
+                {activePopup ? (
+                    <>
+                        <DialogTitle>{activePopup.name}</DialogTitle>
+                        <DialogContent>
+                            {activePopup.nodes.map((node) => (
+                                <PreviewNode
+                                    key={`popup-${node.id}`}
+                                    node={node}
+                                    customStyleById={customStyleById}
+                                    onOpenPopup={setOpenPopupId}
+                                />
+                            ))}
+                        </DialogContent>
+                    </>
+                ) : null}
+            </MuiDialog>
         </div>
     );
 }

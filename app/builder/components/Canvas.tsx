@@ -273,9 +273,12 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
 export const Canvas = () => {
     const { state } = useBuilder();
     const currentPage = state.pages.find(p => p.id === state.currentPageId);
+    const currentPopup = state.popups.find((popup) => popup.id === state.currentPopupId);
     const activeNodes = state.editingTarget === 'page'
         ? (currentPage?.nodes || [])
-        : state.siteSections[state.editingTarget].nodes;
+        : state.editingTarget === 'popup'
+            ? (currentPopup?.nodes || [])
+            : state.siteSections[state.editingTarget].nodes;
     const customCss = compileCustomStylesCss(state.customStyles);
 
     // Root droppable area
@@ -288,6 +291,7 @@ export const Canvas = () => {
     });
 
     if (state.editingTarget === 'page' && !currentPage) return <div>No page selected</div>;
+    if (state.editingTarget === 'popup' && !currentPopup) return <div>No popup selected</div>;
 
     const widthClass = {
         desktop: 'w-full max-w-6xl',
