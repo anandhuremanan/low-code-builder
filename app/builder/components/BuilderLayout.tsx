@@ -29,6 +29,7 @@ type BuilderLayoutProps = {
 export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayoutProps) => {
     const { state, dispatch } = useBuilder();
     const [activeDragType, setActiveDragType] = useState<ComponentType | null>(null);
+    const [copiedNode, setCopiedNode] = useState<any | null>(null);
     const [isCustomStyleDialogOpen, setIsCustomStyleDialogOpen] = useState(false);
     const [customStyleName, setCustomStyleName] = useState('');
     const [customStyleClassName, setCustomStyleClassName] = useState('');
@@ -59,6 +60,71 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
         useSensor(TouchSensor)
     );
 
+    const getActiveNodes = () => {
+        const currentPage = state.pages.find((p) => p.id === state.currentPageId);
+        const currentPopup = state.popups.find((popup) => popup.id === state.currentPopupId);
+        if (state.editingTarget === 'page') return currentPage?.nodes || [];
+        if (state.editingTarget === 'popup') return currentPopup?.nodes || [];
+        return state.siteSections[state.editingTarget].nodes;
+    };
+
+    const findNodeAndParent = (
+        nodes: any[],
+        nodeId: string,
+        parentId: string | null = null
+    ): { node: any | null; parentId: string | null } => {
+        for (const node of nodes) {
+            if (node.id === nodeId) {
+                return { node, parentId };
+            }
+            if (node.children?.length) {
+                const found = findNodeAndParent(node.children, nodeId, node.id);
+                if (found.node) return found;
+            }
+        }
+        return { node: null, parentId: null };
+    };
+
+    const cloneNodeWithFreshIds = (node: any): any => ({
+        ...node,
+        id: `node-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        props: JSON.parse(JSON.stringify(node.props || {})),
+        children: Array.isArray(node.children) ? node.children.map(cloneNodeWithFreshIds) : []
+    });
+
+    const copySelectedNode = () => {
+        if (!state.selectedNodeId || state.selectedNodeId === 'root-container') return;
+        const activeNodes = getActiveNodes();
+        const { node } = findNodeAndParent(activeNodes, state.selectedNodeId);
+        if (!node) return;
+        setCopiedNode(JSON.parse(JSON.stringify(node)));
+    };
+
+    const pasteCopiedNode = () => {
+        if (!copiedNode) return;
+        const activeNodes = getActiveNodes();
+        let targetParentId = 'root-container';
+
+        if (state.selectedNodeId) {
+            const { node: selectedNode, parentId } = findNodeAndParent(activeNodes, state.selectedNodeId);
+            if (selectedNode?.type === 'Container') {
+                targetParentId = selectedNode.id;
+            } else if (parentId) {
+                targetParentId = parentId;
+            }
+        }
+
+        const clonedNode = cloneNodeWithFreshIds(copiedNode);
+        dispatch({
+            type: 'ADD_NODE',
+            payload: {
+                parentId: targetParentId,
+                node: clonedNode
+            }
+        });
+        dispatch({ type: 'SELECT_NODE', payload: { id: clonedNode.id } });
+    };
+
     const handleDragStart = (event: DragStartEvent) => {
         const { active } = event;
         const type = active.data.current?.type as ComponentType;
@@ -78,6 +144,12 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                     e.preventDefault();
                     if (e.shiftKey) dispatch({ type: 'REDO' });
                     else dispatch({ type: 'UNDO' });
+                } else if (e.key === 'c') {
+                    e.preventDefault();
+                    copySelectedNode();
+                } else if (e.key === 'v') {
+                    e.preventDefault();
+                    pasteCopiedNode();
                 } else if (e.key === 'y') {
                     e.preventDefault();
                     dispatch({ type: 'REDO' });
@@ -94,7 +166,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [dispatch, state.selectedNodeId]);
+    }, [dispatch, state.selectedNodeId, copiedNode, state.currentPageId, state.currentPopupId, state.editingTarget, state.pages, state.popups, state.siteSections]);
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
@@ -253,6 +325,22 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                                             title="Redo (Ctrl+Y)"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 7v6h-6" /><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" /></svg>
+                                        </button>
+                                        <button
+                                            onClick={copySelectedNode}
+                                            disabled={!state.selectedNodeId || state.selectedNodeId === 'root-container'}
+                                            className="p-1.5 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                                            title="Copy (Ctrl+C)"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                                        </button>
+                                        <button
+                                            onClick={pasteCopiedNode}
+                                            disabled={!copiedNode}
+                                            className="p-1.5 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                                            title="Paste (Ctrl+V)"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2" /><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /><path d="M9 14H5" /><path d="M7 12v4" /></svg>
                                         </button>
                                     </div>
                                     <button
