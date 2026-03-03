@@ -14,7 +14,8 @@ import {
     Calendar as CalendarIcon,
     ListOrdered as StepperIcon,
     Clock3 as TimePickerIcon,
-    StarHalf as RatingIcon
+    StarHalf as RatingIcon,
+    Link2 as LinkIcon
 } from 'lucide-react';
 import { type RegisteredComponent, type ComponentType } from './types';
 
@@ -37,6 +38,7 @@ import { MultiSelect } from '../components/ui/MultiSelect';
 import { Stepper } from './components/Stepper';
 import { RadioGroup as RadioGroupUI } from '../components/ui/RadioGroup';
 import { Rating as RatingUI } from '../components/ui/Rating';
+import { Link as LinkUI } from '../components/ui/Link';
 
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Container: {
@@ -82,6 +84,49 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             pageSlug: '',
             popupId: ''
         },
+    },
+    Link: {
+        name: 'Link',
+        icon: LinkIcon,
+        component: ({ linkType, pageSlug, externalUrl, openInNewTab, onNavigateToPageSlug, onClick, node, ...props }: any) => {
+            const resolvedLinkType = linkType || (externalUrl ? 'external' : 'internal');
+            const href = resolvedLinkType === 'external' ? (externalUrl || '#') : (pageSlug || '#');
+            return (
+                <LinkUI
+                    {...props}
+                    href={href}
+                    target={resolvedLinkType === 'external' && openInNewTab ? '_blank' : undefined}
+                    rel={resolvedLinkType === 'external' && openInNewTab ? 'noopener noreferrer' : undefined}
+                    onClick={(event: React.MouseEvent<HTMLAnchorElement>) => {
+                        if (node) {
+                            event.preventDefault();
+                            return;
+                        }
+                        event.stopPropagation();
+                        if (resolvedLinkType === 'internal' && pageSlug && onNavigateToPageSlug) {
+                            event.preventDefault();
+                            onNavigateToPageSlug(pageSlug);
+                            return;
+                        }
+                        if (resolvedLinkType === 'external' && !externalUrl) {
+                            event.preventDefault();
+                            return;
+                        }
+                        onClick?.(event);
+                    }}
+                />
+            );
+        },
+        defaultProps: {
+            children: 'Link',
+            className: '',
+            linkType: 'internal',
+            pageSlug: '/',
+            externalUrl: '',
+            openInNewTab: true,
+            underline: 'hover',
+            color: 'primary'
+        }
     },
     Input: {
         name: 'Input',

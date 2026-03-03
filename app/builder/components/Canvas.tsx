@@ -102,7 +102,7 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
         node
     };
     componentProps.className = resolvedClassName;
-    if (node.type === 'Button') {
+    if (node.type === 'Button' || node.type === 'Link') {
         componentProps.onNavigateToPageSlug = (pageSlug: string) => {
             const targetPage = state.pages.find((page) => page.slug === pageSlug);
             if (!targetPage) return;

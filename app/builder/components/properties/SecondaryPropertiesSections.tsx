@@ -45,7 +45,7 @@ export const SecondaryPropertiesSections = ({
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Content</label>
 
                 {/* Children / Text Content */}
-                {(selectedNode.type === 'Text' || selectedNode.type === 'Button') && (
+                {(selectedNode.type === 'Text' || selectedNode.type === 'Button' || selectedNode.type === 'Link') && (
                     <div className="space-y-1">
                         <label className="text-xs text-gray-400">Text</label>
                         <Input

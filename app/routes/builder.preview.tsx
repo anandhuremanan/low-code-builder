@@ -10,6 +10,7 @@ import { Rating } from '../components/ui/Rating';
 import { Switch } from '../components/ui/Switch';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
+import { Link as LinkUI } from '../components/ui/Link';
 import { Dialog as MuiDialog, DialogContent, DialogTitle } from '@mui/material';
 import { type ComponentNode, type CustomStyle, type Page, type Popup, type SiteSections } from '../builder/types';
 import { DataGrid } from '../builder/components/DataGrid';
@@ -266,6 +267,25 @@ const PreviewNode = ({
                 >
                     {node.props.children}
                 </Button>
+            );
+        }
+        case 'Link': {
+            const linkType = node.props.linkType || (node.props.externalUrl ? 'external' : 'internal');
+            const href = linkType === 'external'
+                ? (node.props.externalUrl || '#')
+                : `/builder/preview?page=${encodeURIComponent(node.props.pageSlug || '/')}`;
+            return (
+                <LinkUI
+                    className={resolvedClassName}
+                    style={node.props.style}
+                    href={href}
+                    target={linkType === 'external' && node.props.openInNewTab ? '_blank' : undefined}
+                    rel={linkType === 'external' && node.props.openInNewTab ? 'noopener noreferrer' : undefined}
+                    underline={node.props.underline}
+                    color={node.props.color}
+                >
+                    {node.props.children}
+                </LinkUI>
             );
         }
         case 'Input':

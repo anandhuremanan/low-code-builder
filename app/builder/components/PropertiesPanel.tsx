@@ -15,6 +15,7 @@ import { LayoutSizingSettings } from './properties/LayoutSizingSettings';
 import { SpacingSettings } from './properties/SpacingSettings';
 import { BordersSettings } from './properties/BordersSettings';
 import { EffectsSettings } from './properties/EffectsSettings';
+import { LinkSettings } from './properties/LinkSettings';
 
 export const PropertiesPanel = () => {
     const p = useNodeProperties();
@@ -79,6 +80,7 @@ export const PropertiesPanel = () => {
                 <TypographySettings p={p} />
 
                 {selectedNode.type === 'Button' && <ButtonSettings p={p} />}
+                {selectedNode.type === 'Link' && <LinkSettings p={p} />}
                 {selectedNode.type === 'Container' && <ContainerSettings p={p} />}
                 {selectedNode.type === 'Image' && <ImageSettings p={p} />}
 

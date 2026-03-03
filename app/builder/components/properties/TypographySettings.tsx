@@ -60,7 +60,7 @@ export const TypographySettings = ({ p }: { p: NodeProperties }) => {
         );
     }
 
-    if (['Button', 'Input'].includes(selectedNode.type)) {
+    if (['Button', 'Input', 'Link'].includes(selectedNode.type)) {
         return (
             <div className="space-y-3">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Typography</label>

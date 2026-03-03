@@ -4,6 +4,7 @@ import * as LucideIcons from "lucide-react";
 export type ComponentType =
   | "Container"
   | "Button"
+  | "Link"
   | "Input"
   | "Text"
   | "Image"
