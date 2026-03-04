@@ -142,7 +142,9 @@ export const useNodeProperties = () => {
     const trimmed = value.trim();
     if (!trimmed) return null;
     if (/^-?\d+(\.\d+)?$/.test(trimmed)) return `${trimmed}px`;
-    if (/^-?\d+(\.\d+)?(px|rem|em|%|vh|vw)$/.test(trimmed)) return trimmed;
+    if (/^-?\d+(\.\d+)?(px|rem|em|%|vh|vw|dvh|svh|lvh|vmin|vmax)$/.test(trimmed)) return trimmed;
+    if (/^(auto|min-content|max-content|fit-content)$/i.test(trimmed)) return trimmed;
+    if (/^fit-content\(.+\)$/i.test(trimmed)) return trimmed;
     if (trimmed === "full") return "100%";
     if (trimmed === "screen") return "100vh";
     if (/^calc\(.+\)$/.test(trimmed)) return trimmed;
