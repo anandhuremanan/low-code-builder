@@ -10,7 +10,6 @@ import { Rating } from '../components/ui/Rating';
 import { Switch } from '../components/ui/Switch';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Typography } from '../components/ui/Typography';
-import { Link as LinkUI } from '../components/ui/Link';
 import { Dialog as MuiDialog, DialogContent, DialogTitle } from '@mui/material';
 import { type ComponentNode, type CustomStyle, type Page, type Popup, type SiteSections } from '../builder/types';
 import { DataGrid } from '../builder/components/DataGrid';
@@ -21,6 +20,7 @@ import { Stepper } from '../builder/components/Stepper';
 import { TimePicker } from '../builder/components/TimePicker';
 import { DateTimePicker } from '../builder/components/DateTimePicker';
 import { compileCustomStylesCss } from '../lib/customStyleUtils';
+import { LinkNode } from '../builder/components/LinkNode';
 
 const PREVIEW_STORAGE_KEY = 'builder-preview-site';
 
@@ -270,22 +270,23 @@ const PreviewNode = ({
             );
         }
         case 'Link': {
-            const linkType = node.props.linkType || (node.props.externalUrl ? 'external' : 'internal');
-            const href = linkType === 'external'
-                ? (node.props.externalUrl || '#')
-                : `/builder/preview?page=${encodeURIComponent(node.props.pageSlug || '/')}`;
             return (
-                <LinkUI
+                <LinkNode
                     className={resolvedClassName}
                     style={node.props.style}
-                    href={href}
-                    target={linkType === 'external' && node.props.openInNewTab ? '_blank' : undefined}
-                    rel={linkType === 'external' && node.props.openInNewTab ? 'noopener noreferrer' : undefined}
+                    linkType={node.props.linkType}
+                    pageSlug={node.props.pageSlug}
+                    externalUrl={node.props.externalUrl}
+                    openInNewTab={node.props.openInNewTab}
+                    enableHoverMenu={node.props.enableHoverMenu}
+                    hoverMenuItems={node.props.hoverMenuItems}
+                    hoverMenuLayout={node.props.hoverMenuLayout}
+                    hoverMenuColumns={node.props.hoverMenuColumns}
+                    hoverMenuMinWidth={node.props.hoverMenuMinWidth}
                     underline={node.props.underline}
                     color={node.props.color}
-                >
-                    {node.props.children}
-                </LinkUI>
+                    resolveInternalHref={(slug) => `/builder/preview?page=${encodeURIComponent(slug || '/')}`}
+                >{node.props.children}</LinkNode>
             );
         }
         case 'Input':

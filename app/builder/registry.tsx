@@ -38,7 +38,7 @@ import { MultiSelect } from '../components/ui/MultiSelect';
 import { Stepper } from './components/Stepper';
 import { RadioGroup as RadioGroupUI } from '../components/ui/RadioGroup';
 import { Rating as RatingUI } from '../components/ui/Rating';
-import { Link as LinkUI } from '../components/ui/Link';
+import { LinkNode } from './components/LinkNode';
 
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Container: {
@@ -88,35 +88,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     Link: {
         name: 'Link',
         icon: LinkIcon,
-        component: ({ linkType, pageSlug, externalUrl, openInNewTab, onNavigateToPageSlug, onClick, node, ...props }: any) => {
-            const resolvedLinkType = linkType || (externalUrl ? 'external' : 'internal');
-            const href = resolvedLinkType === 'external' ? (externalUrl || '#') : (pageSlug || '#');
-            return (
-                <LinkUI
-                    {...props}
-                    href={href}
-                    target={resolvedLinkType === 'external' && openInNewTab ? '_blank' : undefined}
-                    rel={resolvedLinkType === 'external' && openInNewTab ? 'noopener noreferrer' : undefined}
-                    onClick={(event: React.MouseEvent<HTMLAnchorElement>) => {
-                        if (node) {
-                            event.preventDefault();
-                            return;
-                        }
-                        event.stopPropagation();
-                        if (resolvedLinkType === 'internal' && pageSlug && onNavigateToPageSlug) {
-                            event.preventDefault();
-                            onNavigateToPageSlug(pageSlug);
-                            return;
-                        }
-                        if (resolvedLinkType === 'external' && !externalUrl) {
-                            event.preventDefault();
-                            return;
-                        }
-                        onClick?.(event);
-                    }}
-                />
-            );
-        },
+        component: ({ node, ...props }: any) => <LinkNode {...props} isDesignMode={Boolean(node)} />,
         defaultProps: {
             children: 'Link',
             className: '',
@@ -125,7 +97,12 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
             externalUrl: '',
             openInNewTab: true,
             underline: 'hover',
-            color: 'primary'
+            color: 'primary',
+            enableHoverMenu: false,
+            hoverMenuLayout: 'dropdown',
+            hoverMenuColumns: 3,
+            hoverMenuMinWidth: 640,
+            hoverMenuItems: []
         }
     },
     Input: {
