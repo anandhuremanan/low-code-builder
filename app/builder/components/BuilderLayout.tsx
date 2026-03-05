@@ -41,7 +41,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
     }, []);
 
     useEffect(() => {
-        if (mode === 'builder' && (state.editingTarget === 'header' || state.editingTarget === 'footer')) {
+        if (mode === 'builder' && state.editingTarget !== 'page' && state.editingTarget !== 'popup') {
             dispatch({ type: 'SET_EDITING_TARGET', payload: { target: 'page' } });
             return;
         }
@@ -270,7 +270,10 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
             const popup = state.popups.find((item) => item.id === state.currentPopupId);
             return popup ? `Popup: ${popup.name}` : 'Popup';
         }
-        return state.editingTarget === 'header' ? 'Header' : 'Footer';
+        if (state.editingTarget === 'header') return 'Header';
+        if (state.editingTarget === 'footer') return 'Footer';
+        if (state.editingTarget === 'sidebarLeft') return 'Sidebar Left';
+        return 'Sidebar Right';
     }, [state.currentPopupId, state.editingTarget, state.popups]);
 
     return (

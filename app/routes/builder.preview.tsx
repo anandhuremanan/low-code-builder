@@ -417,6 +417,51 @@ const PreviewNode = ({
     }
 };
 
+const SidebarPreviewSection = ({
+    section,
+    children,
+    side
+}: {
+    section: SiteSections['sidebarLeft'] | SiteSections['sidebarRight'];
+    children: React.ReactNode;
+    side: 'left' | 'right';
+}) => {
+    const [isCollapsed, setIsCollapsed] = useState(Boolean(section.collapsedByDefault));
+
+    useEffect(() => {
+        setIsCollapsed(Boolean(section.collapsedByDefault));
+    }, [section.collapsedByDefault]);
+
+    const expandedWidth = Math.max(180, Number(section.width) || 280);
+    const collapsedWidth = Math.max(44, Number(section.collapsedWidth) || 64);
+    const effectiveWidth = isCollapsed ? collapsedWidth : expandedWidth;
+    const collapsible = Boolean(section.collapsible);
+
+    return (
+        <aside
+            className="relative shrink-0 border-gray-200 bg-white"
+            style={{
+                width: `${effectiveWidth}px`,
+                transition: 'width 200ms ease'
+            }}
+        >
+            {collapsible ? (
+                <button
+                    type="button"
+                    onClick={() => setIsCollapsed((prev) => !prev)}
+                    className={`absolute top-3 z-10 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-600 shadow-sm hover:bg-gray-50 ${side === 'left' ? 'right-2' : 'left-2'}`}
+                    title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                >
+                    {isCollapsed ? (side === 'left' ? '>' : '<') : (side === 'left' ? '<' : '>')}
+                </button>
+            ) : null}
+            <div className={`h-full overflow-auto ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                {children}
+            </div>
+        </aside>
+    );
+};
+
 export default function BuilderPreviewPage() {
     const [site, setSite] = useState<SiteSnapshot | null>(null);
     const [openPopupId, setOpenPopupId] = useState<string | null>(null);
@@ -499,6 +544,10 @@ export default function BuilderPreviewPage() {
     }, [customStyleById, site?.siteSections?.footer?.enabled, site?.siteSections?.footer?.nodes]);
 
     const activePopup = openPopupId ? popupById.get(openPopupId) || null : null;
+    const leftSidebar = site?.siteSections?.sidebarLeft;
+    const rightSidebar = site?.siteSections?.sidebarRight;
+    const showLeftSidebar = Boolean(leftSidebar?.enabled);
+    const showRightSidebar = Boolean(rightSidebar?.enabled);
 
     if (!selectedPage) {
         return (
@@ -517,7 +566,35 @@ export default function BuilderPreviewPage() {
         <div className="min-h-screen w-full overflow-auto bg-white">
             {customCss ? <style>{customCss}</style> : null}
             {headerContent}
-            {pageContent}
+            <div className="flex w-full items-stretch">
+                {showLeftSidebar && leftSidebar ? (
+                    <SidebarPreviewSection section={leftSidebar} side="left">
+                        {leftSidebar.nodes.map((node) => (
+                            <PreviewNode
+                                key={`sidebar-left-${node.id}`}
+                                node={node}
+                                customStyleById={customStyleById}
+                                onOpenPopup={setOpenPopupId}
+                            />
+                        ))}
+                    </SidebarPreviewSection>
+                ) : null}
+                <main className="min-w-0 flex-1">
+                    {pageContent}
+                </main>
+                {showRightSidebar && rightSidebar ? (
+                    <SidebarPreviewSection section={rightSidebar} side="right">
+                        {rightSidebar.nodes.map((node) => (
+                            <PreviewNode
+                                key={`sidebar-right-${node.id}`}
+                                node={node}
+                                customStyleById={customStyleById}
+                                onOpenPopup={setOpenPopupId}
+                            />
+                        ))}
+                    </SidebarPreviewSection>
+                ) : null}
+            </div>
             {footerContent}
             <MuiDialog
                 open={Boolean(activePopup)}

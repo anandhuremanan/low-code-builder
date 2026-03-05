@@ -19,6 +19,22 @@ const createDefaultSiteSections = (): SiteSections => ({
     footer: {
         enabled: false,
         nodes: [createRootContainerNode('w-full p-4 bg-white')]
+    },
+    sidebarLeft: {
+        enabled: false,
+        collapsible: true,
+        collapsedByDefault: false,
+        width: 280,
+        collapsedWidth: 64,
+        nodes: [createRootContainerNode('w-full h-full p-4 bg-white border-r border-gray-200 min-h-[300px]')]
+    },
+    sidebarRight: {
+        enabled: false,
+        collapsible: true,
+        collapsedByDefault: false,
+        width: 280,
+        collapsedWidth: 64,
+        nodes: [createRootContainerNode('w-full h-full p-4 bg-white border-l border-gray-200 min-h-[300px]')]
     }
 });
 
@@ -54,6 +70,7 @@ type Action =
     | { type: 'SET_VIEW_MODE'; payload: { mode: 'desktop' | 'tablet' | 'mobile' } }
     | { type: 'SET_EDITING_TARGET'; payload: { target: EditingTarget; popupId?: string | null } }
     | { type: 'TOGGLE_SITE_SECTION'; payload: { section: SiteSectionKey; enabled: boolean } }
+    | { type: 'UPDATE_SITE_SECTION'; payload: { section: SiteSectionKey; updates: Partial<SiteSections[SiteSectionKey]> } }
     | { type: 'ADD_NODE'; payload: { parentId: string | null; node: ComponentNode; index?: number } }
     | { type: 'UPDATE_NODE'; payload: { id: string; props: Record<string, any> } }
     | { type: 'DELETE_NODE'; payload: { id: string } }
@@ -110,7 +127,10 @@ const hydrateState = (): BuilderState => {
                 : null;
         const parsedEditingTarget = parsed.editingTarget;
         const editingTarget: EditingTarget =
-            parsedEditingTarget === 'header' || parsedEditingTarget === 'footer'
+            parsedEditingTarget === 'header' ||
+                parsedEditingTarget === 'footer' ||
+                parsedEditingTarget === 'sidebarLeft' ||
+                parsedEditingTarget === 'sidebarRight'
                 ? parsedEditingTarget
                 : parsedEditingTarget === 'popup' && currentPopupId
                     ? 'popup'
@@ -360,6 +380,20 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                     [section]: {
                         ...state.siteSections[section],
                         enabled
+                    }
+                }
+            };
+        }
+
+        case 'UPDATE_SITE_SECTION': {
+            const { section, updates } = action.payload;
+            return {
+                ...state,
+                siteSections: {
+                    ...state.siteSections,
+                    [section]: {
+                        ...state.siteSections[section],
+                        ...updates
                     }
                 }
             };

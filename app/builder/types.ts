@@ -47,13 +47,17 @@ export type Popup = {
   nodes: ComponentNode[];
 };
 
-export type SiteSectionKey = "header" | "footer";
+export type SiteSectionKey = "header" | "footer" | "sidebarLeft" | "sidebarRight";
 
 export type EditingTarget = "page" | SiteSectionKey | "popup";
 
 export type SiteSection = {
   enabled: boolean;
   nodes: ComponentNode[];
+  collapsible?: boolean;
+  collapsedByDefault?: boolean;
+  width?: number;
+  collapsedWidth?: number;
 };
 
 export type SiteSections = Record<SiteSectionKey, SiteSection>;
