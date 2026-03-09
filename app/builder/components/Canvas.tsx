@@ -300,14 +300,14 @@ export const Canvas = () => {
     }[state.viewMode] || 'w-full max-w-6xl';
 
     return (
-        <div className="flex-1 h-full bg-gray-100 p-8 pb-16 overflow-auto flex items-start justify-center transition-all">
+        <div className="flex h-full flex-1 items-start justify-center overflow-auto bg-slate-50/60 p-6 pb-14 transition-all">
             {customCss ? <style>{customCss}</style> : null}
             <div
                 ref={setNodeRef}
                 className={clsx(
                     widthClass,
-                    "min-h-[80vh] mb-12 bg-white shadow-sm transition-all duration-300 ease-in-out",
-                    isOver ? "bg-blue-50 ring-2 ring-blue-400" : ""
+                    "mb-10 min-h-[80vh] rounded-2xl border border-slate-200 bg-white p-1 shadow-sm transition-all duration-300 ease-in-out",
+                    isOver ? "bg-blue-50/60 ring-2 ring-blue-400" : ""
                 )}
             >
                 {activeNodes.map(node => (
@@ -315,13 +315,13 @@ export const Canvas = () => {
                 ))}
 
                 {activeNodes.length === 0 && (
-                    <div className="h-full flex flex-col items-center justify-center text-gray-400 p-10">
+                    <div className="flex h-full flex-col items-center justify-center p-10 text-slate-400">
                         <p>Drop components here</p>
                     </div>
                 )}
 
                 {state.editingTarget === 'header' && (
-                    <div className="w-full border-t border-dashed border-gray-300 bg-gray-50 py-8 text-center text-sm text-gray-500">
+                    <div className="w-full border-t border-dashed border-slate-300 bg-slate-50 py-8 text-center text-sm text-slate-500">
                         Your page content here
                     </div>
                 )}

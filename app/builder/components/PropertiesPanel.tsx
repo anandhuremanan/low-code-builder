@@ -23,8 +23,8 @@ export const PropertiesPanel = () => {
 
     if (!selectedNode) {
         return (
-            <div className="w-80 shrink-0 h-full bg-white border-l border-gray-200 p-4">
-                <Typography variant="body2" className="text-gray-500">
+            <div className="ml-3 flex h-full w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+                <Typography variant="body2" className="text-slate-500">
                     Select a component to edit properties.
                 </Typography>
             </div>
@@ -32,12 +32,12 @@ export const PropertiesPanel = () => {
     }
 
     return (
-        <div className="w-80 shrink-0 h-full bg-white border-l border-gray-200 flex flex-col" >
-            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                <Typography variant="h6" className="font-semibold">
+        <div className="ml-3 flex h-full w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm" >
+            <div className="flex items-center justify-between border-b border-slate-200/80 bg-slate-50/70 p-4">
+                <Typography variant="h6" className="font-semibold text-slate-900">
                     Properties
                 </Typography>
-                <div className="bg-gray-100 px-2 py-1 rounded text-xs">
+                <div className="rounded bg-white px-2 py-1 text-xs text-slate-600 border border-slate-200">
                     {selectedNode.type}
                 </div>
             </div>
@@ -49,11 +49,11 @@ export const PropertiesPanel = () => {
 
                 {/* Global Style */}
                 <div className="space-y-3">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Custom CSS Style</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Custom CSS Style</label>
                     <div className="space-y-1">
-                        <label className="text-xs text-gray-400">Global Style</label>
+                        <label className="text-xs text-slate-400">Global Style</label>
                         <select
-                            className="w-full text-sm border rounded p-1 bg-white border-gray-300"
+                            className="w-full rounded border border-slate-300 bg-white p-1 text-sm text-slate-800 focus:border-blue-500 focus:outline-none"
                             value={localProps.customStyleId || ''}
                             onChange={(e) => p.handleCustomStyleChange(e.target.value)}
                         >
@@ -66,7 +66,7 @@ export const PropertiesPanel = () => {
                         </select>
                     </div>
                     {state.customStyles.length === 0 && (
-                        <p className="text-[11px] text-gray-500">
+                        <p className="text-[11px] text-slate-500">
                             No global styles yet. Add them from the top toolbar.
                         </p>
                     )}
@@ -103,10 +103,10 @@ export const PropertiesPanel = () => {
                     handleNodeStyleChange={p.handleNodeStyleChange}
                 />
 
-                <div className="border-t border-gray-200 pt-4 mt-8">
+                <div className="mt-8 border-t border-slate-200 pt-4">
                     <button
                         onClick={p.handleDelete}
-                        className="w-full py-2 px-4 bg-red-50 hover:bg-red-100 text-red-600 rounded flex items-center justify-center gap-2 transition-colors border border-red-200"
+                        className="flex w-full items-center justify-center gap-2 rounded border border-red-200 bg-red-50 px-4 py-2 text-red-600 transition hover:bg-red-100"
                     >
                         <X size={16} /> Delete Component
                     </button>
