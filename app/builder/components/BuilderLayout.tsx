@@ -284,7 +284,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
         <>
             {isClient ? (
                 <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-                    <div className="flex h-screen w-full overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white p-3">
+                    <div className="flex h-screen w-full overflow-hidden bg-linear-to-b from-slate-50 via-white to-white p-3">
                         <Sidebar showPages={mode === 'builder'} />
                         <div className="relative ml-3 flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
                             <header className="flex h-16 items-center justify-between border-b border-slate-200/80 bg-slate-50/70 px-4">
@@ -386,17 +386,17 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                         }}
                         cancelText="Close"
                     >
-                        <div className="space-y-4 min-w-[560px] max-w-[720px]">
-                            <div className="space-y-1">
-                                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Style Name</label>
+                        <div className="w-160 max-w-full space-y-4 pt-1">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold uppercase tracking-wide text-slate-600">Style Name</label>
                                 <Input size="small" placeholder="Primary CTA" value={customStyleName} onChange={(e) => setCustomStyleName(e.target.value)} />
                             </div>
-                            <div className="space-y-1">
-                                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">CSS Class Name</label>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold uppercase tracking-wide text-slate-600">CSS Class Name</label>
                                 <Input size="small" placeholder="cta-primary" value={customStyleClassName} onChange={(e) => setCustomStyleClassName(e.target.value)} />
                             </div>
-                            <div className="space-y-1">
-                                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">CSS Code</label>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold uppercase tracking-wide text-slate-600">CSS Code</label>
                                 <Input
                                     multiline
                                     minRows={6}
@@ -409,15 +409,17 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                                 type="button"
                                 onClick={handleAddCustomStyle}
                                 disabled={!customStyleName.trim() || !normalizeClassName(customStyleClassName) || !customStyleCss.trim()}
-                                className="rounded-lg border border-blue-300 px-3 py-1.5 text-sm font-medium text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rounded-lg border border-blue-300 bg-white px-3 py-1.5 text-sm font-medium text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 Add Style
                             </button>
 
-                            <div className="space-y-2 border-t border-slate-200 pt-2">
+                            <div className="space-y-2 border-t border-slate-200 pt-3">
                                 <Typography variant="body2" className="font-medium text-slate-700">Added Styles</Typography>
                                 {state.customStyles.length === 0 ? (
-                                    <Typography variant="body2" className="text-sm text-slate-500">No styles added yet.</Typography>
+                                    <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
+                                        <Typography variant="body2" className="text-sm text-slate-500">No styles added yet.</Typography>
+                                    </div>
                                 ) : (
                                     <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                                         {state.customStyles.map((style) => (
@@ -442,7 +444,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                     </Dialog>
                 </DndContext>
             ) : (
-                <div className="flex h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white text-slate-500">
+                <div className="flex h-screen w-full items-center justify-center overflow-hidden bg-linear-to-b from-slate-50 via-white to-white text-slate-500">
                     Loading Builder...
                 </div>
             )}

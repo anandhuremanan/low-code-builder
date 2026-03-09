@@ -19,13 +19,26 @@ export const Dialog: React.FC<CustomDialogProps> = ({
     ...props
 }) => {
     return (
-        <MuiDialog onClose={onClose} {...props}>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogContent>
+        <MuiDialog
+            onClose={onClose}
+            {...props}
+            PaperProps={{
+                className: 'rounded-2xl border border-slate-200 shadow-lg',
+                sx: {
+                    borderRadius: '16px',
+                    borderColor: '#e2e8f0',
+                    backgroundColor: '#ffffff'
+                }
+            }}
+        >
+            <DialogTitle className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 text-base font-semibold text-slate-900">
+                {title}
+            </DialogTitle>
+            <DialogContent className="px-6 py-5">
                 {children}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={(e) => onClose()} color="inherit">
+            <DialogActions className="border-t border-slate-200 bg-slate-50/50 px-6 py-3">
+                <Button onClick={() => onClose()} color="inherit">
                     {cancelText}
                 </Button>
                 {onConfirm && (
