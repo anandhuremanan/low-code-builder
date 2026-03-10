@@ -284,7 +284,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
         <>
             {isClient ? (
                 <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-                    <div className="flex h-screen w-full overflow-hidden bg-linear-to-b from-slate-50 via-white to-white p-3">
+                    <div className="flex h-screen w-full overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white p-3">
                         <Sidebar showPages={mode === 'builder'} />
                         <div className="relative ml-3 flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
                             <header className="flex h-16 items-center justify-between border-b border-slate-200/80 bg-slate-50/70 px-4">
@@ -386,7 +386,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                         }}
                         cancelText="Close"
                     >
-                        <div className="w-160 max-w-full space-y-4 pt-1">
+                        <div className="w-[640px] max-w-full space-y-4 pt-1">
                             <div className="space-y-1.5">
                                 <label className="text-xs font-semibold uppercase tracking-wide text-slate-600">Style Name</label>
                                 <Input size="small" placeholder="Primary CTA" value={customStyleName} onChange={(e) => setCustomStyleName(e.target.value)} />
@@ -444,7 +444,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                     </Dialog>
                 </DndContext>
             ) : (
-                <div className="flex h-screen w-full items-center justify-center overflow-hidden bg-linear-to-b from-slate-50 via-white to-white text-slate-500">
+                <div className="flex h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white text-slate-500">
                     Loading Builder...
                 </div>
             )}

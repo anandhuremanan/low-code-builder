@@ -37,6 +37,13 @@ const extractLayoutClasses = (className?: string): string => {
 };
 
 type ResizeHandle = "right" | "bottom" | "corner";
+const INLINE_WRAPPER_TYPES = new Set([
+  "Button",
+  "Link",
+  "Checkbox",
+  "Switch",
+  "MaterialIcon",
+]);
 
 const pxFromStyleOrFallback = (value: unknown, fallback: number): number => {
   if (typeof value === "number") return value;
@@ -108,6 +115,7 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
     node.props,
     "children",
   );
+  const shouldUseInlineWrapper = INLINE_WRAPPER_TYPES.has(node.type);
   const selectedCustomStyle = state.customStyles.find(
     (style) => style.id === node.props.customStyleId,
   );
@@ -239,7 +247,7 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
       className={clsx(
         "group relative transition-all duration-200 outline-none",
         isRoot ? "w-full" : "",
-        !isContainer && node.type !== "Image" ? "inline-block align-top" : "",
+        !isContainer && shouldUseInlineWrapper ? "inline-block align-top" : "block",
         wrapperMarginClasses,
         wrapperLayoutClasses,
         isSelected
