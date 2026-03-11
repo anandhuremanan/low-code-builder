@@ -36,6 +36,23 @@ const extractLayoutClasses = (className?: string): string => {
     .join(" ");
 };
 
+const stripWrapperClasses = (
+  className: string,
+  wrapperMarginClasses: string,
+  wrapperLayoutClasses: string,
+): string => {
+  if (!className) return "";
+  const wrapperTokens = new Set(
+    `${wrapperMarginClasses} ${wrapperLayoutClasses}`
+      .split(/\s+/)
+      .filter(Boolean),
+  );
+  return className
+    .split(/\s+/)
+    .filter((token) => token && !wrapperTokens.has(token))
+    .join(" ");
+};
+
 type ResizeHandle = "right" | "bottom" | "corner";
 const INLINE_WRAPPER_TYPES = new Set([
   "Button",
@@ -126,7 +143,19 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
     ...node.props,
     node,
   };
-  componentProps.className = resolvedClassName;
+  // In builder mode, sizing/padding are handled by the selection wrapper for Container.
+  // Keeping them on the rendered Container as well applies them twice and breaks percentage sizing.
+  if (node.type === "Container" && componentProps.style) {
+    const nextContainerStyle = { ...componentProps.style };
+    delete nextContainerStyle.width;
+    delete nextContainerStyle.height;
+    delete nextContainerStyle.padding;
+    delete nextContainerStyle.paddingTop;
+    delete nextContainerStyle.paddingRight;
+    delete nextContainerStyle.paddingBottom;
+    delete nextContainerStyle.paddingLeft;
+    componentProps.style = nextContainerStyle;
+  }
   if (node.type === "Button" || node.type === "Link") {
     componentProps.onNavigateToPageSlug = (pageSlug: string) => {
       const targetPage = state.pages.find((page) => page.slug === pageSlug);
@@ -136,6 +165,14 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
   }
   const wrapperMarginClasses = extractMarginClasses(resolvedClassName);
   const wrapperLayoutClasses = extractLayoutClasses(resolvedClassName);
+  componentProps.className =
+    node.type === "Container"
+      ? stripWrapperClasses(
+          resolvedClassName,
+          wrapperMarginClasses,
+          wrapperLayoutClasses,
+        )
+      : resolvedClassName;
   const wrapperSizeStyle = {
     width: node.props?.style?.width,
     height: node.props?.style?.height,

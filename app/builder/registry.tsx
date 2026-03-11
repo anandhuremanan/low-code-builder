@@ -1,369 +1,395 @@
-import React from 'react';
+import React from "react";
 import {
-    Box as BoxIcon,
-    Type as TextIcon,
-    MousePointer2 as ButtonIcon,
-    TextCursorInput as InputIcon,
-    List as SelectIcon,
-    CheckSquare as CheckboxIcon,
-    ToggleLeft as SwitchIcon,
-    Layout as ContainerIcon,
-    Table as TableIcon,
-    BarChart3 as ChartIcon,
-    Star as StarIcon,
-    Calendar as CalendarIcon,
-    ListOrdered as StepperIcon,
-    Clock3 as TimePickerIcon,
-    StarHalf as RatingIcon,
-    Link2 as LinkIcon
-} from 'lucide-react';
-import { type RegisteredComponent, type ComponentType } from './types';
+  Box as BoxIcon,
+  Type as TextIcon,
+  MousePointer2 as ButtonIcon,
+  TextCursorInput as InputIcon,
+  List as SelectIcon,
+  CheckSquare as CheckboxIcon,
+  ToggleLeft as SwitchIcon,
+  Layout as ContainerIcon,
+  Table as TableIcon,
+  BarChart3 as ChartIcon,
+  Star as StarIcon,
+  Calendar as CalendarIcon,
+  ListOrdered as StepperIcon,
+  Clock3 as TimePickerIcon,
+  StarHalf as RatingIcon,
+  Link2 as LinkIcon,
+} from "lucide-react";
+import { type RegisteredComponent, type ComponentType } from "./types";
 
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
-import { Checkbox } from '../components/ui/Checkbox';
-import { Switch as SwitchUI } from '../components/ui/Switch';
-import { Box } from '../components/ui/Box';
-import { Typography } from '../components/ui/Typography';
-import { DataGrid } from './components/DataGrid';
-import { Charts } from './components/Charts';
-import { Container } from './components/Container';
-import { Tabs } from './components/Tabs';
-import { MaterialIcon } from './components/MaterialIcon';
-import { DatePicker } from './components/DatePicker';
-import { TimePicker } from './components/TimePicker';
-import { DateTimePicker } from './components/DateTimePicker';
-import { MultiSelect } from '../components/ui/MultiSelect';
-import { Stepper } from './components/Stepper';
-import { RadioGroup as RadioGroupUI } from '../components/ui/RadioGroup';
-import { Rating as RatingUI } from '../components/ui/Rating';
-import { LinkNode } from './components/LinkNode';
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
+import { Select } from "../components/ui/Select";
+import { Checkbox } from "../components/ui/Checkbox";
+import { Switch as SwitchUI } from "../components/ui/Switch";
+import { Box } from "../components/ui/Box";
+import { Typography } from "../components/ui/Typography";
+import { DataGrid } from "./components/DataGrid";
+import { Charts } from "./components/Charts";
+import { Container } from "./components/Container";
+import { Tabs } from "./components/Tabs";
+import { MaterialIcon } from "./components/MaterialIcon";
+import { DatePicker } from "./components/DatePicker";
+import { TimePicker } from "./components/TimePicker";
+import { DateTimePicker } from "./components/DateTimePicker";
+import { MultiSelect } from "../components/ui/MultiSelect";
+import { Stepper } from "./components/Stepper";
+import { RadioGroup as RadioGroupUI } from "../components/ui/RadioGroup";
+import { Rating as RatingUI } from "../components/ui/Rating";
+import { LinkNode } from "./components/LinkNode";
 
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
-    Container: {
-        name: 'Container',
-        icon: ContainerIcon,
-        component: Container,
-        defaultProps: {
-            className: 'p-4 border border-dashed border-gray-300 w-full',
-        },
+  Container: {
+    name: "Container",
+    icon: ContainerIcon,
+    component: Container,
+    defaultProps: {
+      className: "p-4 border border-dashed border-gray-300 w-full",
     },
-    Button: {
-        name: 'Button',
-        icon: ButtonIcon,
-        component: ({ actionType, pageSlug, popupId, onNavigateToPageSlug, onOpenPopup, onClick, node, ...props }: any) => (
-            <Button
-                {...props}
-                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-                    if (node) {
-                        event.preventDefault();
-                        return;
-                    }
-                    event.stopPropagation();
-                    const resolvedActionType = actionType || (pageSlug ? 'navigate' : 'none');
-                    if (resolvedActionType === 'openPopup' && popupId && onOpenPopup) {
-                        onOpenPopup(popupId);
-                        return;
-                    }
-                    if (resolvedActionType === 'navigate' && pageSlug && onNavigateToPageSlug) {
-                        onNavigateToPageSlug(pageSlug);
-                        return;
-                    }
-                    onClick?.(event);
-                }}
-            />
-        ),
-        defaultProps: {
-            children: 'Button',
-            variant: 'contained',
-            className: '',
-            icon: '',
-            iconPos: 'start',
-            actionType: 'none',
-            pageSlug: '',
-            popupId: ''
-        },
+  },
+  Button: {
+    name: "Button",
+    icon: ButtonIcon,
+    component: ({
+      actionType,
+      pageSlug,
+      popupId,
+      onNavigateToPageSlug,
+      onOpenPopup,
+      onClick,
+      node,
+      ...props
+    }: any) => (
+      <Button
+        {...props}
+        onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+          if (node) {
+            event.preventDefault();
+            return;
+          }
+          event.stopPropagation();
+          const resolvedActionType =
+            actionType || (pageSlug ? "navigate" : "none");
+          if (resolvedActionType === "openPopup" && popupId && onOpenPopup) {
+            onOpenPopup(popupId);
+            return;
+          }
+          if (
+            resolvedActionType === "navigate" &&
+            pageSlug &&
+            onNavigateToPageSlug
+          ) {
+            onNavigateToPageSlug(pageSlug);
+            return;
+          }
+          onClick?.(event);
+        }}
+      />
+    ),
+    defaultProps: {
+      children: "Button",
+      variant: "contained",
+      className: "",
+      icon: "",
+      iconPos: "start",
+      actionType: "none",
+      pageSlug: "",
+      popupId: "",
     },
-    Link: {
-        name: 'Link',
-        icon: LinkIcon,
-        component: ({ node, ...props }: any) => <LinkNode {...props} isDesignMode={Boolean(node)} />,
-        defaultProps: {
-            children: 'Link',
-            className: '',
-            linkType: 'internal',
-            pageSlug: '/',
-            externalUrl: '',
-            openInNewTab: true,
-            underline: 'hover',
-            color: 'primary',
-            enableHoverMenu: false,
-            hoverMenuLayout: 'dropdown',
-            hoverMenuColumns: 3,
-            hoverMenuMinWidth: 640,
-            hoverMenuItems: []
-        }
+  },
+  Link: {
+    name: "Link",
+    icon: LinkIcon,
+    component: ({ node, ...props }: any) => (
+      <LinkNode {...props} isDesignMode={Boolean(node)} />
+    ),
+    defaultProps: {
+      children: "Link",
+      className: "",
+      linkType: "internal",
+      pageSlug: "/",
+      externalUrl: "",
+      openInNewTab: true,
+      underline: "hover",
+      color: "primary",
+      enableHoverMenu: false,
+      hoverMenuLayout: "dropdown",
+      hoverMenuColumns: 3,
+      hoverMenuMinWidth: 640,
+      hoverMenuItems: [],
     },
-    Input: {
-        name: 'Input',
-        icon: InputIcon,
-        component: ({ label, type, labelColor, ...props }: any) => (
-            <div className="flex flex-col gap-1 w-full">
-                {label && (
-                    <label className="text-sm font-medium text-gray-700" style={labelColor ? { color: labelColor } : undefined}>
-                        {label}
-                    </label>
-                )}
-                <Input {...props} type={type || 'text'} />
-            </div>
-        ),
-        defaultProps: {
-            label: 'Input Label',
-            labelColor: '#374151',
-            type: 'text',
-            placeholder: 'Enter text...',
-            disableBorder: false,
-            className: '',
-            fullWidth: false,
-        },
+  },
+  Input: {
+    name: "Input",
+    icon: InputIcon,
+    component: ({
+      label,
+      type,
+      labelColor,
+      fullWidth: _unusedFullWidth,
+      ...props
+    }: any) => (
+      <div className="flex flex-col gap-1 w-full">
+        {label && (
+          <label
+            className="text-sm font-medium text-gray-700"
+            style={labelColor ? { color: labelColor } : undefined}
+          >
+            {label}
+          </label>
+        )}
+        <Input {...props} type={type || "text"} fullWidth />
+      </div>
+    ),
+    defaultProps: {
+      label: "Input Label",
+      labelColor: "#374151",
+      type: "text",
+      placeholder: "Enter text...",
+      disableBorder: false,
+      className: "",
     },
-    Text: {
-        name: 'Text',
-        icon: TextIcon,
-        component: Typography,
-        defaultProps: {
-            children: 'Double click to edit text',
-            variant: 'inherit',
-            className: 'text-base text-gray-800',
-        },
+  },
+  Text: {
+    name: "Text",
+    icon: TextIcon,
+    component: Typography,
+    defaultProps: {
+      children: "Double click to edit text",
+      variant: "inherit",
+      className: "text-base text-gray-800",
     },
-    Select: {
-        name: 'Select',
-        icon: SelectIcon,
-        component: ({ options, ...props }: any) => (
-            <Select {...props} options={options || []} />
-        ),
-        defaultProps: {
-            label: 'Select Option',
-            className: '',
-            fullWidth: false,
-            options: [
-                { value: 'option1', label: 'Option 1' },
-                { value: 'option2', label: 'Option 2' }
-            ]
-        },
+  },
+  Select: {
+    name: "Select",
+    icon: SelectIcon,
+    component: ({ options, ...props }: any) => (
+      <Select {...props} options={options || []} />
+    ),
+    defaultProps: {
+      label: "Select Option",
+      className: "",
+      fullWidth: false,
+      options: [
+        { value: "option1", label: "Option 1" },
+        { value: "option2", label: "Option 2" },
+      ],
     },
-    Checkbox: {
-        name: 'Checkbox',
-        icon: CheckboxIcon,
-        component: Checkbox,
-        defaultProps: {
-            label: 'Check me',
-        },
+  },
+  Checkbox: {
+    name: "Checkbox",
+    icon: CheckboxIcon,
+    component: Checkbox,
+    defaultProps: {
+      label: "Check me",
     },
-    Switch: {
-        name: 'Switch',
-        icon: SwitchIcon,
-        component: SwitchUI,
-        defaultProps: {
-            label: 'Enable option',
-            checked: false,
-            size: 'medium',
-            className: ''
-        },
+  },
+  Switch: {
+    name: "Switch",
+    icon: SwitchIcon,
+    component: SwitchUI,
+    defaultProps: {
+      label: "Enable option",
+      checked: false,
+      size: "medium",
+      className: "",
     },
-    RadioGroup: {
-        name: 'RadioGroup',
-        icon: SelectIcon,
-        component: ({ options, ...props }: any) => (
-            <RadioGroupUI {...props} options={options || []} />
-        ),
-        defaultProps: {
-            label: 'Choose an option',
-            options: [
-                { value: 'option1', label: 'Option 1' },
-                { value: 'option2', label: 'Option 2' }
-            ],
-            value: '',
-            row: false,
-            className: ''
-        },
+  },
+  RadioGroup: {
+    name: "RadioGroup",
+    icon: SelectIcon,
+    component: ({ options, ...props }: any) => (
+      <RadioGroupUI {...props} options={options || []} />
+    ),
+    defaultProps: {
+      label: "Choose an option",
+      options: [
+        { value: "option1", label: "Option 1" },
+        { value: "option2", label: "Option 2" },
+      ],
+      value: "",
+      row: false,
+      className: "",
     },
-    Rating: {
-        name: 'Rating',
-        icon: RatingIcon,
-        component: (props: any) => <RatingUI {...props} />,
-        defaultProps: {
-            label: 'Rate this',
-            value: 3,
-            max: 5,
-            precision: 1,
-            readOnly: false,
-            size: 'medium',
-            className: ''
-        },
+  },
+  Rating: {
+    name: "Rating",
+    icon: RatingIcon,
+    component: (props: any) => <RatingUI {...props} />,
+    defaultProps: {
+      label: "Rate this",
+      value: 3,
+      max: 5,
+      precision: 1,
+      readOnly: false,
+      size: "medium",
+      className: "",
     },
-    Image: {
-        name: 'Image',
-        icon: BoxIcon,
-        component: ({ src, alt, className, ...props }: any) => (
-            <img
-                src={src || 'https://placehold.co/150'}
-                alt={alt || 'placeholder'}
-                className={`max-w-full ${className || ''}`}
-                {...props}
-            />
-        ),
-        defaultProps: {},
+  },
+  Image: {
+    name: "Image",
+    icon: BoxIcon,
+    component: ({ src, alt, className, ...props }: any) => (
+      <img
+        src={src || "https://placehold.co/150"}
+        alt={alt || "placeholder"}
+        className={`max-w-full ${className || ""}`}
+        {...props}
+      />
+    ),
+    defaultProps: {},
+  },
+  Textarea: {
+    name: "Textarea",
+    icon: TextIcon,
+    component: ({ className, ...props }: any) => (
+      <textarea {...props} className={className || "border p-2 rounded"} />
+    ),
+    defaultProps: {
+      placeholder: "Enter long text...",
+      className: "",
     },
-    Textarea: {
-        name: 'Textarea',
-        icon: TextIcon,
-        component: ({ className, ...props }: any) => <textarea {...props} className={className || 'border p-2 rounded'} />,
-        defaultProps: {
-            placeholder: 'Enter long text...',
-            className: ''
-        }
+  },
+  DataGrid: {
+    name: "DataGrid",
+    icon: TableIcon,
+    component: DataGrid,
+    defaultProps: {
+      className: "",
+      apiUrl: "",
+      columns: [
+        { field: "id", headerName: "ID", width: 70 },
+        { field: "firstName", headerName: "First name", width: 130 },
+        { field: "lastName", headerName: "Last name", width: 130 },
+      ],
+      style: { width: "100%", height: "400px" },
     },
-    DataGrid: {
-        name: 'DataGrid',
-        icon: TableIcon,
-        component: DataGrid,
-        defaultProps: {
-            className: '',
-            apiUrl: '',
-            columns: [
-                { field: 'id', headerName: 'ID', width: 70 },
-                { field: 'firstName', headerName: 'First name', width: 130 },
-                { field: 'lastName', headerName: 'Last name', width: 130 },
-            ],
-            style: { width: '100%', height: '400px' }
-        }
+  },
+  Charts: {
+    name: "Charts",
+    icon: ChartIcon,
+    component: Charts,
+    defaultProps: {
+      chartType: "bar",
+      title: "Sales Overview",
+      dataSource: "manual",
+      apiUrl: "",
+      jsonData: "",
+      dataPath: "",
+      xAxisKey: "",
+      yAxisKey: "",
+      colorKey: "",
+      labels: ["Jan", "Feb", "Mar", "Apr"],
+      values: [12, 19, 8, 15],
+      height: 320,
+      showLegend: true,
+      showGrid: true,
+      color: "#1976d2",
+      pointColors: ["#1976d2", "#2e7d32", "#ed6c02", "#9c27b0"],
+      lineCurve: "monotoneX",
+      xAxisLabel: "",
+      yAxisLabel: "",
+      pieInnerRadius: 0,
+      className: "w-full",
     },
-    Charts: {
-        name: 'Charts',
-        icon: ChartIcon,
-        component: Charts,
-        defaultProps: {
-            chartType: 'bar',
-            title: 'Sales Overview',
-            dataSource: 'manual',
-            apiUrl: '',
-            jsonData: '',
-            dataPath: '',
-            xAxisKey: '',
-            yAxisKey: '',
-            colorKey: '',
-            labels: ['Jan', 'Feb', 'Mar', 'Apr'],
-            values: [12, 19, 8, 15],
-            height: 320,
-            showLegend: true,
-            showGrid: true,
-            color: '#1976d2',
-            pointColors: ['#1976d2', '#2e7d32', '#ed6c02', '#9c27b0'],
-            lineCurve: 'monotoneX',
-            xAxisLabel: '',
-            yAxisLabel: '',
-            pieInnerRadius: 0,
-            className: 'w-full'
-        }
+  },
+  MaterialIcon: {
+    name: "MaterialIcon",
+    icon: StarIcon,
+    component: MaterialIcon,
+    defaultProps: {
+      icon: "home",
+      className: "text-gray-800 text-4xl",
+      style: { fontSize: "40px" },
     },
-    MaterialIcon: {
-        name: 'MaterialIcon',
-        icon: StarIcon,
-        component: MaterialIcon,
-        defaultProps: {
-            icon: 'home',
-            className: 'text-gray-800 text-4xl',
-            style: { fontSize: '40px' }
-        }
+  },
+  DatePicker: {
+    name: "DatePicker",
+    icon: CalendarIcon,
+    component: DatePicker,
+    defaultProps: {
+      label: "Select Date",
+      className: "",
+      helperText: "",
     },
-    DatePicker: {
-        name: 'DatePicker',
-        icon: CalendarIcon,
-        component: DatePicker,
-        defaultProps: {
-            label: 'Select Date',
-            className: '',
-            helperText: ''
-        }
+  },
+  TimePicker: {
+    name: "TimePicker",
+    icon: TimePickerIcon,
+    component: TimePicker,
+    defaultProps: {
+      label: "Select Time",
+      className: "",
+      helperText: "",
     },
-    TimePicker: {
-        name: 'TimePicker',
-        icon: TimePickerIcon,
-        component: TimePicker,
-        defaultProps: {
-            label: 'Select Time',
-            className: '',
-            helperText: ''
-        }
+  },
+  DateTimePicker: {
+    name: "DateTimePicker",
+    icon: CalendarIcon,
+    component: DateTimePicker,
+    defaultProps: {
+      label: "Select Date & Time",
+      className: "",
+      helperText: "",
     },
-    DateTimePicker: {
-        name: 'DateTimePicker',
-        icon: CalendarIcon,
-        component: DateTimePicker,
-        defaultProps: {
-            label: 'Select Date & Time',
-            className: '',
-            helperText: ''
-        }
+  },
+  MultiSelect: {
+    name: "MultiSelect",
+    icon: SelectIcon,
+    component: ({ options, ...props }: any) => (
+      <MultiSelect {...props} options={options || []} />
+    ),
+    defaultProps: {
+      label: "Multi Select",
+      className: "",
+      fullWidth: false,
+      options: [
+        { value: "option1", label: "Option 1" },
+        { value: "option2", label: "Option 2" },
+        { value: "option3", label: "Option 3" },
+      ],
+      value: [],
     },
-    MultiSelect: {
-        name: 'MultiSelect',
-        icon: SelectIcon,
-        component: ({ options, ...props }: any) => (
-            <MultiSelect {...props} options={options || []} />
-        ),
-        defaultProps: {
-            label: 'Multi Select',
-            className: '',
-            fullWidth: false,
-            options: [
-                { value: 'option1', label: 'Option 1' },
-                { value: 'option2', label: 'Option 2' },
-                { value: 'option3', label: 'Option 3' }
-            ],
-            value: []
-        },
+  },
+  Tabs: {
+    name: "Tabs",
+    icon: ContainerIcon,
+    component: Tabs,
+    defaultProps: {
+      items: [
+        { label: "Tab 1", id: "tab1" },
+        { label: "Tab 2", id: "tab2" },
+      ],
+      defaultValue: 0,
+      className: "",
     },
-    Tabs: {
-        name: 'Tabs',
-        icon: ContainerIcon,
-        component: Tabs,
-        defaultProps: {
-            items: [
-                { label: 'Tab 1', id: 'tab1' },
-                { label: 'Tab 2', id: 'tab2' }
-            ],
-            defaultValue: 0,
-            className: ''
-        }
+  },
+  Stepper: {
+    name: "Stepper",
+    icon: StepperIcon,
+    component: Stepper,
+    defaultProps: {
+      steps: [
+        { label: "Select campaign settings", optional: false },
+        { label: "Create an ad group", optional: true },
+        { label: "Create an ad", optional: false },
+      ],
+      activeStep: 1,
+      orientation: "horizontal",
+      linear: true,
+      alternativeLabel: true,
+      showControls: true,
+      showStatusText: true,
+      stepPrefixText: "Step",
+      completedText: "All steps completed - you're finished",
+      backLabel: "BACK",
+      nextLabel: "NEXT",
+      skipLabel: "SKIP",
+      finishLabel: "FINISH",
+      resetLabel: "RESET",
+      className: "w-full",
     },
-    Stepper: {
-        name: 'Stepper',
-        icon: StepperIcon,
-        component: Stepper,
-        defaultProps: {
-            steps: [
-                { label: 'Select campaign settings', optional: false },
-                { label: 'Create an ad group', optional: true },
-                { label: 'Create an ad', optional: false }
-            ],
-            activeStep: 1,
-            orientation: 'horizontal',
-            linear: true,
-            alternativeLabel: true,
-            showControls: true,
-            showStatusText: true,
-            stepPrefixText: 'Step',
-            completedText: "All steps completed - you're finished",
-            backLabel: 'BACK',
-            nextLabel: 'NEXT',
-            skipLabel: 'SKIP',
-            finishLabel: 'FINISH',
-            resetLabel: 'RESET',
-            className: 'w-full'
-        }
-    }
+  },
 };
