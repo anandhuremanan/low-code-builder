@@ -165,13 +165,12 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   Select: {
     name: "Select",
     icon: SelectIcon,
-    component: ({ options, ...props }: any) => (
-      <Select {...props} options={options || []} />
+    component: ({ options, fullWidth: _unusedFullWidth, ...props }: any) => (
+      <Select {...props} options={options || []} fullWidth />
     ),
     defaultProps: {
       label: "Select Option",
       className: "",
-      fullWidth: false,
       options: [
         { value: "option1", label: "Option 1" },
         { value: "option2", label: "Option 2" },
@@ -338,13 +337,12 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   MultiSelect: {
     name: "MultiSelect",
     icon: SelectIcon,
-    component: ({ options, ...props }: any) => (
-      <MultiSelect {...props} options={options || []} />
+    component: ({ options, fullWidth: _unusedFullWidth, ...props }: any) => (
+      <MultiSelect {...props} options={options || []} fullWidth />
     ),
     defaultProps: {
       label: "Multi Select",
       className: "",
-      fullWidth: false,
       options: [
         { value: "option1", label: "Option 1" },
         { value: "option2", label: "Option 2" },
