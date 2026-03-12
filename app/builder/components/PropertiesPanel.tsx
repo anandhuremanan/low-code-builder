@@ -10,6 +10,7 @@ import { InputSettings } from './properties/InputSettings';
 import { TypographySettings } from './properties/TypographySettings';
 import { ButtonSettings } from './properties/ButtonSettings';
 import { ContainerSettings } from './properties/ContainerSettings';
+import { FormSettings } from './properties/FormSettings';
 import { ImageSettings } from './properties/ImageSettings';
 import { LayoutSizingSettings } from './properties/LayoutSizingSettings';
 import { SpacingSettings } from './properties/SpacingSettings';
@@ -82,6 +83,7 @@ export const PropertiesPanel = () => {
                 {selectedNode.type === 'Button' && <ButtonSettings p={p} />}
                 {selectedNode.type === 'Link' && <LinkSettings p={p} />}
                 {selectedNode.type === 'Container' && <ContainerSettings p={p} />}
+                {selectedNode.type === 'Form' && <FormSettings p={p} />}
                 {selectedNode.type === 'Image' && <ImageSettings p={p} />}
 
                 <SecondaryPropertiesSections

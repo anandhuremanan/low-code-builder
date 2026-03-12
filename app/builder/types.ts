@@ -3,6 +3,7 @@ import * as LucideIcons from "lucide-react";
 
 export type ComponentType =
   | "Container"
+  | "Form"
   | "Button"
   | "Link"
   | "Input"

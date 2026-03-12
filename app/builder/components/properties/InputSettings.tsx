@@ -42,6 +42,54 @@ export const InputSettings = ({ p }: { p: NodeProperties }) => {
                         placeholder="Placeholder text"
                     />
                 </div>
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-400">Field Name</label>
+                    <Input
+                        size="small"
+                        value={p.localProps.name || ''}
+                        onChange={(e) => p.handleChange('name', e.target.value)}
+                        placeholder="email"
+                    />
+                </div>
+                <label className="flex items-center gap-2 text-xs text-gray-400">
+                    <input
+                        type="checkbox"
+                        checked={Boolean(p.localProps.required)}
+                        onChange={(e) => p.handleChange('required', e.target.checked)}
+                    />
+                    Required
+                </label>
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-400">Regex Pattern</label>
+                    <Input
+                        size="small"
+                        value={p.localProps.regexPattern || ''}
+                        onChange={(e) => p.handleChange('regexPattern', e.target.value)}
+                        placeholder="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+                    />
+                </div>
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-400">Regex Validation Trigger</label>
+                    <select
+                        className="w-full text-sm border rounded p-1"
+                        value={p.localProps.regexValidationTrigger || 'onSubmit'}
+                        onChange={(e) => p.handleChange('regexValidationTrigger', e.target.value)}
+                    >
+                        <option value="onSubmit">Parent Form Submit</option>
+                        <option value="onKeydown">onKeydown</option>
+                        <option value="onBlur">onBlur</option>
+                        <option value="onInput">onInput</option>
+                    </select>
+                </div>
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-400">Regex Error Message</label>
+                    <Input
+                        size="small"
+                        value={p.localProps.regexErrorMessage || ''}
+                        onChange={(e) => p.handleChange('regexErrorMessage', e.target.value)}
+                        placeholder="Please enter a valid value."
+                    />
+                </div>
                 <label className="flex items-center gap-2 text-xs text-gray-400">
                     <input
                         type="checkbox"

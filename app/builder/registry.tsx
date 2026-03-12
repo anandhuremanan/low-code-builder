@@ -8,6 +8,7 @@ import {
   CheckSquare as CheckboxIcon,
   ToggleLeft as SwitchIcon,
   Layout as ContainerIcon,
+  FileText as FormIcon,
   Table as TableIcon,
   BarChart3 as ChartIcon,
   Star as StarIcon,
@@ -29,6 +30,7 @@ import { Typography } from "../components/ui/Typography";
 import { DataGrid } from "./components/DataGrid";
 import { Charts } from "./components/Charts";
 import { Container } from "./components/Container";
+import { Form } from "./components/Form";
 import { Tabs } from "./components/Tabs";
 import { MaterialIcon } from "./components/MaterialIcon";
 import { DatePicker } from "./components/DatePicker";
@@ -109,6 +111,17 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     component: Container,
     defaultProps: withDefaultVerticalMargins({
       className: "p-4 border border-dashed border-gray-300 w-full",
+    }),
+  },
+  Form: {
+    name: "Form",
+    icon: FormIcon,
+    component: Form,
+    defaultProps: withDefaultVerticalMargins({
+      className: "p-4 border border-dashed border-gray-300 w-full rounded",
+      showSubmitButton: true,
+      submitButtonText: "Submit",
+      submitButtonVariant: "contained",
     }),
   },
   Button: {
@@ -227,6 +240,11 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
       type: "text",
       placeholder: "Enter text...",
       disableBorder: false,
+      required: false,
+      name: "",
+      regexPattern: "",
+      regexValidationTrigger: "onSubmit",
+      regexErrorMessage: "",
       className: "",
     }),
   },

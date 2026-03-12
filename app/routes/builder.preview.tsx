@@ -45,6 +45,18 @@ type TabItem = {
   label: string;
 };
 
+type ValidationReason = "onKeydown" | "onBlur" | "onInput" | "onSubmit";
+
+type FormContextValue = {
+  registerFieldValidator: (
+    fieldId: string,
+    validator: (reason: ValidationReason) => boolean,
+  ) => void;
+  unregisterFieldValidator: (fieldId: string) => void;
+};
+
+const PreviewFormContext = React.createContext<FormContextValue | null>(null);
+
 const sanitizePreviewContainerClassName = (className?: string): string => {
   if (!className) return "";
   const tokens = className.split(/\s+/).filter(Boolean);
@@ -325,6 +337,184 @@ const resolveNodeClassName = (
   return props?.className || "";
 };
 
+const PreviewInputField = ({
+  node,
+  inputClassName,
+  inputStyle,
+}: {
+  node: ComponentNode;
+  inputClassName: string;
+  inputStyle?: React.CSSProperties;
+}) => {
+  const formContext = React.useContext(PreviewFormContext);
+  const [value, setValue] = useState(String(node.props.value ?? ""));
+  const [errorText, setErrorText] = useState<string | undefined>(undefined);
+
+  const required = Boolean(node.props.required);
+  const regexPattern = String(node.props.regexPattern || "").trim();
+  const regexErrorMessage = String(node.props.regexErrorMessage || "").trim();
+  const regexValidationTrigger = (node.props.regexValidationTrigger ||
+    "onSubmit") as ValidationReason;
+
+  useEffect(() => {
+    setValue(String(node.props.value ?? ""));
+  }, [node.props.value, node.id]);
+
+  const validateValue = React.useCallback(
+    (reason: ValidationReason, candidateValue: string) => {
+      const normalizedValue = candidateValue.trim();
+
+      if (required && !normalizedValue) {
+        setErrorText("This field is required.");
+        return false;
+      }
+
+      if (!regexPattern) {
+        setErrorText(undefined);
+        return true;
+      }
+
+      let regex: RegExp;
+      try {
+        regex = new RegExp(regexPattern);
+      } catch {
+        setErrorText("Invalid regex pattern.");
+        return false;
+      }
+
+      const shouldEvaluateRegex =
+        reason === "onSubmit" || regexValidationTrigger === reason;
+      if (!shouldEvaluateRegex) {
+        if (!required || normalizedValue) {
+          setErrorText(undefined);
+        }
+        return true;
+      }
+
+      if (!regex.test(candidateValue)) {
+        setErrorText(
+          regexErrorMessage || "Input does not match the regex pattern.",
+        );
+        return false;
+      }
+
+      setErrorText(undefined);
+      return true;
+    },
+    [regexPattern, regexValidationTrigger, required],
+  );
+
+  useEffect(() => {
+    if (!formContext) return;
+    const validator = (reason: ValidationReason) => validateValue(reason, value);
+    formContext.registerFieldValidator(node.id, validator);
+    return () => {
+      formContext.unregisterFieldValidator(node.id);
+    };
+  }, [formContext, node.id, validateValue, value]);
+
+  return (
+    <Input
+      className={inputClassName}
+      style={inputStyle}
+      placeholder={node.props.placeholder}
+      size={node.props.size}
+      type={node.props.type || "text"}
+      disableBorder={Boolean(node.props.disableBorder)}
+      value={value}
+      name={node.props.name || undefined}
+      required={required}
+      error={Boolean(errorText)}
+      helperText={errorText}
+      onChange={(event) => {
+        const nextValue = event.target.value;
+        setValue(nextValue);
+        if (regexValidationTrigger === "onInput") {
+          validateValue("onInput", nextValue);
+        }
+      }}
+      onBlur={(event) => {
+        const input = event.target as HTMLInputElement;
+        validateValue("onBlur", input.value);
+      }}
+      onKeyDown={(event) => {
+        if (regexValidationTrigger === "onKeydown") {
+          const input = event.target as HTMLInputElement;
+          window.requestAnimationFrame(() => {
+            validateValue("onKeydown", input.value);
+          });
+        }
+      }}
+    />
+  );
+};
+
+const PreviewFormNode = ({
+  node,
+  resolvedClassName,
+  resolvedStyle,
+  children,
+}: {
+  node: ComponentNode;
+  resolvedClassName: string;
+  resolvedStyle: React.CSSProperties;
+  children: React.ReactNode;
+}) => {
+  const validatorMapRef = React.useRef<
+    Map<string, (reason: ValidationReason) => boolean>
+  >(new Map());
+
+  const registerFieldValidator = React.useCallback(
+    (fieldId: string, validator: (reason: ValidationReason) => boolean) => {
+      validatorMapRef.current.set(fieldId, validator);
+    },
+    [],
+  );
+
+  const unregisterFieldValidator = React.useCallback((fieldId: string) => {
+    validatorMapRef.current.delete(fieldId);
+  }, []);
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const validators = Array.from(validatorMapRef.current.values());
+    for (const validate of validators) {
+      const valid = validate("onSubmit");
+      if (!valid) return;
+    }
+  };
+
+  const contextValue: FormContextValue = {
+    registerFieldValidator,
+    unregisterFieldValidator,
+  };
+
+  return (
+    <PreviewFormContext.Provider value={contextValue}>
+      <Box
+        component="form"
+        className={sanitizePreviewContainerClassName(resolvedClassName)}
+        style={resolvedStyle}
+        onSubmit={handleSubmit}
+      >
+        <div className="flex flex-col gap-3">
+          {children}
+          {node.props.showSubmitButton ? (
+            <div>
+              <Button
+                type="submit"
+                variant={node.props.submitButtonVariant || "contained"}
+              >
+                {node.props.submitButtonText || "Submit"}
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      </Box>
+    </PreviewFormContext.Provider>
+  );
+};
+
 const PreviewNode = ({
   node,
   customStyleById,
@@ -357,6 +547,16 @@ const PreviewNode = ({
         >
           {childNodes}
         </Box>
+      );
+    case "Form":
+      return (
+        <PreviewFormNode
+          node={node}
+          resolvedClassName={resolvedClassName}
+          resolvedStyle={resolvedStyle}
+        >
+          {childNodes}
+        </PreviewFormNode>
       );
     case "Text":
       return (
@@ -440,13 +640,10 @@ const PreviewNode = ({
               {node.props.label}
             </label>
           )}
-          <Input
-            className={inputClassName}
-            style={inputStyle}
-            placeholder={node.props.placeholder}
-            size={node.props.size}
-            type={node.props.type || "text"}
-            disableBorder={Boolean(node.props.disableBorder)}
+          <PreviewInputField
+            node={node}
+            inputClassName={inputClassName}
+            inputStyle={inputStyle}
           />
         </div>
       );

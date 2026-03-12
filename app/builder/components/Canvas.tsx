@@ -80,7 +80,7 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
   const componentEntry = COMPONENT_REGISTRY[node.type];
 
   // Setup droppable for container types
-  const isContainer = node.type === "Container";
+  const isContainer = node.type === "Container" || node.type === "Form";
   const { setNodeRef, isOver } = useDroppable({
     id: node.id,
     data: {
