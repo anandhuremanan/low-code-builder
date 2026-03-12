@@ -51,7 +51,7 @@ header {
 }
 
 .landing-container {
-  background-image: linear-gradient(89deg, #f0f4ff 0%, #fafafd 50%);
+  background-image: linear-gradient(89deg, #f7f6fc, #f7f7fe 50%);
   width: 100%;
   height: 100vh;
 }
@@ -65,9 +65,140 @@ header {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 150px 65px;
+  padding: 10% 6%;
 }
 
 .content-sec {
-  background-size: 61% !important;
+  background-size: 60% !important;
+}
+
+.btn-login {
+  float: inline-end;
+  background-image: linear-gradient(89deg, #f4f7fb 30%, #dfecff 70%);
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  padding: 7px 10px 7px 20px;
+  border-radius: 30px;
+  color: #113c5d;
+  border: 1px solid #dfdfdf;
+  margin: 15px;
+}
+
+.main-container {
+  width: 100%;
+  height: 100vh;
+}
+
+.body-sec {
+  display: flex;
+}
+
+.config-container {
+  /* background-image: linear-gradient(89deg, #f7f6fc, #f7f7fe 50%); */
+  width: 100%;
+  height: 100vh;
+}
+
+.config-sec {
+  padding: 40px 30px;
+}
+
+.tile-sec {
+  padding: 20px 0px;
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.tile-components {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px;
+  width: 100%;
+  margin: 0px 20px;
+  height: fit-content;
+  min-height: 290px;
+}
+
+.heading-sec {
+  padding: 0px 20px;
+  margin-top: 20px;
+}
+
+.components-header {
+  background-color: transparent;
+  font-size: 22px;
+  display: flex;
+}
+
+.tile-content {
+  background-color: #f5f5f5;
+}
+
+.tile-content p {
+  padding: 15px 15px;
+  font-size: 14px;
+}
+
+.tile-label {
+  display: flex;
+}
+
+.tile-buttonsec {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #f2f2f2;
+  min-height: 65px;
+}
+
+.tile-editbtn {
+  float: inline-end;
+  background-image: linear-gradient(89deg, #f4f7fb 30%, #dfecff 70%);
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  padding: 7px 10px 7px 20px;
+  border-radius: 30px;
+  color: #113c5d;
+  border: 1px solid #dfdfdf;
+  margin: 15px;
+}
+
+.tile-editbtn:hover {
+  background-image: linear-gradient(89deg, #55585c 30%, #44474a 70%);
+  color: #fff;
+}
+
+.sidebar-sec {
+  min-width: 250px;
+  height: calc(100vh - 69px);
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+  background-image: linear-gradient(131deg, #02142d 20%, #03306a 80%);
+}
+
+
+.menu {
+  list-style: none;
+  padding: 0;
+}
+
+.menu li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.menu li:hover {
+  background: #374151;
+}
+
+.submenu {
+  list-style: none;
+  padding-left: 20px;
+}
+
+.submenu li {
+  font-size: 14px;
+  padding: 8px;
 }
