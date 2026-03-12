@@ -89,8 +89,7 @@ const splitMarginStyle = (
 };
 
 const DEFAULT_COMPONENT_MARGIN_STYLE: React.CSSProperties = {
-  marginTop: "8px",
-  marginBottom: "8px",
+  marginTop: "12px",
 };
 
 const withDefaultVerticalMargins = <T extends Record<string, any>>(
