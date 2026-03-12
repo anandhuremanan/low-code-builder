@@ -183,6 +183,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     component: Checkbox,
     defaultProps: {
       label: "Check me",
+      fullWidth: true,
     },
   },
   Switch: {

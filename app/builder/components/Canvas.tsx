@@ -62,7 +62,6 @@ type ResizeHandle = "right" | "bottom" | "corner";
 const INLINE_WRAPPER_TYPES = new Set([
   "Button",
   "Link",
-  "Checkbox",
   "Switch",
   "MaterialIcon",
 ]);

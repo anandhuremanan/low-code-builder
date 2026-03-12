@@ -726,6 +726,30 @@ export const SecondaryPropertiesSections = ({
         </div>
       )}
       {/* Switch Section */}
+      {selectedNode.type === "Checkbox" && (
+        <div className="space-y-3">
+          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+            Checkbox
+          </label>
+          <div className="space-y-1">
+            <label className="text-xs text-gray-400">Label</label>
+            <Input
+              size="small"
+              value={localProps.label || ""}
+              onChange={(e) => handleChange("label", e.target.value)}
+            />
+          </div>
+          <label className="flex items-center gap-2 text-xs text-gray-400">
+            <input
+              type="checkbox"
+              checked={Boolean(localProps.checked)}
+              onChange={(e) => handleChange("checked", e.target.checked)}
+            />
+            Checked
+          </label>
+        </div>
+      )}
+      {/* Switch Section */}
       {selectedNode.type === "Switch" && (
         <div className="space-y-3">
           <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">

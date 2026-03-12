@@ -3,13 +3,38 @@ import { Checkbox as MuiCheckbox, type CheckboxProps, FormControlLabel } from '@
 
 export interface CustomCheckboxProps extends CheckboxProps {
     label?: string;
+    fullWidth?: boolean;
+    node?: unknown;
 }
 
-export const Checkbox: React.FC<CustomCheckboxProps> = ({ label, ...props }) => {
+export const Checkbox: React.FC<CustomCheckboxProps> = ({
+    label,
+    fullWidth = true,
+    className,
+    style,
+    checked,
+    onChange,
+    node: _unusedNode,
+    ...props
+}) => {
+    const wrapperStyle: React.CSSProperties = {
+        minWidth: 0,
+        ...(fullWidth ? { width: '100%' } : {}),
+        ...(style || {})
+    };
+
     return (
-        <FormControlLabel
-            control={<MuiCheckbox {...props} />}
-            label={label || ''}
-        />
+        <div className={className} style={wrapperStyle}>
+            <FormControlLabel
+                sx={{
+                    width: fullWidth ? '100%' : undefined,
+                    minWidth: 0,
+                    display: 'flex',
+                    margin: 0
+                }}
+                control={<MuiCheckbox {...props} checked={checked} onChange={onChange} />}
+                label={label || ''}
+            />
+        </div>
     );
 };

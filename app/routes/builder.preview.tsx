@@ -225,6 +225,35 @@ const PreviewSwitchField = ({
   );
 };
 
+const PreviewCheckboxField = ({
+  className,
+  style,
+  label,
+  checked,
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+  label?: string;
+  checked?: boolean;
+}) => {
+  const [isChecked, setIsChecked] = useState(Boolean(checked));
+
+  useEffect(() => {
+    setIsChecked(Boolean(checked));
+  }, [checked]);
+
+  return (
+    <Checkbox
+      className={className}
+      style={style}
+      label={label}
+      fullWidth
+      checked={isChecked}
+      onChange={(event) => setIsChecked(event.target.checked)}
+    />
+  );
+};
+
 const resolveNodeClassName = (
   props: Record<string, any>,
   customStyleById: Map<string, CustomStyle>,
@@ -403,10 +432,11 @@ const PreviewNode = ({
       );
     case "Checkbox":
       return (
-        <Checkbox
-          label={node.props.label}
+        <PreviewCheckboxField
           className={resolvedClassName}
           style={resolvedStyle}
+          label={node.props.label}
+          checked={Boolean(node.props.checked)}
         />
       );
     case "Switch":
