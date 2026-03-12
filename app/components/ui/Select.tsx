@@ -7,12 +7,14 @@ export interface Option {
 }
 
 export type CustomSelectProps = SelectProps & {
+    caption?: string;
     label?: string;
     options: Option[];
     fullWidth?: boolean;
 };
 
 export const Select: React.FC<CustomSelectProps> = ({
+    caption,
     label,
     options,
     fullWidth = true,
@@ -28,6 +30,7 @@ export const Select: React.FC<CustomSelectProps> = ({
 
     return (
         <div className={className} style={wrapperStyle}>
+            {caption && <div className="mb-1 text-sm font-medium text-gray-700">{caption}</div>}
             <FormControl
                 fullWidth={fullWidth}
                 variant="outlined"

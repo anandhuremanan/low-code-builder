@@ -600,6 +600,14 @@ export const SecondaryPropertiesSections = ({
             Field Settings
           </label>
           <div className="space-y-1">
+            <label className="text-xs text-gray-400">Caption (Top Label)</label>
+            <Input
+              size="small"
+              value={localProps.caption || ""}
+              onChange={(e) => handleChange("caption", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
             <label className="text-xs text-gray-400">Label</label>
             <Input
               size="small"
@@ -636,6 +644,14 @@ export const SecondaryPropertiesSections = ({
             Date Picker
           </label>
           <div className="space-y-1">
+            <label className="text-xs text-gray-400">Caption (Top Label)</label>
+            <Input
+              size="small"
+              value={localProps.caption || ""}
+              onChange={(e) => handleChange("caption", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
             <label className="text-xs text-gray-400">Label</label>
             <Input
               size="small"
@@ -667,6 +683,14 @@ export const SecondaryPropertiesSections = ({
           <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
             Time Picker
           </label>
+          <div className="space-y-1">
+            <label className="text-xs text-gray-400">Caption (Top Label)</label>
+            <Input
+              size="small"
+              value={localProps.caption || ""}
+              onChange={(e) => handleChange("caption", e.target.value)}
+            />
+          </div>
           <div className="space-y-1">
             <label className="text-xs text-gray-400">Label</label>
             <Input
@@ -700,6 +724,14 @@ export const SecondaryPropertiesSections = ({
             Date Time Picker
           </label>
           <div className="space-y-1">
+            <label className="text-xs text-gray-400">Caption (Top Label)</label>
+            <Input
+              size="small"
+              value={localProps.caption || ""}
+              onChange={(e) => handleChange("caption", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
             <label className="text-xs text-gray-400">Label</label>
             <Input
               size="small"
@@ -732,6 +764,14 @@ export const SecondaryPropertiesSections = ({
             Checkbox
           </label>
           <div className="space-y-1">
+            <label className="text-xs text-gray-400">Caption (Top Label)</label>
+            <Input
+              size="small"
+              value={localProps.caption || ""}
+              onChange={(e) => handleChange("caption", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
             <label className="text-xs text-gray-400">Label</label>
             <Input
               size="small"
@@ -755,6 +795,14 @@ export const SecondaryPropertiesSections = ({
           <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
             Switch
           </label>
+          <div className="space-y-1">
+            <label className="text-xs text-gray-400">Caption (Top Label)</label>
+            <Input
+              size="small"
+              value={localProps.caption || ""}
+              onChange={(e) => handleChange("caption", e.target.value)}
+            />
+          </div>
           <div className="space-y-1">
             <label className="text-xs text-gray-400">Label</label>
             <Input
@@ -790,6 +838,14 @@ export const SecondaryPropertiesSections = ({
           <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
             Rating
           </label>
+          <div className="space-y-1">
+            <label className="text-xs text-gray-400">Caption (Top Label)</label>
+            <Input
+              size="small"
+              value={localProps.caption || ""}
+              onChange={(e) => handleChange("caption", e.target.value)}
+            />
+          </div>
           <div className="space-y-1">
             <label className="text-xs text-gray-400">Label</label>
             <Input

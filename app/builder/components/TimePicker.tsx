@@ -3,6 +3,7 @@ import { TimePicker as MuiTimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
 
 interface TimePickerProps {
+    caption?: string;
     label?: string;
     name?: string;
     helperText?: string;
@@ -13,6 +14,7 @@ interface TimePickerProps {
 }
 
 export const TimePicker: React.FC<TimePickerProps> = ({
+    caption,
     label = 'Select Time',
     name,
     helperText,
@@ -37,6 +39,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
 
     return (
         <div className={className} style={style}>
+            {caption && <div className="mb-1 text-sm font-medium text-gray-700">{caption}</div>}
             <MuiTimePicker
                 label={label}
                 value={onChange ? (value ? dayjs(value) : null) : localValue}

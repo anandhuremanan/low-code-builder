@@ -40,14 +40,77 @@ import { RadioGroup as RadioGroupUI } from "../components/ui/RadioGroup";
 import { Rating as RatingUI } from "../components/ui/Rating";
 import { LinkNode } from "./components/LinkNode";
 
+const INPUT_MARGIN_CLASS_REGEX = /^-?m(?:[trblxy])?-/;
+
+const splitMarginClasses = (
+  className?: string,
+): { wrapperClassName: string; inputClassName: string } => {
+  if (!className) return { wrapperClassName: "", inputClassName: "" };
+
+  const tokens = className.split(/\s+/).filter(Boolean);
+  const wrapperTokens = tokens.filter((token) =>
+    INPUT_MARGIN_CLASS_REGEX.test(token),
+  );
+  const inputTokens = tokens.filter(
+    (token) => !INPUT_MARGIN_CLASS_REGEX.test(token),
+  );
+
+  return {
+    wrapperClassName: wrapperTokens.join(" "),
+    inputClassName: inputTokens.join(" "),
+  };
+};
+
+const splitMarginStyle = (
+  style?: React.CSSProperties,
+): { wrapperStyle?: React.CSSProperties; inputStyle?: React.CSSProperties } => {
+  if (!style) return {};
+
+  const {
+    margin,
+    marginTop,
+    marginRight,
+    marginBottom,
+    marginLeft,
+    ...inputStyle
+  } = style;
+
+  const wrapperStyle: React.CSSProperties = {};
+  if (margin !== undefined) wrapperStyle.margin = margin;
+  if (marginTop !== undefined) wrapperStyle.marginTop = marginTop;
+  if (marginRight !== undefined) wrapperStyle.marginRight = marginRight;
+  if (marginBottom !== undefined) wrapperStyle.marginBottom = marginBottom;
+  if (marginLeft !== undefined) wrapperStyle.marginLeft = marginLeft;
+
+  return {
+    wrapperStyle: Object.keys(wrapperStyle).length ? wrapperStyle : undefined,
+    inputStyle: Object.keys(inputStyle).length ? inputStyle : undefined,
+  };
+};
+
+const DEFAULT_COMPONENT_MARGIN_STYLE: React.CSSProperties = {
+  marginTop: "8px",
+  marginBottom: "8px",
+};
+
+const withDefaultVerticalMargins = <T extends Record<string, any>>(
+  defaultProps: T,
+): T => ({
+  ...defaultProps,
+  style: {
+    ...DEFAULT_COMPONENT_MARGIN_STYLE,
+    ...(defaultProps.style || {}),
+  },
+});
+
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   Container: {
     name: "Container",
     icon: ContainerIcon,
     component: Container,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
       className: "p-4 border border-dashed border-gray-300 w-full",
-    },
+    }),
   },
   Button: {
     name: "Button",
@@ -88,7 +151,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         }}
       />
     ),
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
       children: "Button",
       variant: "contained",
       className: "",
@@ -97,7 +160,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
       actionType: "none",
       pageSlug: "",
       popupId: "",
-    },
+    }),
   },
   Link: {
     name: "Link",
@@ -105,7 +168,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     component: ({ node, ...props }: any) => (
       <LinkNode {...props} isDesignMode={Boolean(node)} />
     ),
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
       children: "Link",
       className: "",
       linkType: "internal",
@@ -119,7 +182,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
       hoverMenuColumns: 3,
       hoverMenuMinWidth: 640,
       hoverMenuItems: [],
-    },
+    }),
   },
   Input: {
     name: "Input",
@@ -129,38 +192,54 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
       type,
       labelColor,
       fullWidth: _unusedFullWidth,
+      className,
+      style,
       ...props
-    }: any) => (
-      <div className="flex flex-col gap-1 w-full">
-        {label && (
-          <label
-            className="text-sm font-medium text-gray-700"
-            style={labelColor ? { color: labelColor } : undefined}
-          >
-            {label}
-          </label>
-        )}
-        <Input {...props} type={type || "text"} fullWidth />
-      </div>
-    ),
-    defaultProps: {
+    }: any) => {
+      const { wrapperClassName, inputClassName } = splitMarginClasses(className);
+      const { wrapperStyle, inputStyle } = splitMarginStyle(style);
+
+      return (
+        <div
+          className={`flex flex-col gap-1 w-full ${wrapperClassName}`.trim()}
+          style={wrapperStyle}
+        >
+          {label && (
+            <label
+              className="text-sm font-medium text-gray-700"
+              style={labelColor ? { color: labelColor } : undefined}
+            >
+              {label}
+            </label>
+          )}
+          <Input
+            {...props}
+            className={inputClassName}
+            style={inputStyle}
+            type={type || "text"}
+            fullWidth
+          />
+        </div>
+      );
+    },
+    defaultProps: withDefaultVerticalMargins({
       label: "Input Label",
       labelColor: "#374151",
       type: "text",
       placeholder: "Enter text...",
       disableBorder: false,
       className: "",
-    },
+    }),
   },
   Text: {
     name: "Text",
     icon: TextIcon,
     component: Typography,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
       children: "Double click to edit text",
       variant: "inherit",
       className: "text-base text-gray-800",
-    },
+    }),
   },
   Select: {
     name: "Select",
@@ -168,34 +247,37 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     component: ({ options, fullWidth: _unusedFullWidth, ...props }: any) => (
       <Select {...props} options={options || []} fullWidth />
     ),
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
+      caption: "",
       label: "Select Option",
       className: "",
       options: [
         { value: "option1", label: "Option 1" },
         { value: "option2", label: "Option 2" },
       ],
-    },
+    }),
   },
   Checkbox: {
     name: "Checkbox",
     icon: CheckboxIcon,
     component: Checkbox,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
+      caption: "",
       label: "Check me",
       fullWidth: true,
-    },
+    }),
   },
   Switch: {
     name: "Switch",
     icon: SwitchIcon,
     component: SwitchUI,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
+      caption: "",
       label: "Enable option",
       checked: false,
       size: "medium",
       className: "",
-    },
+    }),
   },
   RadioGroup: {
     name: "RadioGroup",
@@ -203,7 +285,8 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     component: ({ options, ...props }: any) => (
       <RadioGroupUI {...props} options={options || []} />
     ),
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
+      caption: "",
       label: "Choose an option",
       options: [
         { value: "option1", label: "Option 1" },
@@ -212,13 +295,14 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
       value: "",
       row: false,
       className: "",
-    },
+    }),
   },
   Rating: {
     name: "Rating",
     icon: RatingIcon,
     component: (props: any) => <RatingUI {...props} />,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
+      caption: "",
       label: "Rate this",
       value: 3,
       max: 5,
@@ -226,7 +310,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
       readOnly: false,
       size: "medium",
       className: "",
-    },
+    }),
   },
   Image: {
     name: "Image",
@@ -239,7 +323,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         {...props}
       />
     ),
-    defaultProps: {},
+    defaultProps: withDefaultVerticalMargins({}),
   },
   Textarea: {
     name: "Textarea",
@@ -247,16 +331,16 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     component: ({ className, ...props }: any) => (
       <textarea {...props} className={className || "border p-2 rounded"} />
     ),
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
       placeholder: "Enter long text...",
       className: "",
-    },
+    }),
   },
   DataGrid: {
     name: "DataGrid",
     icon: TableIcon,
     component: DataGrid,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
       className: "",
       apiUrl: "",
       columns: [
@@ -265,13 +349,13 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         { field: "lastName", headerName: "Last name", width: 130 },
       ],
       style: { width: "100%", height: "400px" },
-    },
+    }),
   },
   Charts: {
     name: "Charts",
     icon: ChartIcon,
     component: Charts,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
       chartType: "bar",
       title: "Sales Overview",
       dataSource: "manual",
@@ -293,47 +377,50 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
       yAxisLabel: "",
       pieInnerRadius: 0,
       className: "w-full",
-    },
+    }),
   },
   MaterialIcon: {
     name: "MaterialIcon",
     icon: StarIcon,
     component: MaterialIcon,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
       icon: "home",
       className: "text-gray-800 text-4xl",
       style: { fontSize: "40px" },
-    },
+    }),
   },
   DatePicker: {
     name: "DatePicker",
     icon: CalendarIcon,
     component: DatePicker,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
+      caption: "",
       label: "Select Date",
       className: "",
       helperText: "",
-    },
+    }),
   },
   TimePicker: {
     name: "TimePicker",
     icon: TimePickerIcon,
     component: TimePicker,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
+      caption: "",
       label: "Select Time",
       className: "",
       helperText: "",
-    },
+    }),
   },
   DateTimePicker: {
     name: "DateTimePicker",
     icon: CalendarIcon,
     component: DateTimePicker,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
+      caption: "",
       label: "Select Date & Time",
       className: "",
       helperText: "",
-    },
+    }),
   },
   MultiSelect: {
     name: "MultiSelect",
@@ -341,7 +428,8 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
     component: ({ options, fullWidth: _unusedFullWidth, ...props }: any) => (
       <MultiSelect {...props} options={options || []} fullWidth />
     ),
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
+      caption: "",
       label: "Multi Select",
       className: "",
       options: [
@@ -350,26 +438,26 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
         { value: "option3", label: "Option 3" },
       ],
       value: [],
-    },
+    }),
   },
   Tabs: {
     name: "Tabs",
     icon: ContainerIcon,
     component: Tabs,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
       items: [
         { label: "Tab 1", id: "tab1" },
         { label: "Tab 2", id: "tab2" },
       ],
       defaultValue: 0,
       className: "",
-    },
+    }),
   },
   Stepper: {
     name: "Stepper",
     icon: StepperIcon,
     component: Stepper,
-    defaultProps: {
+    defaultProps: withDefaultVerticalMargins({
       steps: [
         { label: "Select campaign settings", optional: false },
         { label: "Create an ad group", optional: true },
@@ -389,6 +477,6 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
       finishLabel: "FINISH",
       resetLabel: "RESET",
       className: "w-full",
-    },
+    }),
   },
 };

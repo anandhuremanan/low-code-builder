@@ -71,6 +71,54 @@ const withDefaultWidthStyle = (
   return { ...nextStyle, width: "100%" };
 };
 
+const INPUT_MARGIN_CLASS_REGEX = /^-?m(?:[trblxy])?-/;
+
+const splitMarginClasses = (
+  className?: string,
+): { wrapperClassName: string; inputClassName: string } => {
+  if (!className) return { wrapperClassName: "", inputClassName: "" };
+
+  const tokens = className.split(/\s+/).filter(Boolean);
+  const wrapperTokens = tokens.filter((token) =>
+    INPUT_MARGIN_CLASS_REGEX.test(token),
+  );
+  const inputTokens = tokens.filter(
+    (token) => !INPUT_MARGIN_CLASS_REGEX.test(token),
+  );
+
+  return {
+    wrapperClassName: wrapperTokens.join(" "),
+    inputClassName: inputTokens.join(" "),
+  };
+};
+
+const splitMarginStyle = (
+  style?: React.CSSProperties,
+): { wrapperStyle?: React.CSSProperties; inputStyle?: React.CSSProperties } => {
+  if (!style) return {};
+
+  const {
+    margin,
+    marginTop,
+    marginRight,
+    marginBottom,
+    marginLeft,
+    ...inputStyle
+  } = style;
+
+  const wrapperStyle: React.CSSProperties = {};
+  if (margin !== undefined) wrapperStyle.margin = margin;
+  if (marginTop !== undefined) wrapperStyle.marginTop = marginTop;
+  if (marginRight !== undefined) wrapperStyle.marginRight = marginRight;
+  if (marginBottom !== undefined) wrapperStyle.marginBottom = marginBottom;
+  if (marginLeft !== undefined) wrapperStyle.marginLeft = marginLeft;
+
+  return {
+    wrapperStyle: Object.keys(wrapperStyle).length ? wrapperStyle : undefined,
+    inputStyle: Object.keys(inputStyle).length ? inputStyle : undefined,
+  };
+};
+
 const PreviewTabs = ({
   items,
   children,
@@ -120,6 +168,7 @@ const PreviewTabs = ({
 const PreviewRadioGroupField = ({
   className,
   style,
+  caption,
   label,
   options,
   value,
@@ -127,6 +176,7 @@ const PreviewRadioGroupField = ({
 }: {
   className?: string;
   style?: React.CSSProperties;
+  caption?: string;
   label?: string;
   options: Array<{ label: string; value: string | number }>;
   value?: string | number;
@@ -145,6 +195,7 @@ const PreviewRadioGroupField = ({
     <RadioGroup
       className={className}
       style={style}
+      caption={caption}
       label={label}
       options={options || []}
       value={selectedValue}
@@ -157,6 +208,7 @@ const PreviewRadioGroupField = ({
 const PreviewRatingField = ({
   className,
   style,
+  caption,
   label,
   value,
   max,
@@ -166,6 +218,7 @@ const PreviewRatingField = ({
 }: {
   className?: string;
   style?: React.CSSProperties;
+  caption?: string;
   label?: string;
   value?: number | null;
   max?: number;
@@ -183,6 +236,7 @@ const PreviewRatingField = ({
     <Rating
       className={className}
       style={style}
+      caption={caption}
       label={label}
       value={selectedValue}
       max={max ?? 5}
@@ -197,12 +251,14 @@ const PreviewRatingField = ({
 const PreviewSwitchField = ({
   className,
   style,
+  caption,
   label,
   checked,
   size,
 }: {
   className?: string;
   style?: React.CSSProperties;
+  caption?: string;
   label?: string;
   checked?: boolean;
   size?: "small" | "medium";
@@ -217,6 +273,7 @@ const PreviewSwitchField = ({
     <Switch
       className={className}
       style={style}
+      caption={caption}
       label={label}
       size={size || "medium"}
       checked={isChecked}
@@ -228,11 +285,13 @@ const PreviewSwitchField = ({
 const PreviewCheckboxField = ({
   className,
   style,
+  caption,
   label,
   checked,
 }: {
   className?: string;
   style?: React.CSSProperties;
+  caption?: string;
   label?: string;
   checked?: boolean;
 }) => {
@@ -246,6 +305,7 @@ const PreviewCheckboxField = ({
     <Checkbox
       className={className}
       style={style}
+      caption={caption}
       label={label}
       fullWidth
       checked={isChecked}
@@ -360,8 +420,14 @@ const PreviewNode = ({
       );
     }
     case "Input":
+      const { wrapperClassName, inputClassName } =
+        splitMarginClasses(resolvedClassName);
+      const { wrapperStyle, inputStyle } = splitMarginStyle(resolvedStyle);
       return (
-        <div className="flex flex-col gap-1 w-full">
+        <div
+          className={`flex flex-col gap-1 w-full ${wrapperClassName}`.trim()}
+          style={wrapperStyle}
+        >
           {node.props.label && (
             <label
               className="text-sm font-medium text-gray-700"
@@ -375,8 +441,8 @@ const PreviewNode = ({
             </label>
           )}
           <Input
-            className={resolvedClassName}
-            style={resolvedStyle}
+            className={inputClassName}
+            style={inputStyle}
             placeholder={node.props.placeholder}
             size={node.props.size}
             type={node.props.type || "text"}
@@ -388,6 +454,7 @@ const PreviewNode = ({
       return (
         <Select
           className={resolvedClassName}
+          caption={node.props.caption}
           label={node.props.label}
           options={node.props.options || []}
           style={resolvedStyle}
@@ -399,6 +466,7 @@ const PreviewNode = ({
       return (
         <MultiSelect
           className={resolvedClassName}
+          caption={node.props.caption}
           label={node.props.label}
           options={node.props.options || []}
           style={resolvedStyle}
@@ -411,6 +479,7 @@ const PreviewNode = ({
         <PreviewRadioGroupField
           className={resolvedClassName}
           style={resolvedStyle}
+          caption={node.props.caption}
           label={node.props.label}
           options={node.props.options || []}
           value={node.props.value}
@@ -422,6 +491,7 @@ const PreviewNode = ({
         <PreviewRatingField
           className={resolvedClassName}
           style={resolvedStyle}
+          caption={node.props.caption}
           label={node.props.label}
           value={node.props.value}
           max={node.props.max}
@@ -435,6 +505,7 @@ const PreviewNode = ({
         <PreviewCheckboxField
           className={resolvedClassName}
           style={resolvedStyle}
+          caption={node.props.caption}
           label={node.props.label}
           checked={Boolean(node.props.checked)}
         />
@@ -444,6 +515,7 @@ const PreviewNode = ({
         <PreviewSwitchField
           className={resolvedClassName}
           style={resolvedStyle}
+          caption={node.props.caption}
           label={node.props.label}
           checked={node.props.checked}
           size={node.props.size}

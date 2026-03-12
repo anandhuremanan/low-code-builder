@@ -3,6 +3,7 @@ import { DatePicker as MuiDatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 
 interface DatePickerProps {
+    caption?: string;
     label?: string;
     name?: string;
     helperText?: string;
@@ -13,6 +14,7 @@ interface DatePickerProps {
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
+    caption,
     label = 'Select Date',
     name,
     helperText,
@@ -23,6 +25,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 }) => {
     return (
         <div className={className} style={style}>
+            {caption && <div className="mb-1 text-sm font-medium text-gray-700">{caption}</div>}
             <MuiDatePicker
                 label={label}
                 value={value ? dayjs(value) : null}

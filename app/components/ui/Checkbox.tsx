@@ -2,12 +2,14 @@ import React from 'react';
 import { Checkbox as MuiCheckbox, type CheckboxProps, FormControlLabel } from '@mui/material';
 
 export interface CustomCheckboxProps extends CheckboxProps {
+    caption?: string;
     label?: string;
     fullWidth?: boolean;
     node?: unknown;
 }
 
 export const Checkbox: React.FC<CustomCheckboxProps> = ({
+    caption,
     label,
     fullWidth = true,
     className,
@@ -25,6 +27,7 @@ export const Checkbox: React.FC<CustomCheckboxProps> = ({
 
     return (
         <div className={className} style={wrapperStyle}>
+            {caption && <div className="mb-1 text-sm font-medium text-gray-700">{caption}</div>}
             <FormControlLabel
                 sx={{
                     width: fullWidth ? '100%' : undefined,
