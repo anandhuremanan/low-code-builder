@@ -36,6 +36,11 @@ const extractLayoutClasses = (className?: string): string => {
     .join(" ");
 };
 
+const hasWidthClass = (className?: string): boolean => {
+  if (!className) return false;
+  return className.split(/\s+/).some((token) => /^w-/.test(token));
+};
+
 const stripWrapperClasses = (
   className: string,
   wrapperMarginClasses: string,
@@ -165,6 +170,10 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
   }
   const wrapperMarginClasses = extractMarginClasses(resolvedClassName);
   const wrapperLayoutClasses = extractLayoutClasses(resolvedClassName);
+  const fallbackWidth =
+    node.props?.style?.width || hasWidthClass(resolvedClassName)
+      ? undefined
+      : "100%";
   componentProps.className =
     node.type === "Container"
       ? stripWrapperClasses(
@@ -174,7 +183,7 @@ const NodeRenderer = ({ node }: { node: ComponentNode }) => {
         )
       : resolvedClassName;
   const wrapperSizeStyle = {
-    width: node.props?.style?.width,
+    width: node.props?.style?.width || fallbackWidth,
     height: node.props?.style?.height,
     ...(node.type === "Container"
       ? {

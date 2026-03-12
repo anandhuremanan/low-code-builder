@@ -12,17 +12,47 @@ export type CustomSelectProps = SelectProps & {
     fullWidth?: boolean;
 };
 
-export const Select: React.FC<CustomSelectProps> = ({ label, options, fullWidth = false, ...props }) => {
+export const Select: React.FC<CustomSelectProps> = ({
+    label,
+    options,
+    fullWidth = true,
+    className,
+    style,
+    ...props
+}) => {
+    const wrapperStyle: React.CSSProperties = {
+        minWidth: 0,
+        ...(fullWidth ? { width: '100%' } : {}),
+        ...(style || {})
+    };
+
     return (
-        <FormControl fullWidth={fullWidth} variant="outlined">
+        <div className={className} style={wrapperStyle}>
+            <FormControl
+                fullWidth={fullWidth}
+                variant="outlined"
+                sx={{
+                    display: 'block',
+                    width: fullWidth ? '100%' : undefined,
+                    minWidth: 0
+                }}
+            >
             {label && <InputLabel>{label}</InputLabel>}
-            <MuiSelect label={label} {...props}>
+            <MuiSelect
+                label={label}
+                sx={{
+                    width: fullWidth ? '100%' : undefined,
+                    minWidth: 0
+                }}
+                {...props}
+            >
                 {options.map((opt) => (
                     <MenuItem key={opt.value} value={opt.value}>
                         {opt.label}
                     </MenuItem>
                 ))}
             </MuiSelect>
-        </FormControl>
+            </FormControl>
+        </div>
     );
 };

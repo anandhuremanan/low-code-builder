@@ -29,6 +29,7 @@ type BuilderStepperProps = {
     finishLabel?: string;
     resetLabel?: string;
     className?: string;
+    style?: React.CSSProperties;
     children?: React.ReactNode;
 };
 
@@ -54,6 +55,7 @@ export const Stepper = ({
     finishLabel = 'Finish',
     resetLabel = 'Reset',
     className = '',
+    style,
     children
 }: BuilderStepperProps) => {
     const safeSteps = useMemo(
@@ -105,7 +107,7 @@ export const Stepper = ({
     };
 
     return (
-        <Box className={className}>
+        <Box className={className} style={style}>
             <MuiStepper
                 activeStep={currentStep}
                 orientation={orientation}
