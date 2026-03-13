@@ -7,44 +7,61 @@ import sidebaricon from "/assets/images/sidebaricon.png";
 import pageicon from "/assets/images/pageicon.png";
 import { Menu, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import {
-  LayoutDashboard,
-  Users,
-  ShoppingCart,
-  Folder,
-  Settings
-} from "lucide-react";
-
+import { LayoutDashboard, FolderKanban, FileText, Globe, Puzzle, Paintbrush, Plug, Wrench, Settings } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 // import { NavLink } from "react-router-dom";
 
 export const menuData = [
   {
-    title: "Apps",
+    title: "Dashboard",
     icon: LayoutDashboard,
     path: "/"
   },
   {
-    title: "Users",
-    icon: Users,
+    title: "Projects",
+    icon: FolderKanban,
     submenu: [
-      { title: "Add User", path: "/add-user" },
-      { title: "User List", path: "/users" }
+      { title: "All Projects", path: "/projects" },
+      { title: "New Project +", path: "/projects/new" }
     ]
   },
   {
-    title: "Products",
-    icon: Folder,
+    title: "Pages",
+    icon: FileText,
     submenu: [
-      { title: "Add Product", path: "/add-product" },
-      { title: "Product List", path: "/products" },
-      { title: "Categories", path: "/categories" }
+      { title: "All Pages", path: "/pages" },
+      { title: "Add Page", path: "/pages/add" }
     ]
   },
   {
-    title: "Orders",
-    icon: ShoppingCart,
-    path: "/orders"
+    title: "Global",
+    icon: Globe,
+    submenu: [
+      { title: "All Widgets", path: "/widgets" },
+      { title: "Add Widget", path: "/widgets/add" },
+      { title: "Header", path: "/widgets/header" },
+      { title: "Menu", path: "/widgets/menu" },
+      { title: "Footer", path: "/widgets/footer" },
+      { title: "Side Bar", path: "/widgets/sidebar" }
+    ]
+  },
+  {
+    title: "Appearance",
+    icon: Paintbrush,
+    submenu: [
+      { title: "Design", path: "/appearance/design" },
+      { title: "Customize", path: "/appearance/customize" }
+    ]
+  },
+  {
+    title: "Plugins",
+    icon: Plug,
+    path: "/plugins"
+  },
+  {
+    title: "Tools",
+    icon: Wrench,
+    path: "/tools"
   },
   {
     title: "Settings",
@@ -279,7 +296,7 @@ export default function ConfigurePage() {
         <div className="config-container">
           <div className="heading-sec">
             <h3 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              Configure
+              Global Widgets
             </h3>
             {/* <p className="mt-2 max-w-3xl text-sm text-slate-600 sm:text-base">
             Enable core sections, set sidebar placement, and open each area for
