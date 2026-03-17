@@ -216,12 +216,17 @@ export default function ConfigurePage() {
         )}
       </header>
       <section className="body-sec">
-
         <div className="w-64 h-screen bg-slate-900 text-white flex flex-col sidebar-sec">
-
           {/* Logo */}
-          <div className="p-5 text-sm border-b border-slate-700">
-            John Doe
+          <div className="flex items-center gap-3 p-5 border-b border-slate-700">
+            <img
+              src="/profile.jpg"
+              alt="Profile"
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <div>
+              <p className="text-sm font-medium">John Doe</p>
+            </div>
           </div>
 
           {/* Menu */}
@@ -304,249 +309,261 @@ export default function ConfigurePage() {
           </p> */}
           </div>
           <div className="tile-sec">
-            <details open className={sectionClass}>
-              <summary className={summaryClass}><div className="me-3">
-                <img
-                  src={pageicon}
-                  alt="LowCode Logo"
-                  className="h-8 w-8"
-                />
-              </div>
-                <div className="">Page</div></summary>
-              <div className="tile-content"><p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, </p></div>
-              <div className="p-5 tile-buttonsec"></div>
-              <div className="tile-footerbtn">
-                <Link to="/builder" className={buttonLinkClass}>
-                  Edit Page <ChevronRight size={21} />
-                </Link>
-              </div>
-            </details>
-
-            <details open className={sectionClass}>
-              <summary className={summaryClass}> <div className="me-3">
-                <img
-                  src={headericon}
-                  alt="LowCode Logo"
-                  className="h-8 w-8"
-                />
-              </div>
-                <div className="">Header</div> </summary>
-              <div className="tile-content"><p>Perspiciatis unde omniaccuss iste natus error accusantium sit voluptatem accusantium laudantium,</p></div>
-              <div className="p-5 tile-buttonsec">
-                <label className="tile-label">
-                  Header Enable
-                </label>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    dispatch({
-                      type: "TOGGLE_SITE_SECTION",
-                      payload: {
-                        section: "header",
-                        enabled: !state.siteSections.header.enabled,
-                      },
-                    })
-                  }
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors 
-                    ${state.siteSections.header.enabled ? "bg-[#3b7cad]" : "bg-gray-300"}`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform 
-                      ${state.siteSections.header.enabled ? "translate-x-6" : "translate-x-1"}`}
-                  />
-                </button>
-
-              </div>
-              <div className="tile-footerbtn">
-                <Link to="/configure/header" className={buttonLinkClass}>
-                  Edit Header <ChevronRight size={21} />
-                </Link>
-              </div>
-            </details>
-
-            <details open className={sectionClass}>
-              <summary className={summaryClass}>
-                <div className="me-3">
-                  <img
-                    src={footericon}
-                    alt="LowCode Logo"
-                    className="h-8 w-8"
-                  />
-                </div>
-                <div className="">Footer</div> </summary>
-              <div className="tile-content"><p>Fed ut perspiciatis unde omnis iste voluptatem accusantium doloremque laudantium, </p></div>
-              <div className="p-5 tile-buttonsec">
-                <label className="tile-label">
-                  Footer Enable
-                </label>
-                <button
-                  type="button"
-                  onClick={() =>
-                    dispatch({
-                      type: "TOGGLE_SITE_SECTION",
-                      payload: {
-                        section: "footer",
-                        enabled: !state.siteSections.footer.enabled,
-                      },
-                    })
-                  }
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                    ${state.siteSections.footer.enabled ? "bg-[#184F79]" : "bg-gray-300"}`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                      ${state.siteSections.footer.enabled ? "translate-x-6" : "translate-x-1"}`}
-                  />
-                </button>
-              </div>
-              <div className="tile-footerbtn">
-                <Link to="/configure/footer" className={buttonLinkClass}>
-                  Edit Footer <ChevronRight size={21} />
-                </Link>
-              </div>
-            </details>
-
-            <details open className={sectionClass}>
-              <summary className={summaryClass}><div className="me-3">
-                <img
-                  src={sidebaricon}
-                  alt="LowCode Logo"
-                  className="h-8 w-8"
-                />
-              </div>
-                <div className="">Sidebar</div></summary>
-              <div className="tile-content"><p>Edt perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,</p></div>
-              <div className="space-y-4 p-5">
-                <div className="space-y-1">
-                  <label className="text-sm text-slate-700">
-                    Sidebar Placement:{" "}
-                  </label>
-                  <select
-                    className="w-full max-w-xs rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none"
-                    value={sidebarPlacement}
-                    onChange={(e) => handleSidebarPlacementChange(e.target.value)}
-                  >
-                    <option value="none">None</option>
-                    <option value="left">Left</option>
-                    <option value="right">Right</option>
-                    <option value="both">Both</option>
-                  </select>
-                </div>
-
-                {leftEnabled || rightEnabled ? (
-                  <div className="grid">
-                    {leftEnabled ? (
-                      <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-                        <p className="text-sm font-semibold text-slate-900">
-                          Left Sidebar
-                        </p>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            className={checkboxClass}
-                            checked={Boolean(
-                              state.siteSections.sidebarLeft.collapsible,
-                            )}
-                            onChange={(e) =>
-                              dispatch({
-                                type: "UPDATE_SITE_SECTION",
-                                payload: {
-                                  section: "sidebarLeft",
-                                  updates: { collapsible: e.target.checked },
-                                },
-                              })
-                            }
-                          />
-                          Collapsible
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            className={checkboxClass}
-                            checked={Boolean(
-                              state.siteSections.sidebarLeft.collapsedByDefault,
-                            )}
-                            onChange={(e) =>
-                              dispatch({
-                                type: "UPDATE_SITE_SECTION",
-                                payload: {
-                                  section: "sidebarLeft",
-                                  updates: { collapsedByDefault: e.target.checked },
-                                },
-                              })
-                            }
-                          />
-                          Collapsed by default
-                        </label>
-                        <Link
-                          to="/configure/sidebar-left"
-                          className={buttonLinkClass}
-                        >
-                          Edit Left Sidebar <ChevronRight size={21} />
-                        </Link>
-                      </div>
-                    ) : null}
-                    {rightEnabled ? (
-                      <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-                        <p className="text-sm font-semibold text-slate-900">
-                          Right Sidebar
-                        </p>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            className={checkboxClass}
-                            checked={Boolean(
-                              state.siteSections.sidebarRight.collapsible,
-                            )}
-                            onChange={(e) =>
-                              dispatch({
-                                type: "UPDATE_SITE_SECTION",
-                                payload: {
-                                  section: "sidebarRight",
-                                  updates: { collapsible: e.target.checked },
-                                },
-                              })
-                            }
-                          />
-                          Collapsible
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            className={checkboxClass}
-                            checked={Boolean(
-                              state.siteSections.sidebarRight.collapsedByDefault,
-                            )}
-                            onChange={(e) =>
-                              dispatch({
-                                type: "UPDATE_SITE_SECTION",
-                                payload: {
-                                  section: "sidebarRight",
-                                  updates: { collapsedByDefault: e.target.checked },
-                                },
-                              })
-                            }
-                          />
-                          Collapsed by default
-                        </label>
-                        <Link
-                          to="/configure/sidebar-right"
-                          className={buttonLinkClass}
-                        >
-                          Edit Right Sidebar <ChevronRight size={21} />
-                        </Link>
-                      </div>
-                    ) : null}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="">
+                <details open className={sectionClass}>
+                  <summary className={summaryClass}><div className="me-3">
+                    <img
+                      src={pageicon}
+                      alt="LowCode Logo"
+                      className="h-8 w-8"
+                    />
                   </div>
-                ) : (
-                  <p className="text-sm text-slate-500">
-                    Enable a sidebar placement to configure sidebars.
-                  </p>
-                )}
+                    <div className="">Page</div></summary>
+                  <div className="tile-content"><p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, </p></div>
+                  <div className="p-5 tile-buttonsec"></div>
+                  <div className="tile-footerbtn p-3">
+                    <Link to="/builder" className={buttonLinkClass}>
+                      Edit Page <ChevronRight size={21} />
+                    </Link>
+                  </div>
+                </details>
               </div>
-            </details>
 
+              <div className="">
+                <details open className={sectionClass}>
+                  <summary className={summaryClass}> <div className="me-3">
+                    <img
+                      src={headericon}
+                      alt="LowCode Logo"
+                      className="h-8 w-8"
+                    />
+                  </div>
+                    <div className="">Header</div> </summary>
+                  <div className="tile-content"><p>Perspiciatis unde omniaccuss iste natus error accusantium sit voluptatem accusantium laudantium,</p></div>
+                  <div className="p-5 tile-buttonsec">
+                    <label className="tile-label">
+                      Header Enable
+                    </label>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        dispatch({
+                          type: "TOGGLE_SITE_SECTION",
+                          payload: {
+                            section: "header",
+                            enabled: !state.siteSections.header.enabled,
+                          },
+                        })
+                      }
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors 
+                    ${state.siteSections.header.enabled ? "bg-[#3b7cad]" : "bg-gray-300"}`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform 
+                      ${state.siteSections.header.enabled ? "translate-x-6" : "translate-x-1"}`}
+                      />
+                    </button>
+
+                  </div>
+                  <div className="tile-footerbtn p-3">
+                    <Link to="/configure/header" className={buttonLinkClass}>
+                      Edit Header <ChevronRight size={21} />
+                    </Link>
+                  </div>
+                </details>
+              </div>
+
+              <div className="">
+                <details open className={sectionClass}>
+                  <summary className={summaryClass}>
+                    <div className="me-3">
+                      <img
+                        src={footericon}
+                        alt="LowCode Logo"
+                        className="h-8 w-8"
+                      />
+                    </div>
+                    <div className="">Footer</div> </summary>
+                  <div className="tile-content"><p>Fed ut perspiciatis unde omnis iste voluptatem accusantium doloremque laudantium, </p></div>
+                  <div className="p-5 tile-buttonsec">
+                    <label className="tile-label">
+                      Footer Enable
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        dispatch({
+                          type: "TOGGLE_SITE_SECTION",
+                          payload: {
+                            section: "footer",
+                            enabled: !state.siteSections.footer.enabled,
+                          },
+                        })
+                      }
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+                    ${state.siteSections.footer.enabled ? "bg-[#184F79]" : "bg-gray-300"}`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+                      ${state.siteSections.footer.enabled ? "translate-x-6" : "translate-x-1"}`}
+                      />
+                    </button>
+                  </div>
+                  <div className="tile-footerbtn p-3">
+                    <Link to="/configure/footer" className={buttonLinkClass}>
+                      Edit Footer <ChevronRight size={21} />
+                    </Link>
+                  </div>
+                </details>
+              </div>
+              <div className="col-span-2">
+                <details open className={sectionClass}>
+                  <summary className={summaryClass}><div className="me-3">
+                    <img
+                      src={sidebaricon}
+                      alt="LowCode Logo"
+                      className="h-8 w-8"
+                    />
+                  </div>
+                    <div className="">Sidebar</div></summary>
+                  <div className="tile-content"><p>Edt perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,</p></div>
+                  <div className="space-y-4 p-5">
+                    <div className="space-y-1">
+                      <label className="text-sm text-slate-700">
+                        Sidebar Placement:{" "}
+                      </label>
+                      <select
+                        className="w-full max-w-xs rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none"
+                        value={sidebarPlacement}
+                        onChange={(e) => handleSidebarPlacementChange(e.target.value)}
+                      >
+                        <option value="none">None</option>
+                        <option value="left">Left</option>
+                        <option value="right">Right</option>
+                        <option value="both">Both</option>
+                      </select>
+                    </div>
+
+                    {leftEnabled || rightEnabled ? (
+                      <div className="grid grid-cols-2 gap-4">
+                        {leftEnabled ? (
+                          <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                            <p className="text-sm font-semibold text-slate-900">
+                              Left Sidebar
+                            </p>
+                            <label className="flex items-center gap-2 text-sm text-slate-700">
+                              <input
+                                type="checkbox"
+                                className={checkboxClass}
+                                checked={Boolean(
+                                  state.siteSections.sidebarLeft.collapsible,
+                                )}
+                                onChange={(e) =>
+                                  dispatch({
+                                    type: "UPDATE_SITE_SECTION",
+                                    payload: {
+                                      section: "sidebarLeft",
+                                      updates: { collapsible: e.target.checked },
+                                    },
+                                  })
+                                }
+                              />
+                              Collapsible
+                            </label>
+                            <label className="flex items-center gap-2 text-sm text-slate-700">
+                              <input
+                                type="checkbox"
+                                className={checkboxClass}
+                                checked={Boolean(
+                                  state.siteSections.sidebarLeft.collapsedByDefault,
+                                )}
+                                onChange={(e) =>
+                                  dispatch({
+                                    type: "UPDATE_SITE_SECTION",
+                                    payload: {
+                                      section: "sidebarLeft",
+                                      updates: { collapsedByDefault: e.target.checked },
+                                    },
+                                  })
+                                }
+                              />
+                              Collapsed by default
+                            </label>
+                            <div className="tile-footerbtn pt-4">
+                              <Link
+                                to="/configure/sidebar-left"
+                                className={buttonLinkClass}
+                              >
+                                Edit Left Sidebar <ChevronRight size={21} />
+                              </Link>
+                            </div>
+                          </div>
+                        ) : null}
+                        {rightEnabled ? (
+                          <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                            <p className="text-sm font-semibold text-slate-900">
+                              Right Sidebar
+                            </p>
+                            <label className="flex items-center gap-2 text-sm text-slate-700">
+                              <input
+                                type="checkbox"
+                                className={checkboxClass}
+                                checked={Boolean(
+                                  state.siteSections.sidebarRight.collapsible,
+                                )}
+                                onChange={(e) =>
+                                  dispatch({
+                                    type: "UPDATE_SITE_SECTION",
+                                    payload: {
+                                      section: "sidebarRight",
+                                      updates: { collapsible: e.target.checked },
+                                    },
+                                  })
+                                }
+                              />
+                              Collapsible
+                            </label>
+                            <label className="flex items-center gap-2 text-sm text-slate-700">
+                              <input
+                                type="checkbox"
+                                className={checkboxClass}
+                                checked={Boolean(
+                                  state.siteSections.sidebarRight.collapsedByDefault,
+                                )}
+                                onChange={(e) =>
+                                  dispatch({
+                                    type: "UPDATE_SITE_SECTION",
+                                    payload: {
+                                      section: "sidebarRight",
+                                      updates: { collapsedByDefault: e.target.checked },
+                                    },
+                                  })
+                                }
+                              />
+                              Collapsed by default
+                            </label>
+                            <div className="tile-footerbtn pt-4">
+                              <Link
+                                to="/configure/sidebar-right"
+                                className={buttonLinkClass}
+                              >
+                                Edit Right Sidebar <ChevronRight size={21} />
+                              </Link>
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-500">
+                        Enable a sidebar placement to configure sidebars.
+                      </p>
+                    )}
+                  </div>
+                </details>
+              </div>
+            </div>
           </div>
         </div>
       </section>
