@@ -1,24 +1,27 @@
 import { useState } from "react";
 import logo from "/assets/images/logo.png";
-import { TextField, Button, Checkbox, FormControlLabel } from "@mui/material";
+import { TextField, Button } from "@mui/material";
 // import { useAuth } from "./context/UseAuth";
+import { useNavigate } from "react-router";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // const { CallLogin } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    navigate("/dashboard");
     // CallLogin(email, password);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4">
-      
+
       {/* Card */}
       <div className="w-full max-w-md bg-slate-800 rounded-2xl shadow-xl p-8">
-        
+
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src={logo} alt="Logo" className="h-10" />
