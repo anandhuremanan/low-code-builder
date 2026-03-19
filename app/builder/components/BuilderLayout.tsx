@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Bot, Code2 } from 'lucide-react';
 import {
     DndContext,
     DragOverlay,
@@ -19,6 +20,7 @@ import { Dialog } from '../../components/ui/Dialog';
 import { Input } from '../../components/ui/Input';
 import { Typography } from '../../components/ui/Typography';
 import { generatePageComponentCode, generateSectionComponentCode } from '../codegen';
+import { normalizeAiPagePayload } from '../ai';
 
 const PREVIEW_STORAGE_KEY = 'builder-preview-site';
 
@@ -40,6 +42,12 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
     const [generatedCode, setGeneratedCode] = useState('');
     const [generatedFileName, setGeneratedFileName] = useState('');
     const [generatedCodeSourceLabel, setGeneratedCodeSourceLabel] = useState('');
+    const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
+    const [aiMode, setAiMode] = useState<'generate' | 'edit'>('generate');
+    const [aiPrompt, setAiPrompt] = useState('');
+    const [aiError, setAiError] = useState('');
+    const [aiResultJson, setAiResultJson] = useState('');
+    const [isAiSubmitting, setIsAiSubmitting] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
@@ -72,6 +80,8 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
         if (state.editingTarget === 'popup') return currentPopup?.nodes || [];
         return state.siteSections[state.editingTarget].nodes;
     };
+
+    const currentPage = state.pages.find((page) => page.id === state.currentPageId) || null;
 
     const findNodeAndParent = (
         nodes: any[],
@@ -238,6 +248,57 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
         window.open('/builder/preview', '_blank', 'noopener,noreferrer');
     };
 
+    const openAiDialog = (mode: 'generate' | 'edit') => {
+        setAiMode(mode);
+        setAiPrompt('');
+        setAiError('');
+        setAiResultJson('');
+        setIsAiDialogOpen(true);
+    };
+
+    const handleAiSubmit = async () => {
+        if (!currentPage || !aiPrompt.trim()) return;
+
+        setIsAiSubmitting(true);
+        setAiError('');
+
+        try {
+            const response = await fetch('/api/builder-ai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    mode: aiMode,
+                    prompt: aiPrompt.trim(),
+                    currentPage: aiMode === 'edit'
+                        ? {
+                            name: currentPage.name,
+                            slug: currentPage.slug,
+                            nodes: currentPage.nodes
+                        }
+                        : undefined
+                })
+            });
+
+            const payload = await response.json();
+            if (!response.ok) {
+                throw new Error(payload?.error || 'AI request failed.');
+            }
+
+            const normalizedPage = normalizeAiPagePayload(payload.page, currentPage);
+            dispatch({
+                type: 'IMPORT_PAGE',
+                payload: normalizedPage
+            });
+            setAiResultJson(JSON.stringify(normalizedPage, null, 2));
+        } catch (error) {
+            setAiError(error instanceof Error ? error.message : 'AI request failed.');
+        } finally {
+            setIsAiSubmitting(false);
+        }
+    };
+
     const handleGenerateSectionCode = async () => {
         if (mode !== 'section' || !sectionTarget || (sectionTarget !== 'header' && sectionTarget !== 'footer')) {
             return;
@@ -336,6 +397,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
     const toolbarIconClass = "p-1.5 rounded-md text-slate-500 transition hover:bg-slate-200/70 hover:text-slate-700";
     const toolbarIconActiveClass = "bg-white text-slate-800 shadow-sm";
     const toolbarActionClass = "inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50";
+    const toolbarIconButtonClass = "inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:border-slate-400 hover:bg-slate-50";
     const canGenerateSectionCode = mode === 'section' && (sectionTarget === 'header' || sectionTarget === 'footer');
     const canGeneratePageCode = mode === 'builder' && state.editingTarget === 'page';
 
@@ -417,18 +479,32 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                                     </button>
                                     {canGeneratePageCode ? (
                                         <button
-                                            onClick={handleGeneratePageCode}
-                                            className={toolbarActionClass}
+                                            onClick={() => openAiDialog('generate')}
+                                            className={toolbarIconButtonClass}
+                                            title="AI page actions"
+                                            aria-label="AI page actions"
                                         >
-                                            Generate React Code
+                                            <Bot size={18} />
+                                        </button>
+                                    ) : null}
+                                    {canGeneratePageCode ? (
+                                        <button
+                                            onClick={handleGeneratePageCode}
+                                            className={toolbarIconButtonClass}
+                                            title="Generate React code"
+                                            aria-label="Generate React code"
+                                        >
+                                            <Code2 size={18} />
                                         </button>
                                     ) : null}
                                     {canGenerateSectionCode ? (
                                         <button
                                             onClick={handleGenerateSectionCode}
-                                            className={toolbarActionClass}
+                                            className={toolbarIconButtonClass}
+                                            title="Generate React code"
+                                            aria-label="Generate React code"
                                         >
-                                            Generate React Code
+                                            <Code2 size={18} />
                                         </button>
                                     ) : null}
                                     <button
@@ -515,6 +591,80 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    </Dialog>
+
+                    <Dialog
+                        open={isAiDialogOpen}
+                        title={aiMode === 'generate' ? 'AI Generate Page' : 'AI Edit Page'}
+                        onClose={() => {
+                            if (isAiSubmitting) return;
+                            setIsAiDialogOpen(false);
+                        }}
+                        cancelText="Close"
+                    >
+                        <div className="w-[900px] max-w-full space-y-4 pt-1">
+                            <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setAiMode('generate')}
+                                    className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${aiMode === 'generate'
+                                        ? 'bg-white text-slate-900 shadow-sm'
+                                        : 'text-slate-600 hover:text-slate-900'
+                                        }`}
+                                >
+                                    Generate
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setAiMode('edit')}
+                                    className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${aiMode === 'edit'
+                                        ? 'bg-white text-slate-900 shadow-sm'
+                                        : 'text-slate-600 hover:text-slate-900'
+                                        }`}
+                                >
+                                    Edit Existing
+                                </button>
+                            </div>
+                            <Typography variant="body2" className="text-sm text-slate-500">
+                                {aiMode === 'generate'
+                                    ? 'Describe the page you want. The result will replace the current page and remain editable in the drag-and-drop builder.'
+                                    : 'Describe the changes you want. The current page JSON will be sent to the model and the returned version will replace the canvas.'}
+                            </Typography>
+                            <Input
+                                multiline
+                                minRows={8}
+                                placeholder={aiMode === 'generate'
+                                    ? 'Example: Create a SaaS landing page with hero, pricing cards, testimonial section, and contact form.'
+                                    : 'Example: Add a testimonial carousel under pricing, change the hero CTA text, and add a newsletter signup in the footer area of the page.'}
+                                value={aiPrompt}
+                                onChange={(event) => setAiPrompt(event.target.value)}
+                            />
+                            {aiError ? (
+                                <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                                    {aiError}
+                                </div>
+                            ) : null}
+                            <div className="flex items-center justify-between gap-3">
+                                <Typography variant="body2" className="text-xs text-slate-500">
+                                    {currentPage ? `Current page: ${currentPage.name} (${currentPage.slug})` : 'No page selected'}
+                                </Typography>
+                                <button
+                                    type="button"
+                                    onClick={handleAiSubmit}
+                                    disabled={!aiPrompt.trim() || isAiSubmitting || !currentPage}
+                                    className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    {isAiSubmitting ? 'Applying...' : aiMode === 'generate' ? 'Generate Page' : 'Apply Edit'}
+                                </button>
+                            </div>
+                            {aiResultJson ? (
+                                <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-950">
+                                    <pre className="max-h-[40vh] overflow-auto p-4 text-xs leading-6 text-slate-100">
+                                        <code>{aiResultJson}</code>
+                                    </pre>
+                                </div>
+                            ) : null}
                         </div>
                     </Dialog>
 

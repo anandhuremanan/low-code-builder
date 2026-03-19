@@ -77,6 +77,7 @@ type Action =
     | { type: 'SELECT_NODE'; payload: { id: string | null } }
     | { type: 'SET_DRAGGED_COMPONENT'; payload: { type: string | null } }
     | { type: 'ADD_PAGE'; payload: { name: string } }
+    | { type: 'IMPORT_PAGE'; payload: { name: string; slug: string; nodes: ComponentNode[] } }
     | { type: 'SWITCH_PAGE'; payload: { id: string } }
     | { type: 'ADD_POPUP'; payload: { name: string } }
     | { type: 'RENAME_POPUP'; payload: { id: string; name: string } }
@@ -474,6 +475,29 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                 history: pushToHistory(state),
                 pages: [...state.pages, newPage],
                 currentPageId: newPage.id,
+                currentPopupId: null,
+                editingTarget: 'page',
+                selectedNodeId: null
+            };
+        }
+
+        case 'IMPORT_PAGE': {
+            const currentPage = state.pages.find((page) => page.id === state.currentPageId);
+            if (!currentPage) return state;
+
+            return {
+                ...state,
+                history: pushToHistory(state),
+                pages: state.pages.map((page) =>
+                    page.id === currentPage.id
+                        ? {
+                            ...page,
+                            name: action.payload.name,
+                            slug: action.payload.slug,
+                            nodes: action.payload.nodes
+                        }
+                        : page
+                ),
                 currentPopupId: null,
                 editingTarget: 'page',
                 selectedNodeId: null
