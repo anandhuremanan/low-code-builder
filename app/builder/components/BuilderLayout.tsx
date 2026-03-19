@@ -18,6 +18,7 @@ import { type ComponentType, type SiteSectionKey } from '../types';
 import { Dialog } from '../../components/ui/Dialog';
 import { Input } from '../../components/ui/Input';
 import { Typography } from '../../components/ui/Typography';
+import { generatePageComponentCode, generateSectionComponentCode } from '../codegen';
 
 const PREVIEW_STORAGE_KEY = 'builder-preview-site';
 
@@ -35,6 +36,10 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
     const [customStyleClassName, setCustomStyleClassName] = useState('');
     const [customStyleCss, setCustomStyleCss] = useState('');
     const [isClient, setIsClient] = useState(false);
+    const [isCodeDialogOpen, setIsCodeDialogOpen] = useState(false);
+    const [generatedCode, setGeneratedCode] = useState('');
+    const [generatedFileName, setGeneratedFileName] = useState('');
+    const [generatedCodeSourceLabel, setGeneratedCodeSourceLabel] = useState('');
 
     useEffect(() => {
         setIsClient(true);
@@ -233,6 +238,58 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
         window.open('/builder/preview', '_blank', 'noopener,noreferrer');
     };
 
+    const handleGenerateSectionCode = async () => {
+        if (mode !== 'section' || !sectionTarget || (sectionTarget !== 'header' && sectionTarget !== 'footer')) {
+            return;
+        }
+
+        const code = generateSectionComponentCode({
+            section: sectionTarget,
+            nodes: state.siteSections[sectionTarget].nodes,
+            customStyles: state.customStyles
+        });
+
+        setGeneratedCode(code);
+        setGeneratedFileName(sectionTarget === 'header' ? 'GeneratedHeader.tsx' : 'GeneratedFooter.tsx');
+        setGeneratedCodeSourceLabel(sectionTarget);
+        setIsCodeDialogOpen(true);
+    };
+
+    const handleGeneratePageCode = async () => {
+        const currentPage = state.pages.find((page) => page.id === state.currentPageId);
+        if (!currentPage) return;
+
+        const { code, fileName } = generatePageComponentCode({
+            pageName: currentPage.name,
+            pageSlug: currentPage.slug,
+            nodes: currentPage.nodes,
+            customStyles: state.customStyles
+        });
+
+        setGeneratedCode(code);
+        setGeneratedFileName(fileName);
+        setGeneratedCodeSourceLabel(currentPage.name || 'page');
+        setIsCodeDialogOpen(true);
+    };
+
+    const handleDownloadGeneratedCode = () => {
+        if (!generatedCode || !generatedFileName) return;
+        const blob = new Blob([generatedCode], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = generatedFileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleCopyGeneratedCode = async () => {
+        if (!generatedCode || !navigator.clipboard) return;
+        await navigator.clipboard.writeText(generatedCode);
+    };
+
     const resetCustomStyleDialog = () => {
         setCustomStyleName('');
         setCustomStyleClassName('');
@@ -279,6 +336,8 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
     const toolbarIconClass = "p-1.5 rounded-md text-slate-500 transition hover:bg-slate-200/70 hover:text-slate-700";
     const toolbarIconActiveClass = "bg-white text-slate-800 shadow-sm";
     const toolbarActionClass = "inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50";
+    const canGenerateSectionCode = mode === 'section' && (sectionTarget === 'header' || sectionTarget === 'footer');
+    const canGeneratePageCode = mode === 'builder' && state.editingTarget === 'page';
 
     return (
         <>
@@ -356,6 +415,22 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                                     >
                                         Global Styles
                                     </button>
+                                    {canGeneratePageCode ? (
+                                        <button
+                                            onClick={handleGeneratePageCode}
+                                            className={toolbarActionClass}
+                                        >
+                                            Generate React Code
+                                        </button>
+                                    ) : null}
+                                    {canGenerateSectionCode ? (
+                                        <button
+                                            onClick={handleGenerateSectionCode}
+                                            className={toolbarActionClass}
+                                        >
+                                            Generate React Code
+                                        </button>
+                                    ) : null}
                                     <button
                                         onClick={handlePreview}
                                         className={toolbarActionClass}
@@ -439,6 +514,44 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                                         ))}
                                     </div>
                                 )}
+                            </div>
+                        </div>
+                    </Dialog>
+
+                    <Dialog
+                        open={isCodeDialogOpen}
+                        title={generatedFileName || 'Generated React Component'}
+                        onClose={() => setIsCodeDialogOpen(false)}
+                        cancelText="Close"
+                    >
+                        <div className="w-[900px] max-w-full space-y-4 pt-1">
+                            <div className="flex items-center justify-between gap-3">
+                                <Typography variant="body2" className="text-sm text-slate-500">
+                                    Generated from the current {generatedCodeSourceLabel} builder layout.
+                                </Typography>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleCopyGeneratedCode}
+                                        disabled={!generatedCode}
+                                        className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        Copy
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleDownloadGeneratedCode}
+                                        disabled={!generatedCode}
+                                        className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        Download
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-950">
+                                <pre className="max-h-[70vh] overflow-auto p-4 text-xs leading-6 text-slate-100">
+                                    <code>{generatedCode}</code>
+                                </pre>
                             </div>
                         </div>
                     </Dialog>
