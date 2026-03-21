@@ -38,6 +38,20 @@ const createDefaultSiteSections = (): SiteSections => ({
     }
 });
 
+const createDefaultPageNodes = (): ComponentNode[] => [
+    createRootContainerNode('min-h-screen p-8 bg-white')
+];
+
+const createDefaultPopupNodes = (): ComponentNode[] => [
+    createRootContainerNode('w-full min-h-[260px] p-6 bg-white')
+];
+
+const createDefaultNodesForTarget = (target: EditingTarget): ComponentNode[] => {
+    if (target === 'page') return createDefaultPageNodes();
+    if (target === 'popup') return createDefaultPopupNodes();
+    return createDefaultSiteSections()[target].nodes;
+};
+
 type HistorySnapshot = {
     pages: Page[];
     popups: Popup[];
@@ -83,6 +97,7 @@ type Action =
     | { type: 'RENAME_POPUP'; payload: { id: string; name: string } }
     | { type: 'SWITCH_POPUP'; payload: { id: string } }
     | { type: 'MOVE_NODE'; payload: { nodeId: string; newParentId: string | null; index: number } }
+    | { type: 'RESET_ACTIVE_VIEW' }
     | { type: 'ADD_CUSTOM_STYLE'; payload: { style: CustomStyle } }
     | { type: 'REMOVE_CUSTOM_STYLE'; payload: { id: string } }
     | { type: 'UNDO' }
@@ -467,7 +482,7 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                 id: generateId(),
                 name: action.payload.name,
                 slug: `/${action.payload.name.toLowerCase().replace(/\s+/g, '-')}`,
-                nodes: [createRootContainerNode('min-h-screen p-8 bg-white')]
+                nodes: createDefaultPageNodes()
             };
 
             return {
@@ -508,7 +523,7 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             const newPopup: Popup = {
                 id: generateId(),
                 name: action.payload.name,
-                nodes: [createRootContainerNode('w-full min-h-[260px] p-6 bg-white')]
+                nodes: createDefaultPopupNodes()
             };
 
             return {
@@ -534,6 +549,16 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             const popupExists = state.popups.some((popup) => popup.id === action.payload.id);
             if (!popupExists) return state;
             return { ...state, currentPopupId: action.payload.id, editingTarget: 'popup', selectedNodeId: null };
+        }
+
+        case 'RESET_ACTIVE_VIEW': {
+            const resetNodes = createDefaultNodesForTarget(state.editingTarget);
+
+            return withUpdatedActiveNodes({
+                ...state,
+                selectedNodeId: null,
+                history: pushToHistory(state)
+            }, resetNodes);
         }
 
         case 'ADD_CUSTOM_STYLE':
