@@ -1,4 +1,5 @@
 import { COMPONENT_REGISTRY } from "./registry";
+import { buildPageFromPlan } from "./aiPlan";
 import { type ComponentNode, type ComponentType, type Page } from "./types";
 
 type UnknownRecord = Record<string, unknown>;
@@ -7,6 +8,7 @@ export type AiPagePayload = {
   name?: string;
   slug?: string;
   nodes?: unknown;
+  pagePlan?: unknown;
 };
 
 const ROOT_CONTAINER_PROPS = {
@@ -108,6 +110,15 @@ export const normalizeAiPagePayload = (
   currentPage?: Page | null,
 ): Required<Pick<Page, "name" | "slug" | "nodes">> => {
   const payload = isRecord(rawPayload) ? rawPayload : {};
+
+  if (isRecord((payload as AiPagePayload).pagePlan)) {
+    return buildPageFromPlan((payload as AiPagePayload).pagePlan, currentPage);
+  }
+
+  if (!Array.isArray((payload as AiPagePayload).nodes)) {
+    return buildPageFromPlan(rawPayload, currentPage);
+  }
+
   const usedIds = new Set<string>();
   const currentPageName = currentPage?.name || "Generated Page";
   const name =

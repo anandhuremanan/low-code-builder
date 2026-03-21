@@ -12,63 +12,55 @@ type RequestPayload = {
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
-const SUPPORTED_COMPONENTS = [
-  "Container",
-  "Form",
-  "Button",
-  "Link",
-  "Input",
-  "Text",
-  "Image",
-  "Select",
-  "Checkbox",
-  "Switch",
-  "Textarea",
-  "DataGrid",
-  "MaterialIcon",
-  "DatePicker",
-  "TimePicker",
-  "DateTimePicker",
-  "MultiSelect",
-  "Charts",
-  "Tabs",
-  "Stepper",
-  "RadioGroup",
-  "Rating",
-].join(", ");
-
-const COMPONENT_GUIDANCE = `
-Supported component types: ${SUPPORTED_COMPONENTS}
-
+const PAGE_PLAN_GUIDANCE = `
 Return a single JSON object with this shape:
 {
-  "name": "Page Name",
-  "slug": "/page-slug",
-  "nodes": [
-    {
-      "id": "root-container",
-      "type": "Container",
-      "props": {
-        "className": "min-h-screen p-8 bg-white"
-      },
-      "children": []
-    }
-  ]
+  "pagePlan": {
+    "name": "Page Name",
+    "slug": "/page-slug",
+    "style": "saas" | "editorial" | "minimal" | "bold",
+    "sections": [
+      {
+        "type": "hero" | "feature-grid" | "stats" | "testimonial-grid" | "pricing" | "faq" | "cta-banner" | "contact-form" | "content",
+        "heading": "Section heading",
+        "body": "Section supporting copy",
+        "layout": "centered" | "split",
+        "primaryAction": { "label": "Button text" },
+        "secondaryAction": { "label": "Button text" },
+        "items": [
+          {
+            "title": "Card title",
+            "description": "Card description",
+            "meta": "Optional short meta",
+            "value": "Optional metric or price",
+            "bullets": ["Optional bullet", "Optional bullet"]
+          }
+        ],
+        "formFields": [
+          {
+            "type": "text" | "email" | "tel" | "number" | "textarea",
+            "label": "Field label",
+            "placeholder": "Field placeholder",
+            "required": true,
+            "name": "field-name"
+          }
+        ]
+      }
+    ]
+  }
 }
 
 Rules:
 - Return JSON only. No markdown fences, no prose, no comments.
-- The first node must be a Container with id "root-container".
-- Every node must have: id, type, props, children.
-- children must always be an array.
-- Use only the supported component types.
-- Prefer builder-safe props such as className, style, children, label, placeholder, options, variant, src, alt, name, required, caption.
-- Text content should use Text components with props.children as a string.
-- Layout should be composed primarily with nested Container nodes and className strings.
-- Forms should use a Form node with form fields as children.
-- Buttons can be included when the page needs call-to-actions.
-- Keep ids descriptive and unique.
-- Keep output practical for drag-and-drop editing in a visual builder.
+- Prefer 4 to 6 sections total.
+- Always include a "hero" section first.
+- Use coherent marketing-page structure. Good combinations are:
+  hero -> stats -> feature-grid -> testimonial-grid -> pricing -> cta-banner
+  hero -> content -> feature-grid -> faq -> contact-form
+- Keep content concise and realistic.
+- Do not invent raw builder nodes.
+- Use "split" hero only when supporting cards/items are useful.
+- Use at most 6 items per section and 6 form fields.
 `;
 
 const extractJson = (value: string): string => {
@@ -96,11 +88,11 @@ const createUserPrompt = (
 ): string => {
   if (mode === "edit" && currentPage) {
     return `
-${COMPONENT_GUIDANCE}
+${PAGE_PLAN_GUIDANCE}
 
-Task: modify the existing builder page JSON based on the user's requested changes.
-Preserve existing ids whenever the corresponding nodes still exist so drag-and-drop editing remains stable.
-Only remove or regenerate ids for brand-new nodes.
+Task: create an improved page plan for the existing page based on the user's requested changes.
+The current page JSON is provided only as context so you can understand the current content and structure.
+Return a fresh pagePlan, not raw builder nodes.
 
 Current page JSON:
 ${JSON.stringify(currentPage, null, 2)}
@@ -111,9 +103,9 @@ ${prompt}
   }
 
   return `
-${COMPONENT_GUIDANCE}
+${PAGE_PLAN_GUIDANCE}
 
-Task: generate a complete builder page JSON from this prompt:
+Task: generate a high-quality page plan from this prompt:
 ${prompt}
 `.trim();
 };
@@ -156,7 +148,7 @@ export async function action({ request }: ActionFunctionArgs) {
           {
             role: "system",
             content:
-              "You convert product requests into strict JSON for a visual drag-and-drop page builder.",
+              "You are a UI planner. Produce only structured JSON page plans for polished, modern pages. Avoid generic filler and avoid raw builder-node output.",
           },
           {
             role: "user",
