@@ -120,7 +120,7 @@ ${prompt}
 
 export async function action({ request }: ActionFunctionArgs) {
   try {
-    const apiKey = "";
+    const apiKey = process.env.GROQ_API_KEY || process.env.IPA_KEY;
     if (!apiKey) {
       return Response.json(
         { error: "Missing GROQ_API_KEY or IPA_KEY environment variable." },
