@@ -34,8 +34,10 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const hideHeaderRoutes = ["/login"];
-  const shouldShowHeader = !hideHeaderRoutes.includes(location.pathname);
+  const hideHeaderRoutes = ["/login", "/builder"];
+  const shouldShowHeader = !hideHeaderRoutes.some((route) =>
+    location.pathname.startsWith(route),
+  );
 
   return (
     <html lang="en">
