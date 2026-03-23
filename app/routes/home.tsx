@@ -17,12 +17,13 @@ export default function Home() {
       {/* header starts */}
 
       {/* header ends */}
+      
       <div className="content-sec w-full md:w-1/2 h-screen md:bg-[url('/public/assets/images/landing-bg.png')] bg-no-repeat bg-right bg-cover">
         <div className="left-sec w-full md:w-1/2">
-          <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
+          <h2 className="text-4xl tracking-tight sm:text-5xl md:text-6xl">
             Welcome to
           </h2>
-          <h3 className="text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl mt-3">
+          <h3 className="text-4xl tracking-tight sm:text-5xl md:text-6xl mt-3">
             <span className="text-blue-600">Low Code Builder</span>
           </h3>
           <p className="text-xl text-gray-600 mt-4 pt-2">

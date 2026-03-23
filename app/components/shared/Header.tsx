@@ -6,7 +6,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className="bg-white sticky top-0 z-50 shadow-sm">
       <div className="mx-auto px-6 py-4 flex items-center justify-between">
 
         {/* Logo */}
@@ -17,14 +17,15 @@ export default function Header() {
             className="h-9 w-auto"
           />
         </div>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8 text-gray-600 font-medium">
-          <a href="#" className="hover:text-[#184F79] transition">Features</a>
-          <a href="#" className="hover:text-[#184F79] transition">Builder</a>
-          <a href="#" className="hover:text-[#184F79] transition">Templates</a>
-          <a href="#" className="hover:text-[#184F79] transition"><Menu size={20} /></a>
-        </nav>
+        <div className="">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-8 text-gray-600 font-medium">
+            <a href="#" className="hover:text-[#184F79] transition">Features</a>
+            <a href="#" className="hover:text-[#184F79] transition">Builder</a>
+            <a href="#" className="hover:text-[#184F79] transition">Templates</a>
+            <a href="#" className="hover:text-[#184F79] transition"><span className="btn-login">Login</span></a>
+          </nav>
+        </div>
 
         {/* CTA Button */}
         {/* <div className="hidden md:block">

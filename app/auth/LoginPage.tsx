@@ -16,86 +16,78 @@ const LoginPage = () => {
     // CallLogin(email, password);
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4">
+  return (<div className="hero-section-wrap">
+    <div className="animbox diagnoal-top-to-right"></div>
+    <div className="animbox diagnoal-top-to-left"></div>
+    <div className="animbox diagnoal-bottom-to-right"></div>
+    <div className="animbox diagnoal-bottom-to-left"></div>
+    <div className="animbox center-to-top"></div>
 
-      {/* Card */}
-      <div className="w-full max-w-md bg-slate-800 rounded-2xl shadow-xl p-8">
+    <div className="login-container">
+      <div className="left-box">
 
-        {/* Logo */}
+        <div className="left-titlebox">
+          <h1>JOIN US. </h1>
+          <h2>Build With <span className="bluetag">Low</span> <span className="txt-bold">Code.</span></h2>
+        </div>
+      </div>
+      <div className="login-box">
+        <h4 className=" text-center mb-2">
+          Sign in to your account
+        </h4>
+
         <div className="flex justify-center mb-6">
           <img src={logo} alt="Logo" className="h-10" />
         </div>
 
-        {/* Title */}
-        <h1 className="text-2xl font-semibold text-white text-center mb-2">
-          Sign in to your account
-        </h1>
-
-        <p className="text-gray-400 text-sm text-center mb-6">
-          Welcome back! Please enter your details
-        </p>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-
-          {/* Email */}
-          <TextField
-            fullWidth
-            type="email"
-            placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                backgroundColor: "#1e293b",
-                borderRadius: "10px",
-                color: "white",
-                "& fieldset": {
-                  borderColor: "#334155"
+        <form onSubmit={handleSubmit} className="login-form">
+          <div>
+            <label htmlFor="">Username</label>
+            <TextField
+              fullWidth
+              type="Username"
+              placeholder="Enter email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#fff",
+                  borderRadius: "10px", padding: "0px 0px",
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#6366f1"
+                  }
                 },
-                "&:hover fieldset": {
-                  borderColor: "#6366f1"
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#6366f1"
+                "& input::placeholder": {
+                  color: "#94a3b8"
                 }
-              },
-              "& input::placeholder": {
-                color: "#94a3b8"
-              }
-            }}
-          />
+              }}
+            />
+          </div>
+          <div>
+            <label htmlFor="">Password</label>
 
-          {/* Password */}
-          <TextField
-            fullWidth
-            type="password"
-            placeholder="Enter password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                backgroundColor: "#1e293b",
-                borderRadius: "10px",
-                color: "white",
-                "& fieldset": {
-                  borderColor: "#334155"
+            <TextField
+              fullWidth
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#fff",
+                  borderRadius: "10px",
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#6366f1"
+                  }
                 },
-                "&:hover fieldset": {
-                  borderColor: "#6366f1"
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#6366f1"
+                "& input::placeholder": {
+                  color: "#94a3b8"
                 }
-              },
-              "& input::placeholder": {
-                color: "#94a3b8"
-              }
-            }}
-          />
+              }}
+            />
+          </div>
 
           {/* Remember + Forgot
           <div className="flex items-center justify-between">
@@ -112,29 +104,29 @@ const LoginPage = () => {
               Forgot password?
             </span>
           </div> */}
-
+          <div className="forget-signup">
+            <div><span>Forget Password ?</span></div><div><span>Sign Up</span></div>
+          </div>
           {/* Button */}
-          <Button
+          <div className=""><Button
             type="submit"
-            fullWidth
+            className="btn-signin"
             variant="contained"
             sx={{
-              mt: 1,
-              py: 1.5,
-              borderRadius: "10px",
-              backgroundColor: "#6366f1",
               textTransform: "none",
-              fontWeight: "600",
               "&:hover": {
                 backgroundColor: "#4f46e5"
               }
             }}
           >
             Sign in
-          </Button>
+          </Button></div>
+
         </form>
+
       </div>
     </div>
+  </div>
   );
 };
 
