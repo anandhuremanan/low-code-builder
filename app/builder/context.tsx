@@ -38,6 +38,20 @@ const createDefaultSiteSections = (): SiteSections => ({
     }
 });
 
+const createDefaultPageNodes = (): ComponentNode[] => [
+    createRootContainerNode('min-h-screen p-8 bg-white')
+];
+
+const createDefaultPopupNodes = (): ComponentNode[] => [
+    createRootContainerNode('w-full min-h-[260px] p-6 bg-white')
+];
+
+const createDefaultNodesForTarget = (target: EditingTarget): ComponentNode[] => {
+    if (target === 'page') return createDefaultPageNodes();
+    if (target === 'popup') return createDefaultPopupNodes();
+    return createDefaultSiteSections()[target].nodes;
+};
+
 type HistorySnapshot = {
     pages: Page[];
     popups: Popup[];
@@ -77,11 +91,13 @@ type Action =
     | { type: 'SELECT_NODE'; payload: { id: string | null } }
     | { type: 'SET_DRAGGED_COMPONENT'; payload: { type: string | null } }
     | { type: 'ADD_PAGE'; payload: { name: string } }
+    | { type: 'IMPORT_PAGE'; payload: { name: string; slug: string; nodes: ComponentNode[] } }
     | { type: 'SWITCH_PAGE'; payload: { id: string } }
     | { type: 'ADD_POPUP'; payload: { name: string } }
     | { type: 'RENAME_POPUP'; payload: { id: string; name: string } }
     | { type: 'SWITCH_POPUP'; payload: { id: string } }
     | { type: 'MOVE_NODE'; payload: { nodeId: string; newParentId: string | null; index: number } }
+    | { type: 'RESET_ACTIVE_VIEW' }
     | { type: 'ADD_CUSTOM_STYLE'; payload: { style: CustomStyle } }
     | { type: 'REMOVE_CUSTOM_STYLE'; payload: { id: string } }
     | { type: 'UNDO' }
@@ -466,7 +482,7 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                 id: generateId(),
                 name: action.payload.name,
                 slug: `/${action.payload.name.toLowerCase().replace(/\s+/g, '-')}`,
-                nodes: [createRootContainerNode('min-h-screen p-8 bg-white')]
+                nodes: createDefaultPageNodes()
             };
 
             return {
@@ -480,11 +496,34 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             };
         }
 
+        case 'IMPORT_PAGE': {
+            const currentPage = state.pages.find((page) => page.id === state.currentPageId);
+            if (!currentPage) return state;
+
+            return {
+                ...state,
+                history: pushToHistory(state),
+                pages: state.pages.map((page) =>
+                    page.id === currentPage.id
+                        ? {
+                            ...page,
+                            name: action.payload.name,
+                            slug: action.payload.slug,
+                            nodes: action.payload.nodes
+                        }
+                        : page
+                ),
+                currentPopupId: null,
+                editingTarget: 'page',
+                selectedNodeId: null
+            };
+        }
+
         case 'ADD_POPUP': {
             const newPopup: Popup = {
                 id: generateId(),
                 name: action.payload.name,
-                nodes: [createRootContainerNode('w-full min-h-[260px] p-6 bg-white')]
+                nodes: createDefaultPopupNodes()
             };
 
             return {
@@ -510,6 +549,16 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
             const popupExists = state.popups.some((popup) => popup.id === action.payload.id);
             if (!popupExists) return state;
             return { ...state, currentPopupId: action.payload.id, editingTarget: 'popup', selectedNodeId: null };
+        }
+
+        case 'RESET_ACTIVE_VIEW': {
+            const resetNodes = createDefaultNodesForTarget(state.editingTarget);
+
+            return withUpdatedActiveNodes({
+                ...state,
+                selectedNodeId: null,
+                history: pushToHistory(state)
+            }, resetNodes);
         }
 
         case 'ADD_CUSTOM_STYLE':

@@ -4,6 +4,7 @@ export default [
   index("routes/home.tsx"),
   route("login", "routes/loginPage.tsx"),
   route("dashboard", "routes/dashboard.tsx"),
+  route("api/builder-ai", "routes/api.builder-ai.ts"),
   route("configure/:appId", "routes/configure.$appId.tsx"),
   route("configure/header", "routes/configure.header.tsx"),
   route("configure/footer", "routes/configure.footer.tsx"),
