@@ -2,7 +2,7 @@ import type { Route } from "./+types/dashboard";
 import { Link } from "react-router";
 import { Plus } from "lucide-react";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [
     { title: "Dashboard" },
     { name: "description", content: "Sample dashboard page" },
@@ -24,8 +24,8 @@ const apps = [
 
 export default function Dashboard() {
   return (
-    <main className="min-h-screen bg-[#f4f6fb] text-slate-900">
-      <section className="mx-auto max-w-7xl px-6 pb-16">
+    <main className="maindash-sec">
+      <section className="mx-auto">
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold">Apps</h2>
@@ -34,19 +34,22 @@ export default function Dashboard() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {apps.map((app) => (
+          {apps?.length && apps.map((app) => (
             <Link
               key={app.id}
               to={`/configure/${app.id}`}
-              className="block rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-blue-100 font-semibold text-blue-600">
-                {app.name}
+              className="app-tile">
+              <div className="app-tile-text">
+                <h3 className="app-tile-title">{app.name}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {app.description}
+                </p>
               </div>
-              <h3 className="text-lg font-semibold">{app.name}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                {app.description}
-              </p>
+              <div className="app-tile-icons">
+                <a className="app-tile-btn" href="#">
+                  Edit App
+                </a>
+              </div>
             </Link>
           ))}
 
@@ -59,6 +62,8 @@ export default function Dashboard() {
             </span>
             <span>Create App</span>
           </Link>
+
+
         </div>
       </section>
     </main>
