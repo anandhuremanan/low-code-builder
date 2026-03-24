@@ -215,7 +215,14 @@ export const buildPageFromPlan = (
       {
         id: "root-container",
         type: "Container",
-        props: { className: theme.root },
+        props: {
+          className: theme.root,
+          style: {
+            display: "flex",
+            flexDirection: "column",
+            flexWrap: "nowrap",
+          },
+        },
         children: [node("Container", "page-shell", { className: theme.shell }, children)],
       },
     ],
