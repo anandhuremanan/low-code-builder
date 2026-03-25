@@ -1,10 +1,19 @@
 import { useState } from "react";
 import { Menu } from "lucide-react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import logo from "../../../public/assets/images/logo.png";
+import { authSession, useIsAuthenticated } from "../../features/auth/session";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const isAuthenticated = useIsAuthenticated();
+
+  const handleLogout = () => {
+    authSession.clear();
+    setMenuOpen(false);
+    navigate("/login");
+  };
 
   return (
     <header className="bg-white sticky top-0 z-50 shadow-sm">
@@ -24,7 +33,24 @@ export default function Header() {
             <NavLink to="/#features" className="hover:text-[#184F79] transition">Features</NavLink>
             <NavLink to="/builder" className="hover:text-[#184F79] transition">Builder</NavLink>
             <NavLink to="/#templates" className="hover:text-[#184F79] transition">Templates</NavLink>
-            <NavLink to="/login" className="hover:text-[#184F79] transition"><span className="btn-login">Login</span></NavLink>
+            {isAuthenticated ? (
+              <>
+                <NavLink to="/dashboard" className="hover:text-[#184F79] transition">
+                  Dashboard
+                </NavLink>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="hover:text-[#184F79] transition"
+                >
+                  <span className="btn-login">Logout</span>
+                </button>
+              </>
+            ) : (
+              <NavLink to="/login" className="hover:text-[#184F79] transition">
+                <span className="btn-login">Login</span>
+              </NavLink>
+            )}
           </nav>
         </div>
 
@@ -61,9 +87,32 @@ export default function Header() {
             Templates
           </NavLink>
 
-          <NavLink to="/#pricing" className="block text-gray-600 hover:text-[#184F79]">
-            Pricing
-          </NavLink>
+          {isAuthenticated ? (
+            <>
+              <NavLink
+                to="/dashboard"
+                className="block text-gray-600 hover:text-[#184F79]"
+                onClick={() => setMenuOpen(false)}
+              >
+                Dashboard
+              </NavLink>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="block text-gray-600 hover:text-[#184F79]"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <NavLink
+              to="/login"
+              className="block text-gray-600 hover:text-[#184F79]"
+              onClick={() => setMenuOpen(false)}
+            >
+              Login
+            </NavLink>
+          )}
 
           {/* <button className="bg-[#EF4036] text-white w-full py-2 rounded-lg mt-3">
             Get Started

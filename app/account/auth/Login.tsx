@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Button, TextField } from "@mui/material";
-import { useAuth } from "../context/UseAuth";
+import { Form } from "react-router";
 
 type LoginProps = {
+  isSubmitting: boolean;
   onSwitchToSignup: () => void;
 };
 
@@ -20,30 +21,23 @@ const textFieldSx = {
   },
 };
 
-export default function Login({ onSwitchToSignup }: LoginProps) {
+export default function Login({ isSubmitting, onSwitchToSignup }: LoginProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { CallLogin, loading } = useAuth();
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    await CallLogin({
-      username,
-      password,
-    });
-  };
 
   return (
     <>
       <h4 className=" text-center mb-2">Sign in to your account</h4>
 
-      <form onSubmit={handleSubmit} className="login-form">
+      <Form method="post" className="login-form">
+        <input type="hidden" name="intent" value="login" />
         <div>
           <label>Username</label>
           <TextField
             fullWidth
             type="text"
             placeholder="Enter Username"
+            name="username"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
             variant="outlined"
@@ -56,6 +50,7 @@ export default function Login({ onSwitchToSignup }: LoginProps) {
             fullWidth
             type="password"
             placeholder="Enter password"
+            name="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             variant="outlined"
@@ -79,7 +74,7 @@ export default function Login({ onSwitchToSignup }: LoginProps) {
             type="submit"
             className="btn-signin"
             variant="contained"
-            disabled={loading}
+            disabled={isSubmitting}
             sx={{
               textTransform: "none",
               "&:hover": {
@@ -87,10 +82,10 @@ export default function Login({ onSwitchToSignup }: LoginProps) {
               },
             }}
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {isSubmitting ? "Signing in..." : "Sign in"}
           </Button>
         </div>
-      </form>
+      </Form>
     </>
   );
 }

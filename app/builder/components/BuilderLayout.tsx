@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Bot, Code2, EllipsisVertical, Palette, RotateCcw } from 'lucide-react';
-import { NavLink } from 'react-router';
+import { NavLink, useFetcher } from 'react-router';
 import {
     DndContext,
     DragOverlay,
@@ -22,8 +22,7 @@ import { Input } from '../../components/ui/Input';
 import { Typography } from '../../components/ui/Typography';
 import { generatePageComponentCode, generateSectionComponentCode } from '../codegen';
 import { normalizeAiPagePayload } from '../ai';
-
-const PREVIEW_STORAGE_KEY = 'builder-preview-site';
+import { savePreviewSnapshot } from '../../features/builder/persistence/storage';
 
 type BuilderLayoutProps = {
     mode?: 'builder' | 'section';
@@ -48,9 +47,12 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
     const [aiPrompt, setAiPrompt] = useState('');
     const [aiError, setAiError] = useState('');
     const [aiResultJson, setAiResultJson] = useState('');
-    const [isAiSubmitting, setIsAiSubmitting] = useState(false);
     const [isToolbarMenuOpen, setIsToolbarMenuOpen] = useState(false);
     const toolbarMenuRef = useRef<HTMLDivElement | null>(null);
+    const lastAiResponseRef = useRef<unknown>(null);
+    const aiFetcher = useFetcher<{ error?: string; page?: unknown }>();
+    const isAiSubmitting = aiFetcher.state !== 'idle';
+    const currentPage = state.pages.find((page) => page.id === state.currentPageId) || null;
 
     useEffect(() => {
         setIsClient(true);
@@ -68,6 +70,26 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
         window.addEventListener('mousedown', handlePointerDown);
         return () => window.removeEventListener('mousedown', handlePointerDown);
     }, [isToolbarMenuOpen]);
+
+    useEffect(() => {
+        if (aiFetcher.state !== 'idle' || !aiFetcher.data) return;
+        if (lastAiResponseRef.current === aiFetcher.data) return;
+        lastAiResponseRef.current = aiFetcher.data;
+
+        if (aiFetcher.data.error) {
+            setAiError(aiFetcher.data.error);
+            return;
+        }
+
+        if (!aiFetcher.data.page || !currentPage) return;
+
+        const normalizedPage = normalizeAiPagePayload(aiFetcher.data.page, currentPage);
+        dispatch({
+            type: 'IMPORT_PAGE',
+            payload: normalizedPage
+        });
+        setAiResultJson(JSON.stringify(normalizedPage, null, 2));
+    }, [aiFetcher.data, aiFetcher.state, currentPage, dispatch]);
 
     useEffect(() => {
         if (mode === 'builder' && state.editingTarget !== 'page' && state.editingTarget !== 'popup') {
@@ -96,8 +118,6 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
         if (state.editingTarget === 'popup') return currentPopup?.nodes || [];
         return state.siteSections[state.editingTarget].nodes;
     };
-
-    const currentPage = state.pages.find((page) => page.id === state.currentPageId) || null;
 
     const findNodeAndParent = (
         nodes: any[],
@@ -252,7 +272,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
     };
 
     const handlePreview = () => {
-        localStorage.setItem(PREVIEW_STORAGE_KEY, JSON.stringify({
+        savePreviewSnapshot({
             pages: state.pages,
             popups: state.popups,
             currentPageId: state.currentPageId,
@@ -260,7 +280,7 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
             viewMode: state.viewMode,
             customStyles: state.customStyles,
             siteSections: state.siteSections
-        }));
+        });
         window.open('/builder/preview', '_blank', 'noopener,noreferrer');
     };
 
@@ -274,50 +294,31 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
         setAiPrompt('');
         setAiError('');
         setAiResultJson('');
+        lastAiResponseRef.current = null;
         setIsAiDialogOpen(true);
     };
 
     const handleAiSubmit = async () => {
         if (!currentPage || !aiPrompt.trim()) return;
 
-        setIsAiSubmitting(true);
         setAiError('');
+        const payload = JSON.stringify({
+            mode: aiMode,
+            prompt: aiPrompt.trim(),
+            currentPage: aiMode === 'edit'
+                ? {
+                    name: currentPage.name,
+                    slug: currentPage.slug,
+                    nodes: currentPage.nodes
+                }
+                : undefined
+        });
 
-        try {
-            const response = await fetch('/api/builder-ai', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    mode: aiMode,
-                    prompt: aiPrompt.trim(),
-                    currentPage: aiMode === 'edit'
-                        ? {
-                            name: currentPage.name,
-                            slug: currentPage.slug,
-                            nodes: currentPage.nodes
-                        }
-                        : undefined
-                })
-            });
-
-            const payload = await response.json();
-            if (!response.ok) {
-                throw new Error(payload?.error || 'AI request failed.');
-            }
-
-            const normalizedPage = normalizeAiPagePayload(payload.page, currentPage);
-            dispatch({
-                type: 'IMPORT_PAGE',
-                payload: normalizedPage
-            });
-            setAiResultJson(JSON.stringify(normalizedPage, null, 2));
-        } catch (error) {
-            setAiError(error instanceof Error ? error.message : 'AI request failed.');
-        } finally {
-            setIsAiSubmitting(false);
-        }
+        aiFetcher.submit(payload as any, {
+            method: 'post',
+            action: '/api/builder-ai',
+            encType: 'application/json'
+        });
     };
 
     const handleGenerateSectionCode = async () => {

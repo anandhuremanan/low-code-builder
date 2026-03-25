@@ -1,8 +1,7 @@
 import { encrypt } from "./encryptAndDecryptService";
 import { tokenService } from "./tokenService";
 import { refreshAccessToken } from "./refreshTokenService";
-
-let apiUrl = "http://127.0.0.1:8080";
+import { API_BASE_URL } from "../shared/config/env";
 
 export async function GenericCall<T = any>(
   endpoint: string,
@@ -14,7 +13,7 @@ export async function GenericCall<T = any>(
   const encryptedBody = await encrypt(body);
   console.log("encrypted...", encryptedBody);
 
-  const res = await fetch(apiUrl + endpoint, {
+  const res = await fetch(API_BASE_URL + endpoint, {
     method,
     headers: {
       "Content-Type": "application/json",
@@ -30,7 +29,9 @@ export async function GenericCall<T = any>(
       return GenericCall(endpoint, method, body, false);
     } else {
       tokenService.clear();
-      window.location.href = "/login";
+      if (typeof window !== "undefined") {
+        window.location.assign("/login");
+      }
       throw new Error("Session expired");
     }
   }

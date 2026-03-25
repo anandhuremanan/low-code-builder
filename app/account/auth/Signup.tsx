@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Button, TextField } from "@mui/material";
-import { useAuth } from "../context/UseAuth";
+import { Form } from "react-router";
 
 type SignupProps = {
+  isSubmitting: boolean;
   onSwitchToLogin: () => void;
 };
 
@@ -20,7 +21,7 @@ const textFieldSx = {
   },
 };
 
-export default function Signup({ onSwitchToLogin }: SignupProps) {
+export default function Signup({ isSubmitting, onSwitchToLogin }: SignupProps) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -29,7 +30,6 @@ export default function Signup({ onSwitchToLogin }: SignupProps) {
     phoneNo: "",
     password: "",
   });
-  const { loading, register } = useAuth();
 
   const updateField = (field: keyof typeof formData, value: string) => {
     setFormData((current) => ({
@@ -38,16 +38,12 @@ export default function Signup({ onSwitchToLogin }: SignupProps) {
     }));
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    await register(formData);
-  };
-
   return (
     <>
       <h4 className=" text-center mb-2">Create your account</h4>
 
-      <form onSubmit={handleSubmit} className="login-form">
+      <Form method="post" className="login-form">
+        <input type="hidden" name="intent" value="signup" />
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label>First Name</label>
@@ -55,6 +51,7 @@ export default function Signup({ onSwitchToLogin }: SignupProps) {
               fullWidth
               type="text"
               placeholder="Enter First Name"
+              name="firstName"
               value={formData.firstName}
               onChange={(event) => updateField("firstName", event.target.value)}
               variant="outlined"
@@ -67,6 +64,7 @@ export default function Signup({ onSwitchToLogin }: SignupProps) {
               fullWidth
               type="text"
               placeholder="Enter Last Name"
+              name="lastName"
               value={formData.lastName}
               onChange={(event) => updateField("lastName", event.target.value)}
               variant="outlined"
@@ -80,6 +78,7 @@ export default function Signup({ onSwitchToLogin }: SignupProps) {
             fullWidth
             type="text"
             placeholder="Choose Username"
+            name="username"
             value={formData.username}
             onChange={(event) => updateField("username", event.target.value)}
             variant="outlined"
@@ -92,6 +91,7 @@ export default function Signup({ onSwitchToLogin }: SignupProps) {
             fullWidth
             type="email"
             placeholder="Enter Email"
+            name="email"
             value={formData.email}
             onChange={(event) => updateField("email", event.target.value)}
             variant="outlined"
@@ -104,6 +104,7 @@ export default function Signup({ onSwitchToLogin }: SignupProps) {
             fullWidth
             type="tel"
             placeholder="Enter Phone Number"
+            name="phoneNo"
             value={formData.phoneNo}
             onChange={(event) => updateField("phoneNo", event.target.value)}
             variant="outlined"
@@ -116,6 +117,7 @@ export default function Signup({ onSwitchToLogin }: SignupProps) {
             fullWidth
             type="password"
             placeholder="Create password"
+            name="password"
             value={formData.password}
             onChange={(event) => updateField("password", event.target.value)}
             variant="outlined"
@@ -139,7 +141,7 @@ export default function Signup({ onSwitchToLogin }: SignupProps) {
             type="submit"
             className="btn-signin"
             variant="contained"
-            disabled={loading}
+            disabled={isSubmitting}
             sx={{
               textTransform: "none",
               "&:hover": {
@@ -147,10 +149,10 @@ export default function Signup({ onSwitchToLogin }: SignupProps) {
               },
             }}
           >
-            {loading ? "Creating account..." : "Sign up"}
+            {isSubmitting ? "Creating account..." : "Sign up"}
           </Button>
         </div>
-      </form>
+      </Form>
     </>
   );
 }

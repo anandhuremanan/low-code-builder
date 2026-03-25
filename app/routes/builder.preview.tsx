@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router";
+import { useLoaderData, useLocation } from "react-router";
 import { Box } from "../components/ui/Box";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
@@ -27,18 +27,17 @@ import { TimePicker } from "../builder/components/TimePicker";
 import { DateTimePicker } from "../builder/components/DateTimePicker";
 import { compileCustomStylesCss } from "../lib/customStyleUtils";
 import { LinkNode } from "../builder/components/LinkNode";
+import {
+  type BuilderPreviewSnapshot,
+  loadPreviewSnapshot,
+} from "../features/builder/persistence/storage";
+type SiteSnapshot = BuilderPreviewSnapshot;
 
-const PREVIEW_STORAGE_KEY = "builder-preview-site";
+export async function clientLoader() {
+  return loadPreviewSnapshot();
+}
 
-type SiteSnapshot = {
-  pages: Page[];
-  popups?: Popup[];
-  currentPageId: string | null;
-  currentPopupId?: string | null;
-  viewMode?: "desktop" | "tablet" | "mobile";
-  customStyles?: CustomStyle[];
-  siteSections?: SiteSections;
-};
+Object.assign(clientLoader, { hydrate: true as const });
 
 type TabItem = {
   id: string;
@@ -866,35 +865,10 @@ const SidebarPreviewSection = ({
 };
 
 export default function BuilderPreviewPage() {
-  const [site, setSite] = useState<SiteSnapshot | null>(null);
+  const initialSite = useLoaderData() as SiteSnapshot | null;
+  const [site] = useState<SiteSnapshot | null>(initialSite);
   const [openPopupId, setOpenPopupId] = useState<string | null>(null);
   const location = useLocation();
-
-  useEffect(() => {
-    const raw = localStorage.getItem(PREVIEW_STORAGE_KEY);
-    if (!raw) return;
-
-    try {
-      const parsed = JSON.parse(raw);
-      if (parsed?.pages && Array.isArray(parsed.pages)) {
-        setSite(parsed as SiteSnapshot);
-        return;
-      }
-
-      if (parsed?.nodes) {
-        const singlePage = parsed as Page;
-        setSite({
-          pages: [singlePage],
-          currentPageId: singlePage.id,
-        });
-        return;
-      }
-
-      setSite(null);
-    } catch {
-      setSite(null);
-    }
-  }, []);
 
   const selectedPage = useMemo(() => {
     if (!site) return null;

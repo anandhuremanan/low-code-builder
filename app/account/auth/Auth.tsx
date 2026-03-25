@@ -1,22 +1,16 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useState } from "react";
+import { useActionData, useNavigation } from "react-router";
 import logo from "/assets/images/logo.png";
 import Login from "./Login";
 import Signup from "./Signup";
-import { useAuth } from "../context/UseAuth";
 
 type AuthView = "login" | "signup";
 
 export default function Auth() {
-  const navigate = useNavigate();
-  const { error, user } = useAuth();
   const [activeView, setActiveView] = useState<AuthView>("login");
-
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
-  }, [navigate, user]);
+  const actionData = useActionData() as { error?: string } | undefined;
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   return (
     <div className="hero-section-wrap">
@@ -41,16 +35,22 @@ export default function Auth() {
             <img src={logo} alt="Logo" className="h-10" />
           </div>
 
-          {error ? (
+          {actionData?.error ? (
             <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error}
+              {actionData.error}
             </div>
           ) : null}
 
           {activeView === "login" ? (
-            <Login onSwitchToSignup={() => setActiveView("signup")} />
+            <Login
+              isSubmitting={isSubmitting}
+              onSwitchToSignup={() => setActiveView("signup")}
+            />
           ) : (
-            <Signup onSwitchToLogin={() => setActiveView("login")} />
+            <Signup
+              isSubmitting={isSubmitting}
+              onSwitchToLogin={() => setActiveView("login")}
+            />
           )}
         </div>
       </div>
