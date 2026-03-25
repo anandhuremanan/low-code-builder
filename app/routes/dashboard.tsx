@@ -1,6 +1,7 @@
 import type { Route } from "./+types/dashboard";
-import { Link, NavLink } from "react-router";
-import { Plus } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router";
+import { Plus, X } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,7 +10,13 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-const apps = [
+type App = {
+  id: string;
+  name: string;
+  description: string;
+};
+
+const initialApps: App[] = [
   {
     id: "app-1",
     name: "App 1",
@@ -23,6 +30,30 @@ const apps = [
 ];
 
 export default function Dashboard() {
+  const [apps, setApps] = useState(initialApps);
+  const [open, setOpen] = useState(false);
+  const [appName, setAppName] = useState("");
+  const [appDescription, setAppDescription] = useState("");
+
+  const handleCreateApp = () => {
+    const trimmedName = appName.trim();
+    const trimmedDescription = appDescription.trim();
+    if (!trimmedName) return;
+
+    setApps((currentApps) => [
+      ...currentApps,
+      {
+        id: `app-${Date.now()}`,
+        name: trimmedName,
+        description: trimmedDescription || "New app created from dashboard.",
+      },
+    ]);
+
+    setAppName("");
+    setAppDescription("");
+    setOpen(false);
+  };
+
   return (
     <main className="maindash-sec">
       <section className="mx-auto">
@@ -34,39 +65,97 @@ export default function Dashboard() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {apps?.length &&
-            apps.map((app) => (
-              <div key={app.id} className="app-tile">
-                <div className="app-tile-text">
-                  <NavLink
-                    to={`/configure/${app.id}`}
-                    className="app-tile-title"
-                  >
-                    {app.name}
-                  </NavLink>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {app.description}
-                  </p>
-                </div>
-                <div className="app-tile-icons">
-                  <NavLink className="app-tile-btn" to={`/configure/${app.id}`}>
-                    Edit App
-                  </NavLink>
-                </div>
+          {apps.map((app) => (
+            <Link
+              key={app.id}
+              to={`/configure/${app.id}`}
+              className="app-tile">
+              <div className="app-tile-text">
+                <h3 className="app-tile-title">{app.name}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {app.description}
+                </p>
               </div>
-            ))}
+              <div className="app-tile-icons">
+                <span className="app-tile-btn">Edit App</span>
+              </div>
+            </Link>
+          ))}
 
-          <Link
-            to="/configure"
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
             className="flex min-h-56 flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-slate-300 bg-white text-lg font-medium text-slate-700 transition hover:border-blue-400 hover:text-blue-700"
           >
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-600">
               <Plus size={28} />
             </span>
             <span>Create App</span>
-          </Link>
+          </button>
         </div>
       </section>
+
+      {open ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-semibold text-slate-900">Create App</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                aria-label="Close create app popup"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block">
+                <span className="mb-1 block text-sm font-medium text-slate-700">App Name</span>
+                <input
+                  type="text"
+                  value={appName}
+                  onChange={(event) => setAppName(event.target.value)}
+                  placeholder="Enter app name"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500"
+                />
+              </label>
+
+              <label className="block">
+                <span className="mb-1 block text-sm font-medium text-slate-700">Description</span>
+                <textarea
+                  value={appDescription}
+                  onChange={(event) => setAppDescription(event.target.value)}
+                  placeholder="Enter app description"
+                  rows={4}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500"
+                />
+              </label>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateApp}
+                disabled={!appName.trim()}
+                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
