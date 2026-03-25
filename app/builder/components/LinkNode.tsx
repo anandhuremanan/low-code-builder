@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Link as LinkUI } from "../../components/ui/Link";
+import { NavLink } from "react-router";
 
 type LinkMenuItem = {
   id?: string;
@@ -105,27 +105,23 @@ export const LinkNode = ({
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
-      <LinkUI
-        component={isNonInteractive ? "span" : "a"}
-        className={className}
-        style={style}
-        href={isNonInteractive ? undefined : mainHref}
-        underline={underline}
-        color={color}
-        target={
-          !isNonInteractive && linkType === "external" && openInNewTab
-            ? "_blank"
-            : undefined
-        }
-        rel={
-          !isNonInteractive && linkType === "external" && openInNewTab
-            ? "noopener noreferrer"
-            : undefined
-        }
-        onClick={isNonInteractive ? undefined : handleMainClick}
-      >
-        {children}
-      </LinkUI>
+      {isNonInteractive ? (
+        <span className={className} style={style}>
+          {children}
+        </span>
+      ) : (
+        <NavLink
+          className={className}
+          style={style}
+          to={mainHref}
+          target={linkType === "external" && openInNewTab ? "_blank" : undefined}
+          rel={linkType === "external" && openInNewTab ? "noopener noreferrer" : undefined}
+          reloadDocument={linkType === "external"}
+          onClick={handleMainClick}
+        >
+          {children}
+        </NavLink>
+      )}
 
       {hasHoverItems && isOpen ? (
         <div
@@ -163,9 +159,9 @@ export const LinkNode = ({
               const itemNewTab = Boolean(item.openInNewTab);
 
               return (
-                <a
+                <NavLink
                   key={item.id || `${itemLabel}-${index}`}
-                  href={itemHref}
+                  to={itemHref}
                   target={itemType === "external" && itemNewTab ? "_blank" : undefined}
                   rel={itemType === "external" && itemNewTab ? "noopener noreferrer" : undefined}
                   className="rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -181,7 +177,7 @@ export const LinkNode = ({
                   }}
                 >
                   {itemLabel}
-                </a>
+                </NavLink>
               );
             })}
           </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Bot, Code2, EllipsisVertical, Palette, RotateCcw } from 'lucide-react';
+import { NavLink } from 'react-router';
 import {
     DndContext,
     DragOverlay,
@@ -455,9 +456,9 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                                 </div>
                                 <div className="flex gap-2 items-center">
                                     {mode === 'section' ? (
-                                        <a href="/configure" className={toolbarActionClass}>
+                                        <NavLink to="/configure" className={toolbarActionClass}>
                                             Configure
-                                        </a>
+                                        </NavLink>
                                     ) : null}
                                     <div className="mr-2 flex gap-1 rounded-lg border border-slate-200 bg-slate-100 p-1">
                                         <button

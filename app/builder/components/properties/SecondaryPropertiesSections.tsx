@@ -1,5 +1,6 @@
 import React from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { NavLink } from "react-router";
 import { Input } from "../../../components/ui/Input";
 
 type SecondaryPropertiesSectionsProps = {
@@ -545,14 +546,15 @@ export const SecondaryPropertiesSections = ({
             />
             <p className="text-[10px] text-gray-400">
               See{" "}
-              <a
-                href="https://fonts.google.com/icons"
+              <NavLink
+                to="https://fonts.google.com/icons"
                 target="_blank"
                 rel="noreferrer"
+                reloadDocument
                 className="text-blue-500 underline"
               >
                 Material Icons
-              </a>
+              </NavLink>
               . Use underscore for spaces, e.g. "account_circle".
             </p>
           </div>

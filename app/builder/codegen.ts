@@ -243,6 +243,7 @@ const renderJsxNode = (node: ComponentNode, context: GeneratorContext): string =
         context,
       );
     case "Link":
+      addImport(context.imports, "react-router", "NavLink");
       context.helperNames.add("GeneratedLink");
       return renderIntrinsic(
         "GeneratedLink",
@@ -602,15 +603,16 @@ const GeneratedLink = ({
 
   return (
     <div className="relative inline-block" onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)}>
-      <a
+      <NavLink
         className={className}
         style={style}
-        href={hasHoverItems ? undefined : href}
+        to={hasHoverItems ? "." : href}
         target={linkType === "external" && openInNewTab ? "_blank" : undefined}
         rel={linkType === "external" && openInNewTab ? "noopener noreferrer" : undefined}
+        reloadDocument={linkType === "external"}
       >
         {children}
-      </a>
+      </NavLink>
       {hasHoverItems && isOpen ? (
         <div
           className="absolute left-0 top-full z-30 rounded-md border border-gray-200 bg-white p-2 shadow-lg"
@@ -624,15 +626,16 @@ const GeneratedLink = ({
               const itemType = item.linkType || (item.externalUrl ? "external" : "internal");
               const itemHref = itemType === "external" ? item.externalUrl || "#" : item.pageSlug || "#";
               return (
-                <a
+                <NavLink
                   key={item.id || index}
-                  href={itemHref}
+                  to={itemHref}
                   target={itemType === "external" && item.openInNewTab ? "_blank" : undefined}
                   rel={itemType === "external" && item.openInNewTab ? "noopener noreferrer" : undefined}
+                  reloadDocument={itemType === "external"}
                   className="rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   {item.label || \`Menu Link \${index + 1}\`}
-                </a>
+                </NavLink>
               );
             })}
           </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Menu } from "lucide-react";
+import { NavLink } from "react-router";
 import logo from "../../../public/assets/images/logo.png";
 
 export default function Header() {
@@ -20,10 +21,10 @@ export default function Header() {
         <div className="">
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8 text-gray-600 font-medium">
-            <a href="#" className="hover:text-[#184F79] transition">Features</a>
-            <a href="#" className="hover:text-[#184F79] transition">Builder</a>
-            <a href="#" className="hover:text-[#184F79] transition">Templates</a>
-            <a href="#" className="hover:text-[#184F79] transition"><span className="btn-login">Login</span></a>
+            <NavLink to="/#features" className="hover:text-[#184F79] transition">Features</NavLink>
+            <NavLink to="/builder" className="hover:text-[#184F79] transition">Builder</NavLink>
+            <NavLink to="/#templates" className="hover:text-[#184F79] transition">Templates</NavLink>
+            <NavLink to="/login" className="hover:text-[#184F79] transition"><span className="btn-login">Login</span></NavLink>
           </nav>
         </div>
 
@@ -48,21 +49,21 @@ export default function Header() {
       {menuOpen && (
         <div className="md:hidden px-6 pb-5 space-y-3 border-t bg-white">
 
-          <a href="#" className="block text-gray-600 hover:text-[#184F79]">
+          <NavLink to="/#features" className="block text-gray-600 hover:text-[#184F79]">
             Features
-          </a>
+          </NavLink>
 
-          <a href="#" className="block text-gray-600 hover:text-[#184F79]">
+          <NavLink to="/builder" className="block text-gray-600 hover:text-[#184F79]">
             Builder
-          </a>
+          </NavLink>
 
-          <a href="#" className="block text-gray-600 hover:text-[#184F79]">
+          <NavLink to="/#templates" className="block text-gray-600 hover:text-[#184F79]">
             Templates
-          </a>
+          </NavLink>
 
-          <a href="#" className="block text-gray-600 hover:text-[#184F79]">
+          <NavLink to="/#pricing" className="block text-gray-600 hover:text-[#184F79]">
             Pricing
-          </a>
+          </NavLink>
 
           {/* <button className="bg-[#EF4036] text-white w-full py-2 rounded-lg mt-3">
             Get Started

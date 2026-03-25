@@ -1,5 +1,5 @@
 import type { Route } from "./+types/dashboard";
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 import { Plus } from "lucide-react";
 
 export function meta({ }: Route.MetaArgs) {
@@ -35,22 +35,23 @@ export default function Dashboard() {
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {apps?.length && apps.map((app) => (
-            <Link
+            <div
               key={app.id}
-              to={`/configure/${app.id}`}
               className="app-tile">
               <div className="app-tile-text">
-                <h3 className="app-tile-title">{app.name}</h3>
+                <NavLink to={`/configure/${app.id}`} className="app-tile-title">
+                  {app.name}
+                </NavLink>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   {app.description}
                 </p>
               </div>
               <div className="app-tile-icons">
-                <a className="app-tile-btn" href="#">
+                <NavLink className="app-tile-btn" to={`/configure/${app.id}`}>
                   Edit App
-                </a>
+                </NavLink>
               </div>
-            </Link>
+            </div>
           ))}
 
           <Link
