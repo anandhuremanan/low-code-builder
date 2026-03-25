@@ -1,5 +1,3 @@
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import {
   isRouteErrorResponse,
   Links,
@@ -7,14 +5,10 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLocation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import { BuilderProvider } from './builder/context';
-import Header from './components/shared/Header';
-import { AuthProvider } from './account/context/AuthProvider';
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -34,12 +28,6 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const location = useLocation();
-  const hideHeaderPrefixes = ["/login", "/builder", "/builder/preview"];
-  const shouldShowHeader = !hideHeaderPrefixes.some((prefix) =>
-    location.pathname.startsWith(prefix),
-  );
-
   return (
     <html lang="en">
       <head>
@@ -49,11 +37,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          {shouldShowHeader ? <Header /> : null}
-          {children}
-        </LocalizationProvider>
+        {children}
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -62,13 +46,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return (
-    <AuthProvider>
-    <BuilderProvider>
-      <Outlet />
-    </BuilderProvider>
-    </AuthProvider>
-  );
+  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

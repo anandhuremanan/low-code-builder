@@ -1,14 +1,12 @@
+import { authSession } from "../features/auth/session";
+
 export const tokenService = {
-  getAccessToken: () => localStorage.getItem("accessToken"),
-  getRefreshToken: () => localStorage.getItem("refreshToken"),
-
+  getAccessToken: () => authSession.getAccessToken(),
+  getRefreshToken: () => authSession.getRefreshToken(),
   setTokens: (access: string, refresh: string) => {
-    localStorage.setItem("accessToken", access);
-    localStorage.setItem("refreshToken", refresh);
+    authSession.setSession({ accessToken: access, refreshToken: refresh });
   },
-
   clear: () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-  }
+    authSession.clear();
+  },
 };

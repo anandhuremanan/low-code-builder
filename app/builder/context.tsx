@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react';
 import { type ComponentNode, type CustomStyle, type EditingTarget, type Page, type Popup, type SiteSectionKey, type SiteSections } from './types';
+import { loadBuilderEditorState, saveBuilderEditorState } from '../features/builder/persistence/storage';
 
-const BUILDER_STATE_STORAGE_KEY = 'builder-editor-state-v1';
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 const createRootContainerNode = (className: string): ComponentNode => ({
@@ -129,11 +129,10 @@ const initialState: BuilderState = {
 
 const hydrateState = (): BuilderState => {
     if (typeof window === 'undefined') return initialState;
-    const raw = window.localStorage.getItem(BUILDER_STATE_STORAGE_KEY);
-    if (!raw) return initialState;
+    const parsed = loadBuilderEditorState() as Partial<BuilderState> | null;
+    if (!parsed) return initialState;
 
     try {
-        const parsed = JSON.parse(raw) as Partial<BuilderState>;
         const pages = Array.isArray(parsed.pages) && parsed.pages.length > 0 ? parsed.pages : initialState.pages;
         const popups = Array.isArray(parsed.popups) ? parsed.popups : initialState.popups;
         const currentPageId = typeof parsed.currentPageId === 'string' ? parsed.currentPageId : pages[0]?.id || null;
@@ -582,7 +581,7 @@ export const BuilderProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        window.localStorage.setItem(BUILDER_STATE_STORAGE_KEY, JSON.stringify({
+        const timeoutId = window.setTimeout(() => saveBuilderEditorState({
             pages: state.pages,
             popups: state.popups,
             currentPageId: state.currentPageId,
@@ -593,7 +592,9 @@ export const BuilderProvider = ({ children }: { children: ReactNode }) => {
             draggedComponentType: state.draggedComponentType,
             viewMode: state.viewMode,
             customStyles: state.customStyles
-        }));
+        }), 150);
+
+        return () => window.clearTimeout(timeoutId);
     }, [state]);
 
     return (

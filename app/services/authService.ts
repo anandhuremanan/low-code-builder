@@ -1,5 +1,6 @@
 import { encrypt } from "./encryptAndDecryptService";
-let apiUrl = "http://127.0.0.1:8080/";
+import { API_BASE_URL } from "../shared/config/env";
+
 export const authService = {
   LoginServiceCall: async function <T = any>(
     endpoint?: string,
@@ -37,7 +38,7 @@ export const authService = {
       finalBody = { data: finalBody };
     }
 
-    const res = await fetch(apiUrl + endpoint, {
+    const res = await fetch(`${API_BASE_URL}/${endpoint}`, {
       method: method,
       headers: {
         "Content-Type": "application/json",
@@ -90,7 +91,7 @@ export const authService = {
       finalBody = { data: finalBody };
     }
 
-    const res = await fetch(apiUrl + endpoint, {
+    const res = await fetch(`${API_BASE_URL}/${endpoint}`, {
       method: method,
       headers: {
         "Content-Type": "application/json",
