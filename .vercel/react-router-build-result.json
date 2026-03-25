@@ -12,8 +12,9 @@
     "routeIdToServerBundleId": {
       "routes/home": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/loginPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/signUpPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/configure": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/dashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/api.builder-ai": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/configure.$appId": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/configure.header": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/configure.footer": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/configure.sidebar-left": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
@@ -46,20 +47,29 @@
           "runtime": "nodejs"
         }
       },
-      "routes/signUpPage": {
-        "id": "routes/signUpPage",
+      "routes/dashboard": {
+        "id": "routes/dashboard",
         "parentId": "root",
-        "file": "app/routes/signUpPage.tsx",
-        "path": "signup",
+        "file": "app/routes/dashboard.tsx",
+        "path": "dashboard",
         "config": {
           "runtime": "nodejs"
         }
       },
-      "routes/configure": {
-        "id": "routes/configure",
+      "routes/api.builder-ai": {
+        "id": "routes/api.builder-ai",
         "parentId": "root",
-        "file": "app/routes/configure.tsx",
-        "path": "configure",
+        "file": "app/routes/api.builder-ai.ts",
+        "path": "api/builder-ai",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/configure.$appId": {
+        "id": "routes/configure.$appId",
+        "parentId": "root",
+        "file": "app/routes/configure.$appId.tsx",
+        "path": "configure/:appId",
         "config": {
           "runtime": "nodejs"
         }
@@ -121,9 +131,9 @@
     }
   },
   "reactRouterConfig": {
-    "appDirectory": "D:/Working SVN Folder/less-code/low-code-builder/app",
+    "appDirectory": "D:/working-folder/less-code/app",
     "basename": "/",
-    "buildDirectory": "D:/Working SVN Folder/less-code/low-code-builder/build",
+    "buildDirectory": "D:/working-folder/less-code/build",
     "future": {
       "unstable_optimizeDeps": false,
       "unstable_subResourceIntegrity": false,
@@ -150,17 +160,23 @@
         "file": "routes/loginPage.tsx",
         "path": "login"
       },
-      "routes/signUpPage": {
-        "id": "routes/signUpPage",
+      "routes/dashboard": {
+        "id": "routes/dashboard",
         "parentId": "root",
-        "file": "routes/signUpPage.tsx",
-        "path": "signup"
+        "file": "routes/dashboard.tsx",
+        "path": "dashboard"
       },
-      "routes/configure": {
-        "id": "routes/configure",
+      "routes/api.builder-ai": {
+        "id": "routes/api.builder-ai",
         "parentId": "root",
-        "file": "routes/configure.tsx",
-        "path": "configure"
+        "file": "routes/api.builder-ai.ts",
+        "path": "api/builder-ai"
+      },
+      "routes/configure.$appId": {
+        "id": "routes/configure.$appId",
+        "parentId": "root",
+        "file": "routes/configure.$appId.tsx",
+        "path": "configure/:appId"
       },
       "routes/configure.header": {
         "id": "routes/configure.header",
@@ -222,12 +238,16 @@
             "path": "login"
           },
           {
-            "file": "routes/signUpPage.tsx",
-            "path": "signup"
+            "file": "routes/dashboard.tsx",
+            "path": "dashboard"
           },
           {
-            "file": "routes/configure.tsx",
-            "path": "configure"
+            "file": "routes/api.builder-ai.ts",
+            "path": "api/builder-ai"
+          },
+          {
+            "file": "routes/configure.$appId.tsx",
+            "path": "configure/:appId"
           },
           {
             "file": "routes/configure.header.tsx",

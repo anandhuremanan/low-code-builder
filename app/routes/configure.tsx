@@ -1,11 +1,10 @@
-import { Link, useParams } from "react-router";
+import { Link } from "react-router";
 import { useBuilder } from "../builder/context";
 import headericon from "/assets/images/headericon.png";
 import footericon from "/assets/images/footericon.png";
 import sidebaricon from "/assets/images/sidebaricon.png";
 import pageicon from "/assets/images/pageicon.png";
-import { useState } from "react";
-import { LayoutDashboard, FolderKanban, FileText, Globe, Puzzle, Paintbrush, Plug, Wrench, Settings, ChevronRight } from "lucide-react";
+import { LayoutDashboard, FolderKanban, FileText, Globe, Paintbrush, Plug, Wrench, Settings, ChevronRight } from "lucide-react";
 import ConfigureSidebar, { type SidebarMenuItem } from "../components/layout/ConfigureSidebar";
 
 const configureSidebarMenuData: SidebarMenuItem[] = [
@@ -69,7 +68,6 @@ const configureSidebarMenuData: SidebarMenuItem[] = [
 
 
 export default function ConfigurePage() {
-  const { appId } = useParams();
   const { state, dispatch } = useBuilder();
   const leftEnabled = state.siteSections.sidebarLeft.enabled;
   const rightEnabled = state.siteSections.sidebarRight.enabled;
