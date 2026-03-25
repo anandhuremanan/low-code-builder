@@ -14,6 +14,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { BuilderProvider } from './builder/context';
 import Header from './components/shared/Header';
+import { AuthProvider } from './account/context/AuthProvider';
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -48,6 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           {shouldShowHeader ? <Header /> : null}
           {children}
@@ -61,9 +63,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
+    <AuthProvider>
     <BuilderProvider>
       <Outlet />
     </BuilderProvider>
+    </AuthProvider>
   );
 }
 

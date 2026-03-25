@@ -1,19 +1,22 @@
 import { useState } from "react";
 import logo from "/assets/images/logo.png";
 import { TextField, Button } from "@mui/material";
-// import { useAuth } from "./context/UseAuth";
+import { useAuth } from "../context/UseAuth";
 import { useNavigate } from "react-router";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  // const { CallLogin } = useAuth();
+  const { CallLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate("/dashboard");
-    // CallLogin(email, password);
+     e.preventDefault();
+    let data = {
+      username,
+      password
+    }
+    CallLogin(data);
   };
 
   return (<div className="hero-section-wrap">
@@ -46,9 +49,9 @@ const LoginPage = () => {
             <TextField
               fullWidth
               type="Username"
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter Username"
+              value={username}
+              onChange={(e) => setUserName(e.target.value)}
               variant="outlined"
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -118,6 +121,7 @@ const LoginPage = () => {
                 backgroundColor: "#4f46e5"
               }
             }}
+            onClick={handleSubmit}
           >
             Sign in
           </Button></div>

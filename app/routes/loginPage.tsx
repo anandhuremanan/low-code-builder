@@ -1,4 +1,4 @@
-import LoginPage from "~/auth/LoginPage";
+import LoginPage from "~/account/auth/LoginPage";
 export default function LoginPageRoute() {
   return <LoginPage />;
 }
