@@ -1,5 +1,3 @@
-
-
 import { useState } from "react";
 import { AuthContext } from "./AuthContext";
 import type { LoginDto, RegisterDto } from "./AuthContext";
@@ -16,13 +14,16 @@ export const AuthProvider = ({ children }: Props) => {
 
   const CallLogin = async (data: LoginDto) => {
     try {
-      debugger
       setLoading(true);
       setError(null);
 
-      const response = await authService.LoginServiceCall("api/test-decrypt", "POST", 
-       data
-      ,false,["password"]);
+      const response = await authService.LoginServiceCall(
+        "api/test-decrypt",
+        "POST",
+        data,
+        false,
+        ["password"],
+      );
 
       setUser(response);
     } catch (err: any) {
@@ -36,7 +37,13 @@ export const AuthProvider = ({ children }: Props) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await authService.SignUpServiceCall("api/test-decrypt", "POST", data, true, ["email", "password"]);
+      const response = await authService.SignUpServiceCall(
+        "api/test-decrypt",
+        "POST",
+        data,
+        true,
+        ["email", "password"],
+      );
       setUser(response);
     } catch (err: any) {
       setError(err?.message || "Registration failed");

@@ -8,13 +8,11 @@ export async function GenericCall<T = any>(
   endpoint: string,
   method: string,
   body: any = {},
-  retry = true
+  retry = true,
 ): Promise<T> {
-debugger
   const accessToken = tokenService.getAccessToken();
-  const encryptedBody = encrypt(body);
-  console.log("encrypted...",encryptedBody);
-  
+  const encryptedBody = await encrypt(body);
+  console.log("encrypted...", encryptedBody);
 
   const res = await fetch(apiUrl + endpoint, {
     method,
