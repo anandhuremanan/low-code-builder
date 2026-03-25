@@ -18,10 +18,11 @@ Return a single JSON object with this shape:
   "pagePlan": {
     "name": "Page Name",
     "slug": "/page-slug",
+    "pageType": "landing" | "auth" | "dashboard" | "content",
     "style": "saas" | "editorial" | "minimal" | "bold",
     "sections": [
       {
-        "type": "hero" | "feature-grid" | "stats" | "testimonial-grid" | "pricing" | "faq" | "cta-banner" | "contact-form" | "content",
+        "type": "hero" | "feature-grid" | "stats" | "testimonial-grid" | "pricing" | "faq" | "cta-banner" | "contact-form" | "content" | "auth-form" | "kpi-grid" | "chart-grid" | "data-table",
         "heading": "Section heading",
         "body": "Section supporting copy",
         "layout": "centered" | "split",
@@ -33,7 +34,10 @@ Return a single JSON object with this shape:
             "description": "Card description",
             "meta": "Optional short meta",
             "value": "Optional metric or price",
-            "bullets": ["Optional bullet", "Optional bullet"]
+            "bullets": ["Optional bullet", "Optional bullet"],
+            "chartType": "bar" | "line" | "pie" | "area",
+            "labels": ["Optional label", "Optional label"],
+            "values": [12, 24, 18]
           }
         ],
         "formFields": [
@@ -52,15 +56,26 @@ Return a single JSON object with this shape:
 
 Rules:
 - Return JSON only. No markdown fences, no prose, no comments.
-- Prefer 4 to 6 sections total.
-- Always include a "hero" section first.
-- Use coherent marketing-page structure. Good combinations are:
+- First infer the user's requested page type from the prompt.
+- Use "auth" for login, signup, reset-password, forgot-password, or account access screens.
+- Use "dashboard" for admin, analytics, CRM, reporting, operations, or chart-heavy internal app screens.
+- Use "landing" for marketing, product, company, or promotional pages.
+- Use "content" for simple informational pages that are not auth, dashboard, or marketing heavy.
+- Only include sections that fit the inferred page type. Do not force landing-page sections for auth or dashboard prompts.
+- Prefer 1 to 3 sections for auth pages, 2 to 5 for dashboards, and 3 to 6 for landing/content pages.
+- For auth pages, prefer "auth-form" as the main section and avoid testimonials, pricing, FAQ, stats, and CTA banners unless explicitly requested.
+- For dashboard pages, prefer combinations like:
+  kpi-grid -> chart-grid -> data-table
+  content -> kpi-grid -> chart-grid
+- For landing pages, good combinations are:
   hero -> stats -> feature-grid -> testimonial-grid -> pricing -> cta-banner
   hero -> content -> feature-grid -> faq -> contact-form
 - Keep content concise and realistic.
 - Do not invent raw builder nodes.
 - Use "split" hero only when supporting cards/items are useful.
 - Use at most 6 items per section and 6 form fields.
+- If the prompt is specifically for login/auth, do not add unrelated marketing sections or extra buttons like "Learn more" unless the prompt asks for them.
+- If the prompt asks for charts, include at least one "chart-grid" section with valid numeric data.
 `;
 
 const extractJson = (value: string): string => {
@@ -148,7 +163,7 @@ export async function action({ request }: ActionFunctionArgs) {
           {
             role: "system",
             content:
-              "You are a UI planner. Produce only structured JSON page plans for polished, modern pages. Avoid generic filler and avoid raw builder-node output.",
+              "You are a UI planner. Produce only structured JSON page plans for polished, modern pages. Match the page type to the user's intent instead of defaulting to a marketing site. Avoid generic filler and avoid raw builder-node output.",
           },
           {
             role: "user",

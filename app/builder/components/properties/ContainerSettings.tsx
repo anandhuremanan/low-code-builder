@@ -13,7 +13,7 @@ export const ContainerSettings = ({ p }: { p: NodeProperties }) => {
                     value={p.getContainerFlow()}
                     onChange={(e) => p.handleContainerFlowChange(e.target.value as 'block' | 'column' | 'row' | 'row-wrap')}
                 >
-                    <option value="block">Stack (Default)</option>
+                    <option value="block">Stack</option>
                     <option value="column">Flex Column</option>
                     <option value="row">Row</option>
                     <option value="row-wrap">Row Wrap</option>

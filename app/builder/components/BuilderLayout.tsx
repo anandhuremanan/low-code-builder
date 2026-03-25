@@ -703,8 +703,8 @@ export const BuilderLayout = ({ mode = 'builder', sectionTarget }: BuilderLayout
                                 multiline
                                 minRows={8}
                                 placeholder={aiMode === 'generate'
-                                    ? 'Example: Create a SaaS landing page with hero, pricing cards, testimonial section, and contact form.'
-                                    : 'Example: Add a testimonial carousel under pricing, change the hero CTA text, and add a newsletter signup in the footer area of the page.'}
+                                    ? 'Examples: Create a login page with email/password form. Create a landing page for a SaaS product. Create a dashboard with KPI cards, charts, and a recent activity table.'
+                                    : 'Example: Convert this page into a simple login screen, or add KPI cards and charts to make it a dashboard.'}
                                 value={aiPrompt}
                                 onChange={(event) => setAiPrompt(event.target.value)}
                             />
