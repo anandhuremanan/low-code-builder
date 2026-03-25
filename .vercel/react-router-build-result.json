@@ -1,0 +1,265 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "routes/home": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/loginPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/signUpPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/configure": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/configure.header": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/configure.footer": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/configure.sidebar-left": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/configure.sidebar-right": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/builder": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/builder.preview": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "app/root.tsx",
+        "path": "",
+        "config": {}
+      },
+      "routes/home": {
+        "id": "routes/home",
+        "parentId": "root",
+        "file": "app/routes/home.tsx",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/loginPage": {
+        "id": "routes/loginPage",
+        "parentId": "root",
+        "file": "app/routes/loginPage.tsx",
+        "path": "login",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/signUpPage": {
+        "id": "routes/signUpPage",
+        "parentId": "root",
+        "file": "app/routes/signUpPage.tsx",
+        "path": "signup",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/configure": {
+        "id": "routes/configure",
+        "parentId": "root",
+        "file": "app/routes/configure.tsx",
+        "path": "configure",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/configure.header": {
+        "id": "routes/configure.header",
+        "parentId": "root",
+        "file": "app/routes/configure.header.tsx",
+        "path": "configure/header",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/configure.footer": {
+        "id": "routes/configure.footer",
+        "parentId": "root",
+        "file": "app/routes/configure.footer.tsx",
+        "path": "configure/footer",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/configure.sidebar-left": {
+        "id": "routes/configure.sidebar-left",
+        "parentId": "root",
+        "file": "app/routes/configure.sidebar-left.tsx",
+        "path": "configure/sidebar-left",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/configure.sidebar-right": {
+        "id": "routes/configure.sidebar-right",
+        "parentId": "root",
+        "file": "app/routes/configure.sidebar-right.tsx",
+        "path": "configure/sidebar-right",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/builder": {
+        "id": "routes/builder",
+        "parentId": "root",
+        "file": "app/routes/builder.tsx",
+        "path": "builder",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/builder.preview": {
+        "id": "routes/builder.preview",
+        "parentId": "root",
+        "file": "app/routes/builder.preview.tsx",
+        "path": "builder/preview",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "D:/Working SVN Folder/less-code/low-code-builder/app",
+    "basename": "/",
+    "buildDirectory": "D:/Working SVN Folder/less-code/low-code-builder/build",
+    "future": {
+      "unstable_optimizeDeps": false,
+      "unstable_subResourceIntegrity": false,
+      "unstable_trailingSlashAwareDataRequests": false,
+      "v8_middleware": false,
+      "v8_splitRouteModules": false,
+      "v8_viteEnvironmentApi": false
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "root.tsx",
+        "path": ""
+      },
+      "routes/home": {
+        "id": "routes/home",
+        "parentId": "root",
+        "file": "routes/home.tsx",
+        "index": true
+      },
+      "routes/loginPage": {
+        "id": "routes/loginPage",
+        "parentId": "root",
+        "file": "routes/loginPage.tsx",
+        "path": "login"
+      },
+      "routes/signUpPage": {
+        "id": "routes/signUpPage",
+        "parentId": "root",
+        "file": "routes/signUpPage.tsx",
+        "path": "signup"
+      },
+      "routes/configure": {
+        "id": "routes/configure",
+        "parentId": "root",
+        "file": "routes/configure.tsx",
+        "path": "configure"
+      },
+      "routes/configure.header": {
+        "id": "routes/configure.header",
+        "parentId": "root",
+        "file": "routes/configure.header.tsx",
+        "path": "configure/header"
+      },
+      "routes/configure.footer": {
+        "id": "routes/configure.footer",
+        "parentId": "root",
+        "file": "routes/configure.footer.tsx",
+        "path": "configure/footer"
+      },
+      "routes/configure.sidebar-left": {
+        "id": "routes/configure.sidebar-left",
+        "parentId": "root",
+        "file": "routes/configure.sidebar-left.tsx",
+        "path": "configure/sidebar-left"
+      },
+      "routes/configure.sidebar-right": {
+        "id": "routes/configure.sidebar-right",
+        "parentId": "root",
+        "file": "routes/configure.sidebar-right.tsx",
+        "path": "configure/sidebar-right"
+      },
+      "routes/builder": {
+        "id": "routes/builder",
+        "parentId": "root",
+        "file": "routes/builder.tsx",
+        "path": "builder"
+      },
+      "routes/builder.preview": {
+        "id": "routes/builder.preview",
+        "parentId": "root",
+        "file": "routes/builder.preview.tsx",
+        "path": "builder/preview"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true,
+    "allowedActionOrigins": false,
+    "unstable_routeConfig": [
+      {
+        "id": "root",
+        "path": "",
+        "file": "root.tsx",
+        "children": [
+          {
+            "file": "routes/home.tsx",
+            "index": true
+          },
+          {
+            "file": "routes/loginPage.tsx",
+            "path": "login"
+          },
+          {
+            "file": "routes/signUpPage.tsx",
+            "path": "signup"
+          },
+          {
+            "file": "routes/configure.tsx",
+            "path": "configure"
+          },
+          {
+            "file": "routes/configure.header.tsx",
+            "path": "configure/header"
+          },
+          {
+            "file": "routes/configure.footer.tsx",
+            "path": "configure/footer"
+          },
+          {
+            "file": "routes/configure.sidebar-left.tsx",
+            "path": "configure/sidebar-left"
+          },
+          {
+            "file": "routes/configure.sidebar-right.tsx",
+            "path": "configure/sidebar-right"
+          },
+          {
+            "file": "routes/builder.tsx",
+            "path": "builder"
+          },
+          {
+            "file": "routes/builder.preview.tsx",
+            "path": "builder/preview"
+          }
+        ]
+      }
+    ]
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}
