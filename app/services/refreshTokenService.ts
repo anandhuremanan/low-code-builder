@@ -9,7 +9,7 @@ export async function refreshAccessToken(): Promise<string | null> {
   const res = await fetch(API_BASE_URL + "/refresh-token", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken })
+    body: JSON.stringify({ refreshToken }),
   });
 
   if (!res.ok) return null;

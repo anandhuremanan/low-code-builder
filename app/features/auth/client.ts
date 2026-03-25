@@ -51,7 +51,6 @@ export async function handleAuthSubmission(
       void payload;
 
       // Temporary until the backend auth API is ready.
-      // const response = await authService.SignUpServiceCall(...);
       return {
         error: "Signup is temporarily disabled until the backend is ready.",
       };
@@ -63,7 +62,7 @@ export async function handleAuthSubmission(
     };
 
     // Temporary until the backend auth API is ready.
-    // const response = await authService.LoginServiceCall(...);
+    // const reponse = await authService.LoginServiceCall(payload);
     if (
       payload.username !== TEMP_USERNAME ||
       payload.password !== TEMP_PASSWORD

@@ -12,7 +12,6 @@ export const authService = {
     let finalBody: any = {};
 
     if (payLoadEncryption) {
-      // 🔐 Encrypt entire payload
       finalBody = { ...body };
 
       for (const field of fieldsToEncrypt) {
@@ -27,7 +26,6 @@ export const authService = {
         data: encryptedBody,
       };
     } else {
-      // 🔐 Encrypt only selected fields
       finalBody = { ...body };
 
       for (const field of fieldsToEncrypt) {
@@ -64,8 +62,6 @@ export const authService = {
     let finalBody: any = {};
 
     if (payLoadEncryption) {
-      // 🔐 Encrypt entire payload
-
       finalBody = { ...body, encyptedFields: fieldsToEncrypt };
 
       for (const field of fieldsToEncrypt) {
@@ -80,7 +76,6 @@ export const authService = {
         data: encryptedBody,
       };
     } else {
-      // 🔐 Encrypt only selected fields
       finalBody = { ...body, encyptedFields: fieldsToEncrypt };
 
       for (const field of fieldsToEncrypt) {

@@ -568,10 +568,24 @@ export const useNodeProperties = () => {
 
   const getContainerFlow = (): "block" | "column" | "row" | "row-wrap" => {
     const style = localProps.style || {};
-    if (style.display !== "flex") return "block";
-    if (style.flexDirection === "column") return "column";
-    if (style.flexDirection === "row" && style.flexWrap === "wrap")
-      return "row-wrap";
+    const className = String(localProps.className || "");
+
+    if (style.display === "flex") {
+      if (style.flexDirection === "column") return "column";
+      if (style.flexDirection === "row" && style.flexWrap === "wrap") {
+        return "row-wrap";
+      }
+      return "row";
+    }
+
+    const tokens = className.split(/\s+/).filter(Boolean);
+    const hasFlex = tokens.includes("flex") || tokens.some((token) => token.endsWith(":flex"));
+    const hasColumn = tokens.includes("flex-col") || tokens.some((token) => token.endsWith(":flex-col"));
+    const hasWrap = tokens.includes("flex-wrap") || tokens.some((token) => token.endsWith(":flex-wrap"));
+
+    if (!hasFlex) return "block";
+    if (hasColumn) return "column";
+    if (hasWrap) return "row-wrap";
     return "row";
   };
 

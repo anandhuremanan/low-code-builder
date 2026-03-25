@@ -10,9 +10,14 @@ type SectionType =
   | "faq"
   | "cta-banner"
   | "contact-form"
-  | "content";
+  | "content"
+  | "auth-form"
+  | "kpi-grid"
+  | "chart-grid"
+  | "data-table";
 
 type PlanTheme = "saas" | "editorial" | "minimal" | "bold";
+type PageType = "landing" | "auth" | "dashboard" | "content";
 
 type PlanItem = {
   title?: string;
@@ -20,6 +25,9 @@ type PlanItem = {
   meta?: string;
   value?: string;
   bullets?: string[];
+  chartType?: "bar" | "line" | "pie" | "area";
+  labels?: string[];
+  values?: number[];
 };
 
 type PlanField = {
@@ -44,6 +52,7 @@ type PlanSection = {
 export type AiPagePlan = {
   name?: string;
   slug?: string;
+  pageType?: PageType;
   style?: PlanTheme;
   sections?: PlanSection[];
 };
@@ -57,6 +66,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const str = (value: unknown, fallback: string) =>
   typeof value === "string" && value.trim() ? value.trim() : fallback;
 const arr = <T,>(value: T[] | undefined) => (Array.isArray(value) ? value : []);
+const numArr = (value: unknown): number[] =>
+  Array.isArray(value) ? value.map((item) => Number(item)).filter((item) => Number.isFinite(item)) : [];
+const strArr = (value: unknown): string[] =>
+  Array.isArray(value) ? value.map((item) => (typeof item === "string" ? item.trim() : "")).filter(Boolean) : [];
 
 const themeMap: Record<PlanTheme, Record<string, string>> = {
   saas: {
@@ -119,6 +132,7 @@ export const buildPageFromPlan = (
 ): Required<Pick<Page, "name" | "slug" | "nodes">> => {
   const plan = isRecord(rawPlan) ? (rawPlan as AiPagePlan) : {};
   const theme = themeMap[plan.style || "saas"];
+  const pageType = plan.pageType || "landing";
   const usedIds = new Set<string>();
   const node = (type: ComponentType, prefix: string, props: Record<string, unknown>, children: ComponentNode[] = []): ComponentNode => {
     let id = `${prefix}-${Math.random().toString(36).slice(2, 7)}`;
@@ -134,6 +148,13 @@ export const buildPageFromPlan = (
       variant: secondary ? "outlined" : "contained",
       className: `rounded-full px-5 py-3 text-sm font-semibold ${secondary ? theme.buttonSecondary : theme.buttonPrimary}`,
     });
+  const parseMetricValue = (value: string | undefined, fallback: number[]) => {
+    if (!value) return fallback;
+    const numericTokens = value.match(/-?\d+(\.\d+)?/g);
+    if (!numericTokens?.length) return fallback;
+    const parsed = numericTokens.map((token) => Number(token)).filter((item) => Number.isFinite(item));
+    return parsed.length ? parsed : fallback;
+  };
 
   const mapSection = (section: PlanSection, index: number): ComponentNode => {
     const heading = str(section.heading, `Section ${index + 1}`);
@@ -155,6 +176,42 @@ export const buildPageFromPlan = (
       text(`section-title-${index + 1}`, heading, section.type === "hero" ? theme.title : theme.sectionTitle),
       text(`section-body-${index + 1}`, body, theme.body),
     ]);
+
+    if (section.type === "auth-form") {
+      const fields = (arr(section.formFields).length ? arr(section.formFields) : [
+        { type: "email", label: "Email Address", placeholder: "name@example.com", required: true, name: "email" },
+        { type: "text", label: "Password", placeholder: "Enter your password", required: true, name: "password" },
+      ])
+        .slice(0, 6)
+        .map((field, fieldIndex) => {
+          const name = str(field.name || field.label, `field-${fieldIndex + 1}`).toLowerCase().replace(/[^a-z0-9]+/g, "-");
+          const type = field.type === "textarea" ? "text" : field.type === "number" || field.type === "tel" || field.type === "email" ? field.type : "text";
+          return node("Input", `auth-input-${index + 1}-${fieldIndex + 1}`, {
+            label: str(field.label, `Field ${fieldIndex + 1}`),
+            name,
+            type,
+            placeholder: str(field.placeholder, `Enter ${str(field.label, `field ${fieldIndex + 1}`)}`),
+            required: Boolean(field.required),
+            className: "w-full",
+          });
+        });
+
+      return node("Container", `section-${index + 1}`, { className: "mx-auto w-full max-w-5xl" }, [
+        node("Container", `auth-shell-${index + 1}`, { className: `${theme.section} mx-auto grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center` }, [
+          node("Container", `auth-copy-${index + 1}`, { className: "flex flex-col gap-4" }, [
+            text(`auth-title-${index + 1}`, heading, theme.title),
+            text(`auth-body-${index + 1}`, body, theme.body),
+            ...(section.secondaryAction?.label ? [text(`auth-helper-${index + 1}`, section.secondaryAction.label, theme.sub)] : []),
+          ]),
+          node("Form", `auth-form-${index + 1}`, {
+            className: `${theme.card} w-full`,
+            showSubmitButton: true,
+            submitButtonText: str(section.primaryAction?.label, "Continue"),
+            submitButtonVariant: "contained",
+          }, fields),
+        ]),
+      ]);
+    }
 
     if (section.type === "hero") {
       const actions = node("Container", `hero-actions-${index + 1}`, { className: `flex flex-wrap gap-3 ${section.layout === "centered" ? "justify-center" : ""}` }, [
@@ -180,6 +237,71 @@ export const buildPageFromPlan = (
       ]);
     }
 
+    if (section.type === "chart-grid") {
+      const charts = items.length
+        ? items.map((item, itemIndex) => {
+            const labels = strArr(item.labels);
+            const fallbackValues = parseMetricValue(item.value, [18, 26, 20, 32]);
+            const values = numArr(item.values).length ? numArr(item.values) : fallbackValues;
+            const chartLabels = labels.length ? labels : values.map((_, valueIndex) => `Item ${valueIndex + 1}`);
+            return node("Container", `chart-card-${index + 1}-${itemIndex + 1}`, { className: theme.card }, [
+              text(`chart-title-${index + 1}-${itemIndex + 1}`, str(item.title, `Chart ${itemIndex + 1}`), theme.cardTitle),
+              ...(item.description ? [text(`chart-body-${index + 1}-${itemIndex + 1}`, item.description, theme.body)] : []),
+              node("Charts", `chart-${index + 1}-${itemIndex + 1}`, {
+                chartType: item.chartType || "bar",
+                title: str(item.title, `Chart ${itemIndex + 1}`),
+                labels: chartLabels,
+                values,
+                className: "w-full",
+                height: 280,
+                showLegend: true,
+                showGrid: true,
+              }),
+            ]);
+          })
+        : [card(`chart-fallback-${index + 1}`, [
+            text(`chart-fallback-title-${index + 1}`, "Performance", theme.cardTitle),
+            node("Charts", `chart-fallback-node-${index + 1}`, {
+              chartType: "bar",
+              title: "Performance",
+              labels: ["Mon", "Tue", "Wed", "Thu"],
+              values: [12, 18, 15, 24],
+              className: "w-full",
+              height: 280,
+              showLegend: true,
+              showGrid: true,
+            }),
+          ])];
+
+      return node("Container", `section-${index + 1}`, { className: theme.section }, [
+        top,
+        node("Container", `chart-grid-${index + 1}`, { className: "grid gap-4 xl:grid-cols-2" }, charts),
+      ]);
+    }
+
+    if (section.type === "data-table") {
+      const columns = items.length
+        ? items.map((item, itemIndex) => ({
+            field: str(item.title, `column-${itemIndex + 1}`).toLowerCase().replace(/[^a-z0-9]+/g, "_"),
+            headerName: str(item.title, `Column ${itemIndex + 1}`),
+            width: 180,
+          }))
+        : [
+            { field: "name", headerName: "Name", width: 180 },
+            { field: "status", headerName: "Status", width: 140 },
+            { field: "owner", headerName: "Owner", width: 160 },
+          ];
+
+      return node("Container", `section-${index + 1}`, { className: theme.section }, [
+        top,
+        node("DataGrid", `table-${index + 1}`, {
+          className: "w-full",
+          columns,
+          style: { width: "100%", height: "420px" },
+        }),
+      ]);
+    }
+
     if (section.type === "contact-form") {
       const fields = arr(section.formFields).slice(0, 6).map((field, fieldIndex) => {
         const name = str(field.name || field.label, `field-${fieldIndex + 1}`).toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -197,7 +319,7 @@ export const buildPageFromPlan = (
 
     return node("Container", `section-${index + 1}`, { className: theme.section }, [
       top,
-      node("Container", `section-grid-${index + 1}`, { className: section.type === "stats" ? "grid gap-4 md:grid-cols-3" : section.type === "faq" ? "grid gap-4" : "grid gap-4 md:grid-cols-2 xl:grid-cols-3" }, cards.length ? cards : [card(`fallback-card-${index + 1}`, [text(`fallback-title-${index + 1}`, "Add content", theme.cardTitle), text(`fallback-body-${index + 1}`, "The model did not provide section items.", theme.body)])]),
+      node("Container", `section-grid-${index + 1}`, { className: section.type === "stats" || section.type === "kpi-grid" ? "grid gap-4 md:grid-cols-3" : section.type === "faq" ? "grid gap-4" : "grid gap-4 md:grid-cols-2 xl:grid-cols-3" }, cards.length ? cards : [card(`fallback-card-${index + 1}`, [text(`fallback-title-${index + 1}`, "Add content", theme.cardTitle), text(`fallback-body-${index + 1}`, "The model did not provide section items.", theme.body)])]),
     ]);
   };
 
@@ -216,14 +338,24 @@ export const buildPageFromPlan = (
         id: "root-container",
         type: "Container",
         props: {
-          className: theme.root,
+          className: `${theme.root} ${pageType === "auth" ? "flex items-center justify-center" : ""}`,
+          style: {
+            display: "flex",
+            flexDirection: "column",
+            flexWrap: "nowrap",
+            ...(pageType === "auth" ? { justifyContent: "center" } : {}),
+          },
+        },
+        children: [node("Container", "page-shell", {
+          className: pageType === "auth"
+            ? "mx-auto flex w-full max-w-6xl flex-col px-6 py-10 md:px-10"
+            : theme.shell,
           style: {
             display: "flex",
             flexDirection: "column",
             flexWrap: "nowrap",
           },
-        },
-        children: [node("Container", "page-shell", { className: theme.shell }, children)],
+        }, children)],
       },
     ],
   };

@@ -1,9 +1,6 @@
 import type { Route } from "./+types/home";
 import { Link } from "react-router";
 import { Button } from "../components/ui/Button";
-import { Menu } from "lucide-react";
-import { useState } from "react";
-import logo from "/assets/images/logo.png";
 
 export function meta({ }: Route.MetaArgs) {
   return [
