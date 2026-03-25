@@ -2,7 +2,7 @@ import type { Route } from "./+types/dashboard";
 import { Link, NavLink } from "react-router";
 import { Plus } from "lucide-react";
 
-export function meta({ }: Route.MetaArgs) {
+export function meta({}: Route.MetaArgs) {
   return [
     { title: "Dashboard" },
     { name: "description", content: "Sample dashboard page" },
@@ -34,25 +34,27 @@ export default function Dashboard() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {apps?.length && apps.map((app) => (
-            <div
-              key={app.id}
-              className="app-tile">
-              <div className="app-tile-text">
-                <NavLink to={`/configure/${app.id}`} className="app-tile-title">
-                  {app.name}
-                </NavLink>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {app.description}
-                </p>
+          {apps?.length &&
+            apps.map((app) => (
+              <div key={app.id} className="app-tile">
+                <div className="app-tile-text">
+                  <NavLink
+                    to={`/configure/${app.id}`}
+                    className="app-tile-title"
+                  >
+                    {app.name}
+                  </NavLink>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {app.description}
+                  </p>
+                </div>
+                <div className="app-tile-icons">
+                  <NavLink className="app-tile-btn" to={`/configure/${app.id}`}>
+                    Edit App
+                  </NavLink>
+                </div>
               </div>
-              <div className="app-tile-icons">
-                <NavLink className="app-tile-btn" to={`/configure/${app.id}`}>
-                  Edit App
-                </NavLink>
-              </div>
-            </div>
-          ))}
+            ))}
 
           <Link
             to="/configure"
@@ -63,8 +65,6 @@ export default function Dashboard() {
             </span>
             <span>Create App</span>
           </Link>
-
-
         </div>
       </section>
     </main>
