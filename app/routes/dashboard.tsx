@@ -2,8 +2,8 @@ import type { Route } from "./+types/dashboard";
 import { useState } from "react";
 import { Link } from "react-router";
 import { Plus, X } from "lucide-react";
-import { API_BASE_URL } from "~/shared/config/env";
 import { requireAuthenticatedUser } from "~/features/auth/session.server";
+import { GenericCall } from "~/services/genericAPIService";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -20,28 +20,29 @@ type Applications = {
   modified_at: string;
   is_active: boolean;
 };
+
+type DashboardLoaderData = {
+  data: Applications[];
+  success: boolean;
+};
+
 export async function loader({ request }: Route.LoaderArgs) {
   const { accessToken } = await requireAuthenticatedUser(request);
-  const response = await fetch(
-    `${API_BASE_URL}/api/generic?MappingId=getapplications`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  );
 
-  if (!response.ok) {
-    throw new Response("Failed to load applications", { status: response.status });
-  }
+  const applications = await GenericCall<DashboardLoaderData>({
+    endpoint: "/api/generic?MappingId=getapplications",
+    method: "GET",
+    accessToken,
+  });
 
-  return response.json();
+  return applications;
 }
 
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
-  const { data, success }: { data: Applications[]; success: boolean } =
-    loaderData;
-  console.log("Loader data:", data, "Success:", success);
+  const applicationData = loaderData as DashboardLoaderData;
+
+  const { data } = applicationData;
+
   const [open, setOpen] = useState(false);
   const [appName, setAppName] = useState("");
   const [appDescription, setAppDescription] = useState("");
