@@ -3,34 +3,32 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Plus, X } from "lucide-react";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [
     { title: "Dashboard" },
     { name: "description", content: "Sample dashboard page" },
   ];
 }
 
-type App = {
-  id: string;
-  name: string;
-  description: string;
+type Applications = {
+  application_id: string;
+  application_name: string;
+  application_description: string;
+  created_at: string;
+  modified_at: string;
+  is_active: boolean;
 };
+export async function loader() {
+  const applications = await fetch("http://localhost:8080/api/generic?MappingId=getapplications");
+  return applications;
+}
 
-const initialApps: App[] = [
-  {
-    id: "app-1",
-    name: "App 1",
-    description: "Temporary sample app. Later this can come from API data.",
-  },
-  {
-    id: "app-2",
-    name: "App 2",
-    description: "Another sample app card with a short description.",
-  },
-];
-
-export default function Dashboard() {
-  const [apps, setApps] = useState(initialApps);
+export default function Dashboard({
+  loaderData,
+}: Route.ComponentProps) {
+  const { data, success }: { data: Applications[]; success: boolean } = loaderData;
+  console.log("Loader data:", data, "Success:", success);
+  const [apps, setApps] = useState();
   const [open, setOpen] = useState(false);
   const [appName, setAppName] = useState("");
   const [appDescription, setAppDescription] = useState("");
@@ -40,14 +38,14 @@ export default function Dashboard() {
     const trimmedDescription = appDescription.trim();
     if (!trimmedName) return;
 
-    setApps((currentApps) => [
-      ...currentApps,
-      {
-        id: `app-${Date.now()}`,
-        name: trimmedName,
-        description: trimmedDescription || "New app created from dashboard.",
-      },
-    ]);
+    // setApps((currentApps) => [
+    //   ...currentApps,
+    //   {
+    //     id: `app-${Date.now()}`,
+    //     name: trimmedName,
+    //     description: trimmedDescription || "New app created from dashboard.",
+    //   },
+    // ]);
 
     setAppName("");
     setAppDescription("");
@@ -65,15 +63,15 @@ export default function Dashboard() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {apps.map((app) => (
+          {data.map((app) => (
             <Link
-              key={app.id}
-              to={`/configure/${app.id}`}
+              key={app.application_id}
+              to={`/configure/${app.application_id}`}
               className="app-tile">
               <div className="app-tile-text">
-                <h3 className="app-tile-title">{app.name}</h3>
+                <h3 className="app-tile-title">{app.application_name}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {app.description}
+                  {app.application_description}
                 </p>
               </div>
               <div className="app-tile-icons">
