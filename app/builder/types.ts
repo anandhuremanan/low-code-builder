@@ -72,7 +72,7 @@ export type CustomStyle = {
 
 export type RegisteredComponent = {
   name: string;
-  category?: "Layout" | "Input" | "Selection" | "Display" | "Data" | "Navigation";
+  category: "layout" | "basic" | "input" | "data";
   icon: React.ElementType;
   component: React.ComponentType<any>;
   defaultProps: Record<string, any>;
