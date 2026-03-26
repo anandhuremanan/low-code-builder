@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button, TextField } from "@mui/material";
 import { Form } from "react-router";
+import logo from "/assets/images/logo.png";
+
 
 type SignupProps = {
   isSubmitting: boolean;
@@ -40,119 +42,119 @@ export default function Signup({ isSubmitting, onSwitchToLogin }: SignupProps) {
 
   return (
     <>
-      <h4 className=" text-center mb-2">Create your account</h4>
+      <div className="login-box">
+        <div className="flex justify-center mb-6 login-logo">
+          <img src={logo} alt="Logo" className="h-10" />
+        </div>
+        <h4 className=" text-center mb-2">Create your account</h4>
 
-      <Form method="post" className="login-form">
-        <input type="hidden" name="intent" value="signup" />
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label>First Name</label>
+        <Form method="post" className="login-form">
+          <input type="hidden" name="intent" value="signup" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="mb-2">
+              <label>First Name</label>
+              <TextField
+                fullWidth
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={(event) => updateField("firstName", event.target.value)}
+                variant="outlined"
+                sx={textFieldSx}
+              />
+            </div>
+            <div className="mb-2">
+              <label>Last Name</label>
+              <TextField
+                fullWidth
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={(event) => updateField("lastName", event.target.value)}
+                variant="outlined"
+                sx={textFieldSx}
+              />
+            </div>
+          </div>
+          <div className="mb-2">
+            <label>Username</label>
             <TextField
               fullWidth
               type="text"
-              placeholder="Enter First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={(event) => updateField("firstName", event.target.value)}
+              name="username"
+              value={formData.username}
+              onChange={(event) => updateField("username", event.target.value)}
               variant="outlined"
               sx={textFieldSx}
             />
           </div>
-          <div>
-            <label>Last Name</label>
+          <div className="mb-2">
+            <label>Email</label>
             <TextField
               fullWidth
-              type="text"
-              placeholder="Enter Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={(event) => updateField("lastName", event.target.value)}
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={(event) => updateField("email", event.target.value)}
               variant="outlined"
               sx={textFieldSx}
             />
           </div>
-        </div>
-        <div>
-          <label>Username</label>
-          <TextField
-            fullWidth
-            type="text"
-            placeholder="Choose Username"
-            name="username"
-            value={formData.username}
-            onChange={(event) => updateField("username", event.target.value)}
-            variant="outlined"
-            sx={textFieldSx}
-          />
-        </div>
-        <div>
-          <label>Email</label>
-          <TextField
-            fullWidth
-            type="email"
-            placeholder="Enter Email"
-            name="email"
-            value={formData.email}
-            onChange={(event) => updateField("email", event.target.value)}
-            variant="outlined"
-            sx={textFieldSx}
-          />
-        </div>
-        <div>
-          <label>Phone Number</label>
-          <TextField
-            fullWidth
-            type="tel"
-            placeholder="Enter Phone Number"
-            name="phoneNo"
-            value={formData.phoneNo}
-            onChange={(event) => updateField("phoneNo", event.target.value)}
-            variant="outlined"
-            sx={textFieldSx}
-          />
-        </div>
-        <div>
-          <label>Password</label>
-          <TextField
-            fullWidth
-            type="password"
-            placeholder="Create password"
-            name="password"
-            value={formData.password}
-            onChange={(event) => updateField("password", event.target.value)}
-            variant="outlined"
-            sx={textFieldSx}
-          />
-        </div>
-        <div className="forget-signup">
-          <div>
-            <span>Already have an account?</span>
+          <div className="mb-2">
+            <label>Phone Number</label>
+            <TextField
+              fullWidth
+              type="tel"
+              name="phoneNo"
+              value={formData.phoneNo}
+              onChange={(event) => updateField("phoneNo", event.target.value)}
+              variant="outlined"
+              sx={textFieldSx}
+            />
           </div>
-          <button
-            type="button"
-            className="bg-transparent p-0 text-inherit"
-            onClick={onSwitchToLogin}
-          >
-            <span>Login</span>
-          </button>
-        </div>
-        <div>
-          <Button
-            type="submit"
-            className="btn-signin"
-            variant="contained"
-            disabled={isSubmitting}
-            sx={{
-              textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#4f46e5",
-              },
-            }}
-          >
-            {isSubmitting ? "Creating account..." : "Sign up"}
-          </Button>
-        </div>
-      </Form>
+          <div className="mb-2">
+            <label>Password</label>
+            <TextField
+              fullWidth
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={(event) => updateField("password", event.target.value)}
+              variant="outlined"
+              sx={textFieldSx}
+            />
+          </div>
+          <div className="forget-signup">
+            <div>
+              <span>Already have an account?</span>
+            </div>
+            <button
+              type="button"
+              className="bg-transparent p-0 text-inherit"
+              onClick={onSwitchToLogin}
+            >
+              <span>Login</span>
+            </button>
+          </div>
+          <div>
+            <Button
+              type="submit"
+              className="btn-signin"
+              variant="contained"
+              disabled={isSubmitting}
+              sx={{
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "#4f46e5",
+                },
+              }}
+            >
+              {isSubmitting ? "Creating account..." : "Sign up"}
+            </Button>
+          </div>
+        </Form>
+      </div>
+
     </>
   );
 }
