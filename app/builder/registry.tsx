@@ -107,6 +107,7 @@ const withDefaultVerticalMargins = <T extends Record<string, any>>(
 export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   Container: {
     name: "Container",
+    category: "layout",
     icon: ContainerIcon,
     component: Container,
     defaultProps: withDefaultVerticalMargins({
@@ -115,6 +116,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Form: {
     name: "Form",
+    category: "layout",
     icon: FormIcon,
     component: Form,
     defaultProps: withDefaultVerticalMargins({
@@ -126,6 +128,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Button: {
     name: "Button",
+    category: "basic",
     icon: ButtonIcon,
     component: ({
       actionType,
@@ -176,6 +179,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Link: {
     name: "Link",
+    category: "basic",
     icon: LinkIcon,
     component: ({ node, ...props }: any) => (
       <LinkNode {...props} isDesignMode={Boolean(node)} />
@@ -198,6 +202,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Input: {
     name: "Input",
+    category: "input",
     icon: InputIcon,
     component: ({
       label,
@@ -253,6 +258,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Text: {
     name: "Text",
+    category: "basic",
     icon: TextIcon,
     component: Typography,
     defaultProps: withDefaultVerticalMargins({
@@ -263,6 +269,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Select: {
     name: "Select",
+    category: "input",
     icon: SelectIcon,
     component: ({ options, fullWidth: _unusedFullWidth, ...props }: any) => (
       <Select {...props} options={options || []} fullWidth />
@@ -279,6 +286,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Checkbox: {
     name: "Checkbox",
+    category: "input",
     icon: CheckboxIcon,
     component: Checkbox,
     defaultProps: withDefaultVerticalMargins({
@@ -289,6 +297,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Switch: {
     name: "Switch",
+    category: "input",
     icon: SwitchIcon,
     component: SwitchUI,
     defaultProps: withDefaultVerticalMargins({
@@ -301,6 +310,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   RadioGroup: {
     name: "RadioGroup",
+    category: "input",
     icon: SelectIcon,
     component: ({ options, ...props }: any) => (
       <RadioGroupUI {...props} options={options || []} />
@@ -319,6 +329,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Rating: {
     name: "Rating",
+    category: "input",
     icon: RatingIcon,
     component: (props: any) => <RatingUI {...props} />,
     defaultProps: withDefaultVerticalMargins({
@@ -334,6 +345,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Image: {
     name: "Image",
+    category: "basic",
     icon: BoxIcon,
     component: ({ src, alt, className, ...props }: any) => (
       <img
@@ -347,6 +359,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Textarea: {
     name: "Textarea",
+    category: "input",
     icon: TextIcon,
     component: ({ className, ...props }: any) => (
       <textarea {...props} className={className || "border p-2 rounded"} />
@@ -358,6 +371,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   DataGrid: {
     name: "DataGrid",
+    category: "data",
     icon: TableIcon,
     component: DataGrid,
     defaultProps: withDefaultVerticalMargins({
@@ -373,6 +387,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Charts: {
     name: "Charts",
+    category: "data",
     icon: ChartIcon,
     component: Charts,
     defaultProps: withDefaultVerticalMargins({
@@ -401,6 +416,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   MaterialIcon: {
     name: "MaterialIcon",
+    category: "basic",
     icon: StarIcon,
     component: MaterialIcon,
     defaultProps: withDefaultVerticalMargins({
@@ -411,6 +427,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   DatePicker: {
     name: "DatePicker",
+    category: "input",
     icon: CalendarIcon,
     component: DatePicker,
     defaultProps: withDefaultVerticalMargins({
@@ -422,6 +439,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   TimePicker: {
     name: "TimePicker",
+    category: "input",
     icon: TimePickerIcon,
     component: TimePicker,
     defaultProps: withDefaultVerticalMargins({
@@ -433,6 +451,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   DateTimePicker: {
     name: "DateTimePicker",
+    category: "input",
     icon: CalendarIcon,
     component: DateTimePicker,
     defaultProps: withDefaultVerticalMargins({
@@ -444,6 +463,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   MultiSelect: {
     name: "MultiSelect",
+    category: "input",
     icon: SelectIcon,
     component: ({ options, fullWidth: _unusedFullWidth, ...props }: any) => (
       <MultiSelect {...props} options={options || []} fullWidth />
@@ -462,6 +482,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Tabs: {
     name: "Tabs",
+    category: "layout",
     icon: ContainerIcon,
     component: Tabs,
     defaultProps: withDefaultVerticalMargins({
@@ -475,6 +496,7 @@ export const COMPONENT_REGISTRY: Record<ComponentType, RegisteredComponent> = {
   },
   Stepper: {
     name: "Stepper",
+    category: "layout",
     icon: StepperIcon,
     component: Stepper,
     defaultProps: withDefaultVerticalMargins({
