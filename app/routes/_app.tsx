@@ -1,11 +1,12 @@
 import { Outlet } from "react-router";
+import type { LoaderFunctionArgs } from "react-router";
 import Header from "../components/shared/Header";
-import { requireAuthenticatedUser } from "../features/auth/session";
+import { requireAuthenticatedUser } from "../features/auth/session.server";
 
-export const clientLoader = Object.assign(
-  async () => requireAuthenticatedUser(),
-  { hydrate: true as const },
-);
+export async function loader({ request }: LoaderFunctionArgs) {
+  await requireAuthenticatedUser(request);
+  return null;
+}
 
 export default function AppLayout() {
   return (

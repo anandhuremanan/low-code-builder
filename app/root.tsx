@@ -8,6 +8,7 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { isAuthenticated } from "./features/auth/session.server";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -26,6 +27,12 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/icon?family=Material+Icons",
   },
 ];
+
+export async function loader({ request }: Route.LoaderArgs) {
+  return {
+    isAuthenticated: await isAuthenticated(request),
+  };
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (

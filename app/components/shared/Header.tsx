@@ -1,19 +1,12 @@
 import { useState } from "react";
 import { Menu } from "lucide-react";
-import { NavLink, useNavigate } from "react-router";
+import { Form, NavLink } from "react-router";
 import logo from "../../../public/assets/images/logo.png";
-import { authSession, useIsAuthenticated } from "../../features/auth/session";
+import { useIsAuthenticated } from "../../features/auth/session";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const isAuthenticated = useIsAuthenticated();
-
-  const handleLogout = () => {
-    authSession.clear();
-    setMenuOpen(false);
-    navigate("/login");
-  };
 
   return (
     <header className="bg-white sticky top-0 z-50 shadow-sm">
@@ -38,13 +31,14 @@ export default function Header() {
                 <NavLink to="/dashboard" className="hover:text-[#184F79] transition">
                   Dashboard
                 </NavLink>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="hover:text-[#184F79] transition"
-                >
-                  <span className="btn-login">Logout</span>
-                </button>
+                <Form method="post" action="/logout">
+                  <button
+                    type="submit"
+                    className="hover:text-[#184F79] transition"
+                  >
+                    <span className="btn-login">Logout</span>
+                  </button>
+                </Form>
               </>
             ) : (
               <NavLink to="/login" className="hover:text-[#184F79] transition">
@@ -96,13 +90,18 @@ export default function Header() {
               >
                 Dashboard
               </NavLink>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="block text-gray-600 hover:text-[#184F79]"
+              <Form
+                method="post"
+                action="/logout"
+                onSubmit={() => setMenuOpen(false)}
               >
-                Logout
-              </button>
+                <button
+                  type="submit"
+                  className="block text-gray-600 hover:text-[#184F79]"
+                >
+                  Logout
+                </button>
+              </Form>
             </>
           ) : (
             <NavLink

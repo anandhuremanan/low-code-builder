@@ -5,6 +5,15 @@ import { COMPONENT_REGISTRY } from '../registry';
 import { type ComponentType } from '../types';
 import { Plus, File, Layers, Search, Check, Pencil } from 'lucide-react';
 
+const COMPONENT_CATEGORY_ORDER = [
+    'Layout',
+    'Input',
+    'Selection',
+    'Display',
+    'Data',
+    'Navigation',
+] as const;
+
 const SidebarItem = ({ type }: { type: ComponentType }) => {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: `sidebar-item-${type}`,
@@ -57,6 +66,14 @@ export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
             entry.name.toLowerCase().includes(query)
         );
     });
+
+    const groupedComponentTypes = COMPONENT_CATEGORY_ORDER.map((category) => ({
+        category,
+        types: filteredComponentTypes.filter((key) => {
+            const entry = COMPONENT_REGISTRY[key as ComponentType];
+            return entry.category === category;
+        }),
+    })).filter((group) => group.types.length > 0);
 
     const handleAddPage = () => {
         if (newPageName.trim()) {
@@ -120,9 +137,16 @@ export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
                         />
                     </div>
                     <h2 className="mb-4 text-xs font-semibold uppercase text-slate-500">Elements</h2>
-                    {filteredComponentTypes.length > 0 ? (
-                        filteredComponentTypes.map((key) => (
-                            <SidebarItem key={key} type={key as ComponentType} />
+                    {groupedComponentTypes.length > 0 ? (
+                        groupedComponentTypes.map((group) => (
+                            <div key={group.category} className="mb-5 last:mb-0">
+                                <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                                    {group.category}
+                                </h3>
+                                {group.types.map((key) => (
+                                    <SidebarItem key={key} type={key as ComponentType} />
+                                ))}
+                            </div>
                         ))
                     ) : (
                         <p className="text-xs text-slate-500">No components found.</p>
