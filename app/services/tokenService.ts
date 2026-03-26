@@ -1,12 +1,18 @@
-import { authSession } from "../features/auth/session";
+const readCookie = (name: string) => {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const cookie = document.cookie
+    .split("; ")
+    .find((entry) => entry.startsWith(`${name}=`));
+
+  return cookie ? decodeURIComponent(cookie.split("=").slice(1).join("=")) : null;
+};
 
 export const tokenService = {
-  getAccessToken: () => authSession.getAccessToken(),
-  getRefreshToken: () => authSession.getRefreshToken(),
-  setTokens: (access: string, refresh: string) => {
-    authSession.setSession({ accessToken: access, refreshToken: refresh });
-  },
-  clear: () => {
-    authSession.clear();
-  },
+  getAccessToken: () => readCookie("accessToken"),
+  getRefreshToken: () => readCookie("refreshToken"),
+  setTokens: (_access: string, _refresh: string) => undefined,
+  clear: () => undefined,
 };

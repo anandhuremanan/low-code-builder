@@ -11,7 +11,6 @@ export async function GenericCall<T = any>(
 ): Promise<T> {
   const accessToken = tokenService.getAccessToken();
   const encryptedBody = await encrypt(body);
-  console.log("encrypted...", encryptedBody);
 
   const res = await fetch(API_BASE_URL + endpoint, {
     method,

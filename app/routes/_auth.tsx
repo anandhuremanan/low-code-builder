@@ -1,10 +1,10 @@
 import { Outlet } from "react-router";
-import { redirectIfAuthenticated } from "../features/auth/session";
+import type { LoaderFunctionArgs } from "react-router";
+import { redirectIfAuthenticated } from "../features/auth/session.server";
 
-export const clientLoader = Object.assign(
-  async () => redirectIfAuthenticated(),
-  { hydrate: true as const },
-);
+export async function loader({ request }: LoaderFunctionArgs) {
+  return redirectIfAuthenticated(request);
+}
 
 export default function AuthLayout() {
   return <Outlet />;

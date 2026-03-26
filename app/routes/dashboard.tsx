@@ -2,8 +2,10 @@ import type { Route } from "./+types/dashboard";
 import { useState } from "react";
 import { Link } from "react-router";
 import { Plus, X } from "lucide-react";
+import { API_BASE_URL } from "~/shared/config/env";
+import { requireAuthenticatedUser } from "~/features/auth/session.server";
 
-export function meta({ }: Route.MetaArgs) {
+export function meta({}: Route.MetaArgs) {
   return [
     { title: "Dashboard" },
     { name: "description", content: "Sample dashboard page" },
@@ -18,17 +20,28 @@ type Applications = {
   modified_at: string;
   is_active: boolean;
 };
-export async function loader() {
-  const applications = await fetch("http://localhost:8080/api/generic?MappingId=getapplications");
-  return applications;
+export async function loader({ request }: Route.LoaderArgs) {
+  const { accessToken } = await requireAuthenticatedUser(request);
+  const response = await fetch(
+    `${API_BASE_URL}/api/generic?MappingId=getapplications`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Response("Failed to load applications", { status: response.status });
+  }
+
+  return response.json();
 }
 
-export default function Dashboard({
-  loaderData,
-}: Route.ComponentProps) {
-  const { data, success }: { data: Applications[]; success: boolean } = loaderData;
+export default function Dashboard({ loaderData }: Route.ComponentProps) {
+  const { data, success }: { data: Applications[]; success: boolean } =
+    loaderData;
   console.log("Loader data:", data, "Success:", success);
-  const [apps, setApps] = useState();
   const [open, setOpen] = useState(false);
   const [appName, setAppName] = useState("");
   const [appDescription, setAppDescription] = useState("");
@@ -67,7 +80,8 @@ export default function Dashboard({
             <Link
               key={app.application_id}
               to={`/configure/${app.application_id}`}
-              className="app-tile">
+              className="app-tile"
+            >
               <div className="app-tile-text">
                 <h3 className="app-tile-title">{app.application_name}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -98,7 +112,9 @@ export default function Dashboard({
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-slate-900">Create App</h3>
+                <h3 className="text-xl font-semibold text-slate-900">
+                  Create App
+                </h3>
               </div>
               <button
                 type="button"
@@ -112,7 +128,9 @@ export default function Dashboard({
 
             <div className="space-y-4">
               <label className="block">
-                <span className="mb-1 block text-sm font-medium text-slate-700">App Name</span>
+                <span className="mb-1 block text-sm font-medium text-slate-700">
+                  App Name
+                </span>
                 <input
                   type="text"
                   value={appName}
@@ -123,7 +141,9 @@ export default function Dashboard({
               </label>
 
               <label className="block">
-                <span className="mb-1 block text-sm font-medium text-slate-700">Description</span>
+                <span className="mb-1 block text-sm font-medium text-slate-700">
+                  Description
+                </span>
                 <textarea
                   value={appDescription}
                   onChange={(event) => setAppDescription(event.target.value)}

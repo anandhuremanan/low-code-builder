@@ -1,5 +1,4 @@
-import { redirect } from "react-router";
-import { authSession } from "./session";
+import { createUserSession } from "./session.server";
 
 type LoginPayload = {
   username: string;
@@ -33,8 +32,9 @@ function normalizeResponse(response: any) {
 }
 
 export async function handleAuthSubmission(
+  request: Request,
   formData: FormData,
-): Promise<AuthActionResult> {
+): Promise<AuthActionResult | void> {
   const intent = String(formData.get("intent") || "login");
 
   try {
@@ -72,17 +72,22 @@ export async function handleAuthSubmission(
       };
     }
 
-    authSession.setSession(
-      normalizeResponse({
-        accessToken: "temporary-access-token",
-        refreshToken: "temporary-refresh-token",
-        user: {
-          username: TEMP_USERNAME,
-          role: "admin",
-        },
-      }),
-    );
-    throw redirect("/dashboard");
+    const sessionPayload = normalizeResponse({
+      accessToken: "temporary-access-token",
+      refreshToken: "temporary-refresh-token",
+      user: {
+        username: TEMP_USERNAME,
+        role: "admin",
+      },
+    });
+
+    return createUserSession({
+      request,
+      accessToken: sessionPayload.accessToken,
+      refreshToken: sessionPayload.refreshToken,
+      user: sessionPayload.user,
+      redirectTo: "/dashboard",
+    });
   } catch (error) {
     if (error instanceof Response) {
       throw error;
