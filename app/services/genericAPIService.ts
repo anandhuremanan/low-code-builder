@@ -1,39 +1,38 @@
 import { encrypt } from "./encryptAndDecryptService";
-import { tokenService } from "./tokenService";
-import { refreshAccessToken } from "./refreshTokenService";
 import { API_BASE_URL } from "../shared/config/env";
 
-export async function GenericCall<T = any>(
-  endpoint: string,
-  method: string,
-  body: any = {},
-  retry = true,
-): Promise<T> {
-  const accessToken = tokenService.getAccessToken();
-  const encryptedBody = await encrypt(body);
+export async function GenericCall<T>({
+  endpoint,
+  method,
+  body,
+  accessToken,
+}: {
+  endpoint: string;
+  method: string;
+  body?: unknown;
+  accessToken?: string;
+}): Promise<T> {
+  const normalizedMethod = method.toUpperCase();
+  const canSendBody =
+    normalizedMethod !== "GET" && normalizedMethod !== "HEAD";
+
+  const headers: Record<string, string> = {
+    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+  };
+
+  let requestBody: string | undefined;
+
+  if (canSendBody) {
+    const encryptedBody = await encrypt(body ?? {});
+    headers["Content-Type"] = "application/json";
+    requestBody = JSON.stringify({ data: encryptedBody });
+  }
 
   const res = await fetch(API_BASE_URL + endpoint, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: accessToken ? `Bearer ${accessToken}` : "",
-    },
-    body: JSON.stringify({ data: encryptedBody }),
+    method: normalizedMethod,
+    headers,
+    body: requestBody,
   });
-
-  if (res.status === 401 && retry) {
-    const newToken = await refreshAccessToken();
-
-    if (newToken) {
-      return GenericCall(endpoint, method, body, false);
-    } else {
-      tokenService.clear();
-      if (typeof window !== "undefined") {
-        window.location.assign("/login");
-      }
-      throw new Error("Session expired");
-    }
-  }
 
   if (!res.ok) {
     throw new Error(`API error: ${res.status}`);
