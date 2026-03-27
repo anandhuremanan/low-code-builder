@@ -1,8 +1,7 @@
 import type { Route } from "./+types/dashboard";
-import { useState } from "react";
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useFetcher } from "react-router";
 import { Plus, X } from "lucide-react";
-import { requireAuthenticatedUser } from "~/features/auth/session.server";
 import { GenericCall } from "~/services/genericAPIService";
 
 export function meta({}: Route.MetaArgs) {
@@ -26,44 +25,89 @@ type DashboardLoaderData = {
   success: boolean;
 };
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const { accessToken } = await requireAuthenticatedUser(request);
+type DashboardActionData = {
+  success?: boolean;
+  error?: string;
+};
 
+export async function loader({ request }: Route.LoaderArgs) {
   const applications = await GenericCall<DashboardLoaderData>({
+    request,
     endpoint: "/api/generic?MappingId=getapplications",
     method: "GET",
-    accessToken,
   });
 
   return applications;
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData();
+  const intent = formData.get("intent");
+
+  if (intent !== "createApp") {
+    return Response.json(
+      { error: "Unsupported action." } satisfies DashboardActionData,
+      { status: 400 },
+    );
+  }
+
+  const application_name = String(formData.get("application_name") ?? "").trim();
+  const application_description = String(
+    formData.get("application_description") ?? "",
+  ).trim();
+
+  if (!application_name) {
+    return Response.json(
+      { error: "App name is required." } satisfies DashboardActionData,
+      { status: 400 },
+    );
+  }
+
+  await GenericCall({
+    request,
+    endpoint: "/api/generic?MappingId=createapplication",
+    method: "POST",
+    body: {
+      application_name,
+      application_description,
+    },
+  });
+
+  return Response.json({ success: true } satisfies DashboardActionData);
 }
 
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
   const applicationData = loaderData as DashboardLoaderData;
 
   const { data } = applicationData;
+  const fetcher = useFetcher<DashboardActionData>();
 
   const [open, setOpen] = useState(false);
   const [appName, setAppName] = useState("");
   const [appDescription, setAppDescription] = useState("");
+  const isCreating = fetcher.state !== "idle";
+
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data?.success) {
+      setAppName("");
+      setAppDescription("");
+      setOpen(false);
+    }
+  }, [fetcher.data, fetcher.state]);
 
   const handleCreateApp = () => {
     const trimmedName = appName.trim();
     const trimmedDescription = appDescription.trim();
     if (!trimmedName) return;
 
-    // setApps((currentApps) => [
-    //   ...currentApps,
-    //   {
-    //     id: `app-${Date.now()}`,
-    //     name: trimmedName,
-    //     description: trimmedDescription || "New app created from dashboard.",
-    //   },
-    // ]);
-
-    setAppName("");
-    setAppDescription("");
-    setOpen(false);
+    fetcher.submit(
+      {
+        intent: "createApp",
+        application_name: trimmedName,
+        application_description: trimmedDescription,
+      },
+      { method: "post" },
+    );
   };
 
   return (
@@ -128,6 +172,12 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             </div>
 
             <div className="space-y-4">
+              {fetcher.data?.error ? (
+                <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {fetcher.data.error}
+                </p>
+              ) : null}
+
               <label className="block">
                 <span className="mb-1 block text-sm font-medium text-slate-700">
                   App Name
@@ -159,6 +209,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
+                disabled={isCreating}
                 className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               >
                 Cancel
@@ -166,10 +217,10 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
               <button
                 type="button"
                 onClick={handleCreateApp}
-                disabled={!appName.trim()}
+                disabled={!appName.trim() || isCreating}
                 className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
               >
-                Create
+                {isCreating ? "Creating..." : "Create"}
               </button>
             </div>
           </div>
