@@ -1,4 +1,6 @@
 import { createUserSession } from "./session.server";
+import { authService } from "~/services/authService";
+import { AUTH_LOGIN_ENDPOINT } from "~/shared/config/auth";
 
 type LoginPayload = {
   username: string;
@@ -17,9 +19,6 @@ type SignupPayload = {
 type AuthActionResult = {
   error?: string;
 };
-
-const TEMP_USERNAME = "admin";
-const TEMP_PASSWORD = "admin123";
 
 function normalizeResponse(response: any) {
   return {
@@ -61,27 +60,28 @@ export async function handleAuthSubmission(
       password: String(formData.get("password") || ""),
     };
 
-    // Temporary until the backend auth API is ready.
-    // const reponse = await authService.LoginServiceCall(payload);
-    if (
-      payload.username !== TEMP_USERNAME ||
-      payload.password !== TEMP_PASSWORD
-    ) {
+    if (!payload.username || !payload.password) {
       return {
-        error: `Use username "${TEMP_USERNAME}" and password "${TEMP_PASSWORD}".`,
+        error: "Username and password are required.",
       };
     }
 
-    const sessionPayload = normalizeResponse({
-      accessToken: "temporary-access-token",
-      refreshToken: "temporary-refresh-token",
-      user: {
-        username: TEMP_USERNAME,
-        role: "admin",
-      },
-    });
+    const response = await authService.LoginServiceCall(
+      AUTH_LOGIN_ENDPOINT,
+      "POST",
+      payload,
+      true,
+      ["password"],
+    );
+    const sessionPayload = normalizeResponse(response);
 
-    return createUserSession({
+    if (!sessionPayload.accessToken) {
+      return {
+        error: "Login response did not include an access token.",
+      };
+    }
+
+    return await createUserSession({
       request,
       accessToken: sessionPayload.accessToken,
       refreshToken: sessionPayload.refreshToken,

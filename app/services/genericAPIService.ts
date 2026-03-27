@@ -1,12 +1,15 @@
 import { encrypt } from "./encryptAndDecryptService";
 import { API_BASE_URL } from "../shared/config/env";
+import { requireAuthenticatedUser } from "~/features/auth/session.server";
 
 export async function GenericCall<T>({
+  request,
   endpoint,
   method,
   body,
   accessToken,
 }: {
+  request: Request;
   endpoint: string;
   method: string;
   body?: unknown;
@@ -16,8 +19,11 @@ export async function GenericCall<T>({
   const canSendBody =
     normalizedMethod !== "GET" && normalizedMethod !== "HEAD";
 
+  const resolvedAccessToken =
+    accessToken ?? (await requireAuthenticatedUser(request)).accessToken;
+
   const headers: Record<string, string> = {
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    Authorization: `Bearer ${resolvedAccessToken}`,
   };
 
   let requestBody: string | undefined;
