@@ -679,6 +679,13 @@ form label {
   margin: 50px;
 }
 
+.elements-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-around;
+}
+
 .element-box {
   width: 110px;
   display: flex;
@@ -686,4 +693,8 @@ form label {
   background-color: #e3eefb;
   border: none;
   border-radius: 5px;
+  align-items: center;
+  justify-content: center;
+  margin: 5px 0px;
+  padding: 10px;
 }

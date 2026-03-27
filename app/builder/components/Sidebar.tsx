@@ -36,7 +36,7 @@ const SidebarItem = ({ type }: { type: ComponentType }) => {
         ${isDragging ? 'opacity-50' : 'opacity-100'}
       `}
         >
-            <div className="rounded-md bg-slate-100 p-2">
+            <div className="">
                 <Icon size={20} className="text-slate-600" />
             </div>
             <span className="text-sm font-medium text-slate-700">
@@ -174,7 +174,7 @@ export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
                                         </button>
 
                                         {isOpen ? (
-                                            <div className="border-t border-slate-200 bg-white p-2">
+                                            <div className="border-t border-slate-200 bg-white p-2 elements-group">
                                                 {group.items.map((key) => (
                                                     <SidebarItem key={key} type={key as ComponentType} />
                                                 ))}
