@@ -60,6 +60,7 @@ export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
         input: false,
         data: false,
     });
+    const currentPage = state.pages.find((page) => page.id === state.currentPageId) || null;
 
     const filteredComponentTypes = Object.keys(COMPONENT_REGISTRY).filter((key) => {
         const entry = COMPONENT_REGISTRY[key as ComponentType];
@@ -116,6 +117,20 @@ export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
         });
         setRenamingPopupId(null);
         setRenamePopupValue('');
+    };
+
+    const handlePageLayoutChange = (
+        key: 'showHeader' | 'showFooter' | 'showLeftSidebar' | 'showRightSidebar',
+        checked: boolean
+    ) => {
+        if (!currentPage) return;
+        dispatch({
+            type: 'UPDATE_PAGE_LAYOUT',
+            payload: {
+                id: currentPage.id,
+                layout: { [key]: checked }
+            }
+        });
     };
 
     return (
@@ -207,6 +222,47 @@ export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
                             ))}
                         </div>
                     </div>
+
+                    {currentPage ? (
+                        <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+                            <div className="mb-1 text-xs font-semibold uppercase text-slate-500">Page Layout</div>
+                            <div className="mb-3 text-sm font-medium text-slate-800">{currentPage.name}</div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                                    <input
+                                        type="checkbox"
+                                        checked={currentPage.layout?.showHeader ?? true}
+                                        onChange={(e) => handlePageLayoutChange('showHeader', e.target.checked)}
+                                    />
+                                    Header
+                                </label>
+                                <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                                    <input
+                                        type="checkbox"
+                                        checked={currentPage.layout?.showFooter ?? true}
+                                        onChange={(e) => handlePageLayoutChange('showFooter', e.target.checked)}
+                                    />
+                                    Footer
+                                </label>
+                                <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                                    <input
+                                        type="checkbox"
+                                        checked={currentPage.layout?.showLeftSidebar ?? true}
+                                        onChange={(e) => handlePageLayoutChange('showLeftSidebar', e.target.checked)}
+                                    />
+                                    Left Sidebar
+                                </label>
+                                <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                                    <input
+                                        type="checkbox"
+                                        checked={currentPage.layout?.showRightSidebar ?? true}
+                                        onChange={(e) => handlePageLayoutChange('showRightSidebar', e.target.checked)}
+                                    />
+                                    Right Sidebar
+                                </label>
+                            </div>
+                        </div>
+                    ) : null}
 
                     <div className="border-t border-slate-200 pt-4">
                         <h2 className="mb-2 text-xs font-semibold uppercase text-slate-500">New Page</h2>

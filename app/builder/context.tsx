@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react';
-import { type ComponentNode, type CustomStyle, type EditingTarget, type Page, type Popup, type SiteSectionKey, type SiteSections } from './types';
+import { type ComponentNode, type CustomStyle, type EditingTarget, type Page, type PageLayoutSettings, type Popup, type SiteSectionKey, type SiteSections } from './types';
 import { loadBuilderEditorState, saveBuilderEditorState } from '../features/builder/persistence/storage';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -45,6 +45,21 @@ const createDefaultPageNodes = (): ComponentNode[] => [
 const createDefaultPopupNodes = (): ComponentNode[] => [
     createRootContainerNode('w-full min-h-[260px] p-6 bg-white')
 ];
+
+const createDefaultPageLayoutSettings = (): PageLayoutSettings => ({
+    showHeader: true,
+    showFooter: true,
+    showLeftSidebar: true,
+    showRightSidebar: true
+});
+
+const normalizePage = (page: Page): Page => ({
+    ...page,
+    layout: {
+        ...createDefaultPageLayoutSettings(),
+        ...(page.layout || {})
+    }
+});
 
 const createDefaultNodesForTarget = (target: EditingTarget): ComponentNode[] => {
     if (target === 'page') return createDefaultPageNodes();
@@ -92,6 +107,7 @@ type Action =
     | { type: 'SET_DRAGGED_COMPONENT'; payload: { type: string | null } }
     | { type: 'ADD_PAGE'; payload: { name: string } }
     | { type: 'IMPORT_PAGE'; payload: { name: string; slug: string; nodes: ComponentNode[] } }
+    | { type: 'UPDATE_PAGE_LAYOUT'; payload: { id: string; layout: Partial<PageLayoutSettings> } }
     | { type: 'SWITCH_PAGE'; payload: { id: string } }
     | { type: 'ADD_POPUP'; payload: { name: string } }
     | { type: 'RENAME_POPUP'; payload: { id: string; name: string } }
@@ -109,7 +125,8 @@ const initialState: BuilderState = {
             id: 'home',
             name: 'Home',
             slug: '/',
-            nodes: [createRootContainerNode('min-h-screen p-8 bg-white')]
+            nodes: [createRootContainerNode('min-h-screen p-8 bg-white')],
+            layout: createDefaultPageLayoutSettings()
         }
     ],
     popups: [],
@@ -133,7 +150,7 @@ const hydrateState = (): BuilderState => {
     if (!parsed) return initialState;
 
     try {
-        const pages = Array.isArray(parsed.pages) && parsed.pages.length > 0 ? parsed.pages : initialState.pages;
+        const pages = Array.isArray(parsed.pages) && parsed.pages.length > 0 ? parsed.pages.map(normalizePage) : initialState.pages;
         const popups = Array.isArray(parsed.popups) ? parsed.popups : initialState.popups;
         const currentPageId = typeof parsed.currentPageId === 'string' ? parsed.currentPageId : pages[0]?.id || null;
         const currentPopupId =
@@ -481,7 +498,8 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                 id: generateId(),
                 name: action.payload.name,
                 slug: `/${action.payload.name.toLowerCase().replace(/\s+/g, '-')}`,
-                nodes: createDefaultPageNodes()
+                nodes: createDefaultPageNodes(),
+                layout: createDefaultPageLayoutSettings()
             };
 
             return {
@@ -508,13 +526,37 @@ const builderReducer = (state: BuilderState, action: Action): BuilderState => {
                             ...page,
                             name: action.payload.name,
                             slug: action.payload.slug,
-                            nodes: action.payload.nodes
+                            nodes: action.payload.nodes,
+                            layout: {
+                                ...createDefaultPageLayoutSettings(),
+                                ...(page.layout || {})
+                            }
                         }
                         : page
                 ),
                 currentPopupId: null,
                 editingTarget: 'page',
                 selectedNodeId: null
+            };
+        }
+
+        case 'UPDATE_PAGE_LAYOUT': {
+            const { id, layout } = action.payload;
+            return {
+                ...state,
+                history: pushToHistory(state),
+                pages: state.pages.map((page) =>
+                    page.id === id
+                        ? {
+                            ...page,
+                            layout: {
+                                ...createDefaultPageLayoutSettings(),
+                                ...(page.layout || {}),
+                                ...layout
+                            }
+                        }
+                        : page
+                )
             };
         }
 

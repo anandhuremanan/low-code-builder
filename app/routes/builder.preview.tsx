@@ -896,8 +896,12 @@ export default function BuilderPreviewPage() {
     [site],
   );
 
+  const pageLayout = selectedPage?.layout;
+  const showHeader = Boolean(site?.siteSections?.header?.enabled) && (pageLayout?.showHeader ?? true);
+  const showFooter = Boolean(site?.siteSections?.footer?.enabled) && (pageLayout?.showFooter ?? true);
+
   const headerContent = useMemo(() => {
-    if (!site?.siteSections?.header?.enabled) return null;
+    if (!showHeader) return null;
     return site.siteSections.header.nodes.map((node) => (
       <PreviewNode
         key={`header-${node.id}`}
@@ -908,7 +912,7 @@ export default function BuilderPreviewPage() {
     ));
   }, [
     customStyleById,
-    site?.siteSections?.header?.enabled,
+    showHeader,
     site?.siteSections?.header?.nodes,
   ]);
 
@@ -925,7 +929,7 @@ export default function BuilderPreviewPage() {
   }, [selectedPage, customStyleById]);
 
   const footerContent = useMemo(() => {
-    if (!site?.siteSections?.footer?.enabled) return null;
+    if (!showFooter) return null;
     return site.siteSections.footer.nodes.map((node) => (
       <PreviewNode
         key={`footer-${node.id}`}
@@ -936,15 +940,15 @@ export default function BuilderPreviewPage() {
     ));
   }, [
     customStyleById,
-    site?.siteSections?.footer?.enabled,
+    showFooter,
     site?.siteSections?.footer?.nodes,
   ]);
 
   const activePopup = openPopupId ? popupById.get(openPopupId) || null : null;
   const leftSidebar = site?.siteSections?.sidebarLeft;
   const rightSidebar = site?.siteSections?.sidebarRight;
-  const showLeftSidebar = Boolean(leftSidebar?.enabled);
-  const showRightSidebar = Boolean(rightSidebar?.enabled);
+  const showLeftSidebar = Boolean(leftSidebar?.enabled) && (pageLayout?.showLeftSidebar ?? true);
+  const showRightSidebar = Boolean(rightSidebar?.enabled) && (pageLayout?.showRightSidebar ?? true);
 
   if (!selectedPage) {
     return (

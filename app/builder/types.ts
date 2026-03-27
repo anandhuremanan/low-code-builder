@@ -40,6 +40,14 @@ export type Page = {
   name: string;
   slug: string;
   nodes: ComponentNode[];
+  layout?: PageLayoutSettings;
+};
+
+export type PageLayoutSettings = {
+  showHeader: boolean;
+  showFooter: boolean;
+  showLeftSidebar: boolean;
+  showRightSidebar: boolean;
 };
 
 export type Popup = {

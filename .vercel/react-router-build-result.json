@@ -10,123 +10,144 @@
       }
     },
     "routeIdToServerBundleId": {
+      "root": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/home": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/loginPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/logout": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/api.builder-ai": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/configure": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/configure.$appId": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/builder": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/builder.preview": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/configure.header": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/configure.footer": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/configure.sidebar-left": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/configure.sidebar-right": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/builder": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/builder.preview": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+      "routes/api.builder-ai": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
     },
     "routes": {
       "root": {
         "id": "root",
         "file": "app/root.tsx",
         "path": "",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/_public": {
+        "id": "routes/_public",
+        "parentId": "root",
+        "file": "app/routes/_public.tsx",
         "config": {}
       },
       "routes/home": {
         "id": "routes/home",
-        "parentId": "root",
+        "parentId": "routes/_public",
         "file": "app/routes/home.tsx",
         "index": true,
-        "config": {
-          "runtime": "nodejs"
-        }
+        "config": {}
+      },
+      "routes/_auth": {
+        "id": "routes/_auth",
+        "parentId": "root",
+        "file": "app/routes/_auth.tsx",
+        "config": {}
       },
       "routes/loginPage": {
         "id": "routes/loginPage",
-        "parentId": "root",
+        "parentId": "routes/_auth",
         "file": "app/routes/loginPage.tsx",
         "path": "login",
-        "config": {
-          "runtime": "nodejs"
-        }
+        "config": {}
+      },
+      "routes/logout": {
+        "id": "routes/logout",
+        "parentId": "root",
+        "file": "app/routes/logout.ts",
+        "path": "logout",
+        "config": {}
+      },
+      "routes/_app": {
+        "id": "routes/_app",
+        "parentId": "root",
+        "file": "app/routes/_app.tsx",
+        "config": {}
       },
       "routes/dashboard": {
         "id": "routes/dashboard",
-        "parentId": "root",
+        "parentId": "routes/_app",
         "file": "app/routes/dashboard.tsx",
         "path": "dashboard",
-        "config": {
-          "runtime": "nodejs"
-        }
+        "config": {}
+      },
+      "routes/_builder": {
+        "id": "routes/_builder",
+        "parentId": "root",
+        "file": "app/routes/_builder.tsx",
+        "config": {}
+      },
+      "routes/configure": {
+        "id": "routes/configure",
+        "parentId": "routes/_builder",
+        "file": "app/routes/configure.tsx",
+        "path": "configure",
+        "config": {}
+      },
+      "routes/configure.$appId": {
+        "id": "routes/configure.$appId",
+        "parentId": "routes/_builder",
+        "file": "app/routes/configure.$appId.tsx",
+        "path": "configure/:appId",
+        "config": {}
+      },
+      "routes/builder": {
+        "id": "routes/builder",
+        "parentId": "routes/_builder",
+        "file": "app/routes/builder.tsx",
+        "path": "builder",
+        "config": {}
+      },
+      "routes/builder.preview": {
+        "id": "routes/builder.preview",
+        "parentId": "routes/_builder",
+        "file": "app/routes/builder.preview.tsx",
+        "path": "builder/preview",
+        "config": {}
+      },
+      "routes/configure.header": {
+        "id": "routes/configure.header",
+        "parentId": "routes/_builder",
+        "file": "app/routes/configure.header.tsx",
+        "path": "configure/header",
+        "config": {}
+      },
+      "routes/configure.footer": {
+        "id": "routes/configure.footer",
+        "parentId": "routes/_builder",
+        "file": "app/routes/configure.footer.tsx",
+        "path": "configure/footer",
+        "config": {}
+      },
+      "routes/configure.sidebar-left": {
+        "id": "routes/configure.sidebar-left",
+        "parentId": "routes/_builder",
+        "file": "app/routes/configure.sidebar-left.tsx",
+        "path": "configure/sidebar-left",
+        "config": {}
+      },
+      "routes/configure.sidebar-right": {
+        "id": "routes/configure.sidebar-right",
+        "parentId": "routes/_builder",
+        "file": "app/routes/configure.sidebar-right.tsx",
+        "path": "configure/sidebar-right",
+        "config": {}
       },
       "routes/api.builder-ai": {
         "id": "routes/api.builder-ai",
         "parentId": "root",
         "file": "app/routes/api.builder-ai.ts",
         "path": "api/builder-ai",
-        "config": {
-          "runtime": "nodejs"
-        }
-      },
-      "routes/configure.$appId": {
-        "id": "routes/configure.$appId",
-        "parentId": "root",
-        "file": "app/routes/configure.$appId.tsx",
-        "path": "configure/:appId",
-        "config": {
-          "runtime": "nodejs"
-        }
-      },
-      "routes/configure.header": {
-        "id": "routes/configure.header",
-        "parentId": "root",
-        "file": "app/routes/configure.header.tsx",
-        "path": "configure/header",
-        "config": {
-          "runtime": "nodejs"
-        }
-      },
-      "routes/configure.footer": {
-        "id": "routes/configure.footer",
-        "parentId": "root",
-        "file": "app/routes/configure.footer.tsx",
-        "path": "configure/footer",
-        "config": {
-          "runtime": "nodejs"
-        }
-      },
-      "routes/configure.sidebar-left": {
-        "id": "routes/configure.sidebar-left",
-        "parentId": "root",
-        "file": "app/routes/configure.sidebar-left.tsx",
-        "path": "configure/sidebar-left",
-        "config": {
-          "runtime": "nodejs"
-        }
-      },
-      "routes/configure.sidebar-right": {
-        "id": "routes/configure.sidebar-right",
-        "parentId": "root",
-        "file": "app/routes/configure.sidebar-right.tsx",
-        "path": "configure/sidebar-right",
-        "config": {
-          "runtime": "nodejs"
-        }
-      },
-      "routes/builder": {
-        "id": "routes/builder",
-        "parentId": "root",
-        "file": "app/routes/builder.tsx",
-        "path": "builder",
-        "config": {
-          "runtime": "nodejs"
-        }
-      },
-      "routes/builder.preview": {
-        "id": "routes/builder.preview",
-        "parentId": "root",
-        "file": "app/routes/builder.preview.tsx",
-        "path": "builder/preview",
-        "config": {
-          "runtime": "nodejs"
-        }
+        "config": {}
       }
     }
   },
@@ -148,71 +169,103 @@
         "file": "root.tsx",
         "path": ""
       },
+      "routes/_public": {
+        "id": "routes/_public",
+        "parentId": "root",
+        "file": "routes/_public.tsx"
+      },
       "routes/home": {
         "id": "routes/home",
-        "parentId": "root",
+        "parentId": "routes/_public",
         "file": "routes/home.tsx",
         "index": true
       },
+      "routes/_auth": {
+        "id": "routes/_auth",
+        "parentId": "root",
+        "file": "routes/_auth.tsx"
+      },
       "routes/loginPage": {
         "id": "routes/loginPage",
-        "parentId": "root",
+        "parentId": "routes/_auth",
         "file": "routes/loginPage.tsx",
         "path": "login"
       },
+      "routes/logout": {
+        "id": "routes/logout",
+        "parentId": "root",
+        "file": "routes/logout.ts",
+        "path": "logout"
+      },
+      "routes/_app": {
+        "id": "routes/_app",
+        "parentId": "root",
+        "file": "routes/_app.tsx"
+      },
       "routes/dashboard": {
         "id": "routes/dashboard",
-        "parentId": "root",
+        "parentId": "routes/_app",
         "file": "routes/dashboard.tsx",
         "path": "dashboard"
+      },
+      "routes/_builder": {
+        "id": "routes/_builder",
+        "parentId": "root",
+        "file": "routes/_builder.tsx"
+      },
+      "routes/configure": {
+        "id": "routes/configure",
+        "parentId": "routes/_builder",
+        "file": "routes/configure.tsx",
+        "path": "configure"
+      },
+      "routes/configure.$appId": {
+        "id": "routes/configure.$appId",
+        "parentId": "routes/_builder",
+        "file": "routes/configure.$appId.tsx",
+        "path": "configure/:appId"
+      },
+      "routes/builder": {
+        "id": "routes/builder",
+        "parentId": "routes/_builder",
+        "file": "routes/builder.tsx",
+        "path": "builder"
+      },
+      "routes/builder.preview": {
+        "id": "routes/builder.preview",
+        "parentId": "routes/_builder",
+        "file": "routes/builder.preview.tsx",
+        "path": "builder/preview"
+      },
+      "routes/configure.header": {
+        "id": "routes/configure.header",
+        "parentId": "routes/_builder",
+        "file": "routes/configure.header.tsx",
+        "path": "configure/header"
+      },
+      "routes/configure.footer": {
+        "id": "routes/configure.footer",
+        "parentId": "routes/_builder",
+        "file": "routes/configure.footer.tsx",
+        "path": "configure/footer"
+      },
+      "routes/configure.sidebar-left": {
+        "id": "routes/configure.sidebar-left",
+        "parentId": "routes/_builder",
+        "file": "routes/configure.sidebar-left.tsx",
+        "path": "configure/sidebar-left"
+      },
+      "routes/configure.sidebar-right": {
+        "id": "routes/configure.sidebar-right",
+        "parentId": "routes/_builder",
+        "file": "routes/configure.sidebar-right.tsx",
+        "path": "configure/sidebar-right"
       },
       "routes/api.builder-ai": {
         "id": "routes/api.builder-ai",
         "parentId": "root",
         "file": "routes/api.builder-ai.ts",
         "path": "api/builder-ai"
-      },
-      "routes/configure.$appId": {
-        "id": "routes/configure.$appId",
-        "parentId": "root",
-        "file": "routes/configure.$appId.tsx",
-        "path": "configure/:appId"
-      },
-      "routes/configure.header": {
-        "id": "routes/configure.header",
-        "parentId": "root",
-        "file": "routes/configure.header.tsx",
-        "path": "configure/header"
-      },
-      "routes/configure.footer": {
-        "id": "routes/configure.footer",
-        "parentId": "root",
-        "file": "routes/configure.footer.tsx",
-        "path": "configure/footer"
-      },
-      "routes/configure.sidebar-left": {
-        "id": "routes/configure.sidebar-left",
-        "parentId": "root",
-        "file": "routes/configure.sidebar-left.tsx",
-        "path": "configure/sidebar-left"
-      },
-      "routes/configure.sidebar-right": {
-        "id": "routes/configure.sidebar-right",
-        "parentId": "root",
-        "file": "routes/configure.sidebar-right.tsx",
-        "path": "configure/sidebar-right"
-      },
-      "routes/builder": {
-        "id": "routes/builder",
-        "parentId": "root",
-        "file": "routes/builder.tsx",
-        "path": "builder"
-      },
-      "routes/builder.preview": {
-        "id": "routes/builder.preview",
-        "parentId": "root",
-        "file": "routes/builder.preview.tsx",
-        "path": "builder/preview"
       }
     },
     "routeDiscovery": {
@@ -230,48 +283,76 @@
         "file": "root.tsx",
         "children": [
           {
-            "file": "routes/home.tsx",
-            "index": true
+            "file": "routes/_public.tsx",
+            "children": [
+              {
+                "file": "routes/home.tsx",
+                "index": true
+              }
+            ]
           },
           {
-            "file": "routes/loginPage.tsx",
-            "path": "login"
+            "file": "routes/_auth.tsx",
+            "children": [
+              {
+                "file": "routes/loginPage.tsx",
+                "path": "login"
+              }
+            ]
           },
           {
-            "file": "routes/dashboard.tsx",
-            "path": "dashboard"
+            "file": "routes/logout.ts",
+            "path": "logout"
+          },
+          {
+            "file": "routes/_app.tsx",
+            "children": [
+              {
+                "file": "routes/dashboard.tsx",
+                "path": "dashboard"
+              }
+            ]
+          },
+          {
+            "file": "routes/_builder.tsx",
+            "children": [
+              {
+                "file": "routes/configure.tsx",
+                "path": "configure"
+              },
+              {
+                "file": "routes/configure.$appId.tsx",
+                "path": "configure/:appId"
+              },
+              {
+                "file": "routes/builder.tsx",
+                "path": "builder"
+              },
+              {
+                "file": "routes/builder.preview.tsx",
+                "path": "builder/preview"
+              },
+              {
+                "file": "routes/configure.header.tsx",
+                "path": "configure/header"
+              },
+              {
+                "file": "routes/configure.footer.tsx",
+                "path": "configure/footer"
+              },
+              {
+                "file": "routes/configure.sidebar-left.tsx",
+                "path": "configure/sidebar-left"
+              },
+              {
+                "file": "routes/configure.sidebar-right.tsx",
+                "path": "configure/sidebar-right"
+              }
+            ]
           },
           {
             "file": "routes/api.builder-ai.ts",
             "path": "api/builder-ai"
-          },
-          {
-            "file": "routes/configure.$appId.tsx",
-            "path": "configure/:appId"
-          },
-          {
-            "file": "routes/configure.header.tsx",
-            "path": "configure/header"
-          },
-          {
-            "file": "routes/configure.footer.tsx",
-            "path": "configure/footer"
-          },
-          {
-            "file": "routes/configure.sidebar-left.tsx",
-            "path": "configure/sidebar-left"
-          },
-          {
-            "file": "routes/configure.sidebar-right.tsx",
-            "path": "configure/sidebar-right"
-          },
-          {
-            "file": "routes/builder.tsx",
-            "path": "builder"
-          },
-          {
-            "file": "routes/builder.preview.tsx",
-            "path": "builder/preview"
           }
         ]
       }
