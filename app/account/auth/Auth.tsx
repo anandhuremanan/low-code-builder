@@ -7,9 +7,13 @@ type AuthView = "login" | "signup";
 
 export default function Auth() {
   const [activeView, setActiveView] = useState<AuthView>("login");
-  const actionData = useActionData() as { error?: string } | undefined;
+  const actionData = useActionData() as
+    | { error?: string; intent?: AuthView }
+    | undefined;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const scopedError =
+    actionData?.intent === activeView ? actionData.error : undefined;
 
   return (
     <div className="hero-section-wrap">
@@ -30,20 +34,15 @@ export default function Auth() {
           </div>
         </div>
         <>
-
-          {actionData?.error ? (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {actionData.error}
-            </div>
-          ) : null}
-
           {activeView === "login" ? (
             <Login
+              error={scopedError}
               isSubmitting={isSubmitting}
               onSwitchToSignup={() => setActiveView("signup")}
             />
           ) : (
             <Signup
+              error={scopedError}
               isSubmitting={isSubmitting}
               onSwitchToLogin={() => setActiveView("login")}
             />

@@ -18,6 +18,7 @@ type SignupPayload = {
 
 type AuthActionResult = {
   error?: string;
+  intent?: "login" | "signup";
 };
 
 function normalizeResponse(response: any) {
@@ -52,6 +53,7 @@ export async function handleAuthSubmission(
       // Temporary until the backend auth API is ready.
       return {
         error: "Signup is temporarily disabled until the backend is ready.",
+        intent: "signup",
       };
     }
 
@@ -63,6 +65,7 @@ export async function handleAuthSubmission(
     if (!payload.username || !payload.password) {
       return {
         error: "Username and password are required.",
+        intent: "login",
       };
     }
 
@@ -78,6 +81,7 @@ export async function handleAuthSubmission(
     if (!sessionPayload.accessToken) {
       return {
         error: "Login response did not include an access token.",
+        intent: "login",
       };
     }
 
@@ -95,6 +99,7 @@ export async function handleAuthSubmission(
 
     return {
       error: error instanceof Error ? error.message : "Authentication failed",
+      intent: intent === "signup" ? "signup" : "login",
     };
   }
 }

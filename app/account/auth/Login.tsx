@@ -5,6 +5,7 @@ import logo from "/assets/images/logo.png";
 
 
 type LoginProps = {
+  error?: string;
   isSubmitting: boolean;
   onSwitchToSignup: () => void;
 };
@@ -23,7 +24,7 @@ const textFieldSx = {
   },
 };
 
-export default function Login({ isSubmitting, onSwitchToSignup }: LoginProps) {
+export default function Login({ error, isSubmitting, onSwitchToSignup }: LoginProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -89,6 +90,11 @@ export default function Login({ isSubmitting, onSwitchToSignup }: LoginProps) {
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </div>
+          {error ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          ) : null}
         </Form>
       </div>
 
