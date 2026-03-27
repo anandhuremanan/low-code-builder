@@ -47,12 +47,12 @@ export default function Signup({ error, isSubmitting, onSwitchToLogin }: SignupP
         <div className="flex justify-center mb-6 login-logo">
           <img src={logo} alt="Logo" className="h-10" />
         </div>
-        <h4 className=" text-center mb-2">Create your account</h4>
+        <h4 className=" text-center">Create your account</h4>
 
         <Form method="post" className="login-form">
           <input type="hidden" name="intent" value="signup" />
           <div className="grid grid-cols-2 gap-3">
-            <div className="mb-2">
+            <div className="mb-1">
               <label>First Name</label>
               <TextField
                 fullWidth
@@ -64,7 +64,7 @@ export default function Signup({ error, isSubmitting, onSwitchToLogin }: SignupP
                 sx={textFieldSx}
               />
             </div>
-            <div className="mb-2">
+            <div className="mb-1">
               <label>Last Name</label>
               <TextField
                 fullWidth
@@ -77,7 +77,7 @@ export default function Signup({ error, isSubmitting, onSwitchToLogin }: SignupP
               />
             </div>
           </div>
-          <div className="mb-2">
+          <div className="mb-1">
             <label>Username</label>
             <TextField
               fullWidth
@@ -89,7 +89,7 @@ export default function Signup({ error, isSubmitting, onSwitchToLogin }: SignupP
               sx={textFieldSx}
             />
           </div>
-          <div className="mb-2">
+          <div className="mb-1">
             <label>Email</label>
             <TextField
               fullWidth
@@ -101,7 +101,7 @@ export default function Signup({ error, isSubmitting, onSwitchToLogin }: SignupP
               sx={textFieldSx}
             />
           </div>
-          <div className="mb-2">
+          <div className="mb-1">
             <label>Phone Number</label>
             <TextField
               fullWidth
@@ -113,7 +113,7 @@ export default function Signup({ error, isSubmitting, onSwitchToLogin }: SignupP
               sx={textFieldSx}
             />
           </div>
-          <div className="mb-2">
+          <div className="mb-1">
             <label>Password</label>
             <TextField
               fullWidth
@@ -154,7 +154,7 @@ export default function Signup({ error, isSubmitting, onSwitchToLogin }: SignupP
             </Button>
           </div>
           {error ? (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 mt-3 text-center">
               {error}
             </div>
           ) : null}
