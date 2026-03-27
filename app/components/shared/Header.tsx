@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Menu } from "lucide-react";
 import { Form, NavLink } from "react-router";
-import logo from "../../../public/assets/images/logo.png";
+import logo from "/assets/images/logo.png";
 import { useIsAuthenticated } from "../../features/auth/session";
 
 export default function Header() {

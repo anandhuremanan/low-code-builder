@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import {
-  ChevronDown,
-  type LucideIcon,
-} from "lucide-react";
+import { ChevronDown, type LucideIcon, } from "lucide-react";
+import profile from "/assets/images/profile-img.jpg";
+
+
 
 export type SidebarSubmenuItem = {
   title: string;
@@ -34,12 +34,9 @@ export default function ConfigureSidebar({
 
   return (
     <div className="sidebar-sec flex h-screen w-64 flex-col bg-slate-900 text-white">
-      <div className="flex items-center gap-3 border-b border-slate-700 p-5">
-        <img
-          src="/profile.jpg"
-          alt="Profile"
-          className="h-8 w-8 rounded-full object-cover"
-        />
+      <div className="flex items-center gap-3 border-b border-slate-700 p-3">
+
+        <img src={profile} alt="Logo" className="h-12 w-12 rounded-full object-cover" />
         <div>
           <p className="text-sm font-medium">{userName}</p>
         </div>
@@ -68,9 +65,8 @@ export default function ConfigureSidebar({
                 {menu.submenu ? (
                   <ChevronDown
                     size={16}
-                    className={`transition-transform ${
-                      openMenu === index ? "rotate-180" : ""
-                    }`}
+                    className={`transition-transform ${openMenu === index ? "rotate-180" : ""
+                      }`}
                   />
                 ) : null}
               </div>

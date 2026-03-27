@@ -32,12 +32,11 @@ const SidebarItem = ({ type }: { type: ComponentType }) => {
             {...listeners}
             {...attributes}
             className={`
-        mb-2 flex cursor-grab items-center gap-3 rounded-xl border border-slate-200 bg-white p-3
-        transition hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm
+        element-box
         ${isDragging ? 'opacity-50' : 'opacity-100'}
       `}
         >
-            <div className="rounded-md bg-slate-100 p-2">
+            <div className="">
                 <Icon size={20} className="text-slate-600" />
             </div>
             <span className="text-sm font-medium text-slate-700">
@@ -132,8 +131,7 @@ export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
                 {showPages && (
                     <button
                         onClick={() => setActiveTab('pages')}
-                        className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === 'pages' ? 'text-blue-700 border-b-2 border-blue-600' : 'text-slate-500'}`}
-                    >
+                        className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === 'pages' ? 'text-blue-700 border-b-2 border-blue-600' : 'text-slate-500'}`}>
                         <File size={16} /> Pages
                     </button>
                 )}
@@ -148,7 +146,7 @@ export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
                             value={componentSearch}
                             onChange={(e) => setComponentSearch(e.target.value)}
                             placeholder="Search components..."
-                            className="w-full rounded-lg border border-slate-300 bg-white py-1.5 pl-8 pr-2 text-sm text-slate-800 focus:border-blue-500 focus:outline-none"
+                            className="Elements"
                         />
                     </div>
                     <h2 className="mb-4 text-xs font-semibold uppercase text-slate-500">Elements</h2>
@@ -176,7 +174,7 @@ export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
                                         </button>
 
                                         {isOpen ? (
-                                            <div className="border-t border-slate-200 bg-white p-2">
+                                            <div className="border-t border-slate-200 bg-white p-2 elements-group">
                                                 {group.items.map((key) => (
                                                     <SidebarItem key={key} type={key as ComponentType} />
                                                 ))}
@@ -292,19 +290,19 @@ export const Sidebar = ({ showPages = true }: { showPages?: boolean }) => {
                         </div>
                         <div className="flex gap-2">
                             <input
-                            type="text"
-                            value={newPopupName}
-                            onChange={(e) => setNewPopupName(e.target.value)}
-                            placeholder="Popup name..."
-                            className="flex-1 rounded-lg border border-slate-300 px-2 py-1 text-sm text-slate-800 focus:border-blue-500 focus:outline-none"
-                        />
-                        <button
-                            onClick={handleAddPopup}
-                            className="rounded-lg bg-blue-600 p-1 text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                            disabled={!newPopupName.trim()}
-                            title="Add popup"
-                        >
-                            <Plus size={18} />
+                                type="text"
+                                value={newPopupName}
+                                onChange={(e) => setNewPopupName(e.target.value)}
+                                placeholder="Popup name..."
+                                className="flex-1 rounded-lg border border-slate-300 px-2 py-1 text-sm text-slate-800 focus:border-blue-500 focus:outline-none"
+                            />
+                            <button
+                                onClick={handleAddPopup}
+                                className="rounded-lg bg-blue-600 p-1 text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={!newPopupName.trim()}
+                                title="Add popup"
+                            >
+                                <Plus size={18} />
                             </button>
                         </div>
                     </div>

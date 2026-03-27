@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useActionData, useNavigation } from "react-router";
-import logo from "/assets/images/logo.png";
 import Login from "./Login";
 import Signup from "./Signup";
 
@@ -30,10 +29,7 @@ export default function Auth() {
             </h2>
           </div>
         </div>
-        <div className="login-box">
-          <div className="flex justify-center mb-6">
-            <img src={logo} alt="Logo" className="h-10" />
-          </div>
+        <>
 
           {actionData?.error ? (
             <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -52,7 +48,7 @@ export default function Auth() {
               onSwitchToLogin={() => setActiveView("login")}
             />
           )}
-        </div>
+        </>
       </div>
     </div>
   );
