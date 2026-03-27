@@ -86,12 +86,12 @@ export default function Login({ error, isSubmitting, onSwitchToSignup }: LoginPr
                   backgroundColor: "#4f46e5",
                 },
               }}
-            >
+            > 
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </div>
           {error ? (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 mt-3 text-center">
               {error}
             </div>
           ) : null}
